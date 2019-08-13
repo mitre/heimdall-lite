@@ -16,16 +16,17 @@ import Component from "vue-class-component";
 import VueApexCharts from "vue-apexcharts";
 import { getModule } from "vuex-module-decorators";
 import ColorHackModule from "../../store/color_hack";
-import { Filter } from "@/store/data_filters";
+import FilteredDataModule, { Filter } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
 import { ApexOptions } from "apexcharts";
+import InspecDataModule from "../../store/data_store";
+import StatusCountModule from "../../store/status_counts";
 
 // We declare the props separately
 // to make props types inferrable.
 const ComplianceChartProps = Vue.extend({
   props: {
-    totalTests: Number,
-    passedTests: Number
+    filter: Object // Of type Filer from filteredData
   }
 });
 
@@ -92,10 +93,22 @@ export default class ComplianceChart extends ComplianceChartProps {
   }
 
   /**
-   * Provide a type-checked accessor to our series property
+   * We actuall generate our series ourself! This is what shows up in the chart. It should be a single value
    */
   get series(): number[] {
-    return [100];
+    // Get access to the status counts, to compute compliance percentages
+    let counts = getModule(StatusCountModule, this.$store);
+    let passed = counts.passed(this.filter);
+    let total =
+      passed +
+      counts.failed(this.filter) +
+      counts.profileError(this.filter) +
+      counts.notReviewed(this.filter);
+    if (total == 0) {
+      return [0];
+    } else {
+      return [(100.0 * passed) / total];
+    }
   }
 }
 </script>
