@@ -1,13 +1,7 @@
 <template>
-<<<<<<< HEAD
-  <v-layout align-start justify-space-around row>
-    <v-flex v-for="card in cardProps" :key="card.title" xs12 sm6 md3>
-      <v-card :color="card.color" dark height="100px">
-=======
   <v-row align-start justify-space-around row>
     <v-col xs-3 v-for="card in cardProps" :key="card.title">
       <v-card :color="card.color">
->>>>>>> daebb0d... Charts
         <v-card-title>
           <v-icon large left>mdi-{{ card.icon }}</v-icon>
           <span class="title">{{ card.title + ": " + card.number }}</span>

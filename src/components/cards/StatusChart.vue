@@ -24,7 +24,7 @@ const StatusChartProps = Vue.extend({
 
 /**
  * Categories property must be of type Category
- * Emits "category-selected" with payload of type Category whenever a category is selected.
+ * Emits "filter-status" with payload of type ControlStatus
  */
 @Component({
   components: {

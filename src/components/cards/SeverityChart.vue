@@ -17,13 +17,13 @@ import { Severity } from "inspecjs";
 // We declare the props separately to make props types inferable.
 const SeverityChartProps = Vue.extend({
   props: {
-    filter: Object
+    filter: Object // Of type Filer from filteredData
   }
 });
 
 /**
  * Categories property must be of type Category
- * Emits "category-selected" with payload of type Category whenever a category is selected.
+ * Emits "filter-severity" with payload of Severity
  */
 @Component({
   components: {
@@ -64,8 +64,8 @@ export default class SeverityChart extends SeverityChartProps {
     ];
   }
 
-  onSelect(impact: Category<Severity>) {
-    this.$emit("filter-impact", impact.value);
+  onSelect(severity: Category<Severity>) {
+    this.$emit("filter-severity", severity.value);
   }
 }
 </script>
