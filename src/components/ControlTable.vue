@@ -5,18 +5,18 @@
     :search="search"
     :single-expand="singleExpand"
     :expanded.sync="expanded"
-    item-key="name"
+    item-key="vuln_num"
     show-expand
     class="my-4 px-4"
   >
     <template v-slot:item.status="{ item }">
-      <v-chip :color="getColor(item.status)" :label="true" class="wset">{{
-        item.status
-      }}</v-chip>
+      <v-chip :color="getColor(item.status)" :label="true" class="wset">
+        {{ item.status }}
+      </v-chip>
     </template>
-    <template v-slot:item.nist_tags="{ item }">{{
-      getNist(item.nist_tags)
-    }}</template>
+    <template v-slot:item.nist_tags="{ item }">
+      {{ getNist(item.nist_tags) }}
+    </template>
 
     <template v-slot:top>
       <v-toolbar flat>
