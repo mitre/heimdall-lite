@@ -33,7 +33,7 @@
 
     <!-- DataTable -->
     <v-sheet class="my-4 px-4" elevation="2">
-      <h2>Results View Data</h2>
+      <h2>Profile Results</h2>
       <ControlTable />
     </v-sheet>
   </v-container>

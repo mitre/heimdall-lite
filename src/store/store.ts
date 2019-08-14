@@ -35,6 +35,5 @@ const store = new Vuex.Store({
     sidebar: Sidebar
   }
 });
-console.log(store);
 
 export default store;
