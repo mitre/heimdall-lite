@@ -58,10 +58,5 @@ const AppProps = Vue.extend({
 export default class App extends AppProps {
   drawer: boolean = false;
   dialog: boolean = false;
-
-  // State props
-  created() {
-    this.$vuetify.theme.dark = true;
-  }
 }
 </script>

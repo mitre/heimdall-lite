@@ -1,14 +1,13 @@
 <template>
   <v-sheet>
     <v-toolbar dense ma-4 pa-4>
-      <v-toolbar-title>Title</v-toolbar-title>
-
       <v-spacer></v-spacer>
-
       <v-toolbar-items>
-        <v-btn text>Link 1</v-btn>
-        <v-btn text>Link 2</v-btn>
-        <v-btn text>Link 3</v-btn>
+        <v-switch
+          label="Toggle dark them"
+          v-model="goDark"
+          v-on:change="updateDark"
+        ></v-switch>
       </v-toolbar-items>
 
       <template v-if="$vuetify.breakpoint.smAndUp">
@@ -38,5 +37,10 @@ const ToolbarProps = Vue.extend({
 @Component({
   components: {}
 })
-export default class Toolbar extends ToolbarProps {}
+export default class Toolbar extends ToolbarProps {
+  goDark: boolean = false;
+  updateDark() {
+    this.$vuetify.theme.dark = this.goDark;
+  }
+}
 </script>

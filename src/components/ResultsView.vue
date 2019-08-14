@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md pa-5>
+  <v-container fluid grid-list-md pa-2>
     <!-- Count Cards -->
     <StatusCardRow />
 
@@ -29,6 +29,18 @@
     <!-- TreeMap and Partition Map -->
     <v-sheet class="my-4 px-4" elevation="2" title="test">
       <h2>TreeMap and Others</h2>
+      <div>
+        <!-- Block level -->
+        <div class="row">
+          <div class="col-2 text-truncate">
+            Praeterea iter est quasdam res quas ex communi.
+          </div>
+        </div>
+        <!-- Inline level -->
+        <span class="d-inline-block text-truncate" style="max-width: 300px;"
+          >Praeterea iter est quasdam res quas ex communi.</span
+        >
+      </div>
     </v-sheet>
 
     <!-- DataTable -->
