@@ -11,7 +11,7 @@
 
     <v-btn
       bottom
-      color="pink"
+      color="teal"
       dark
       fab
       fixed
