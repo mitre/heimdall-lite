@@ -37,7 +37,7 @@
       <v-col xs-12>
         <v-card elevation="2" title="test">
           <v-card-title>TreeMap</v-card-title>
-          <v-card-text>WIP</v-card-text>
+          <v-card-text><Treemap :filter="filter"/></v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -58,7 +58,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
-import TreeMap from "@/components/TreeMap.vue";
+import Treemap from "@/components/cards/Treemap.vue";
 import ControlTable from "@/components/ControlTable.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import SeverityChart from "@/components/cards/SeverityChart.vue";
@@ -76,7 +76,7 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     StatusCardRow,
-    TreeMap,
+    Treemap,
     ControlTable,
     StatusChart,
     SeverityChart,
