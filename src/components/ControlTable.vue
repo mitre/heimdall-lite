@@ -10,13 +10,13 @@
     class="my-4 px-4"
   >
     <template v-slot:item.status="{ item }">
-      <v-chip :color="getColor(item.status)" :label="true" class="wset">
-        {{ item.status }}
-      </v-chip>
+      <v-chip :color="getColor(item.status)" :label="true" class="wset">{{
+        item.status
+      }}</v-chip>
     </template>
-    <template v-slot:item.nist_tags="{ item }">
-      {{ getNist(item.nist_tags) }}
-    </template>
+    <template v-slot:item.nist_tags="{ item }">{{
+      getNist(item.nist_tags)
+    }}</template>
 
     <template v-slot:top>
       <v-toolbar flat>
@@ -37,72 +37,87 @@
     </template>
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
-        <v-tabs>
-          <v-tab>Test Details</v-tab>
-          <v-tab-item>
-            <div class="newline">
-              <span>{{ item.finding_details.split(":")[0] }}:</span>
-              <br />
-              <br />
-              <span>{{ item.wraps.desc }}</span>
-            </div>
-            <br />
-            <table border="3px solid white" rule="rows">
-              <tr v-for="(result, index) in item.wraps.results" :key="index">
-                <td>{{ result.status.toUpperCase() }}</td>
-                <td>
-                  <prism language="ruby">Test: {{ result.code_desc }}</prism>
-                </td>
-                <td v-if="result.message">
-                  <prism language="ruby">Message: {{ result.message }}</prism>
-                </td>
-              </tr>
-            </table>
-          </v-tab-item>
+        <v-card class="ma-auto pa-auto" outlined>
+          <v-tabs>
+            <v-tab>Test Details</v-tab>
+            <v-tab-item>
+              <v-container>
+                <v-row class="newline">
+                  <v-col cols="12">
+                    <span>{{ item.finding_details.split(":")[0] }}:</span>
+                    <br />
+                    <br />
+                    <span>{{ item.wraps.desc }}</span>
+                  </v-col>
+                </v-row>
+                <br />
+                <v-row
+                  v-for="(result, index) in item.wraps.results"
+                  :key="index"
+                  class="stripes"
+                >
+                  <v-col cols="2">{{ result.status.toUpperCase() }}</v-col>
+                  <v-col cols="5">
+                    <!--<prism language="ruby">Test: {{ result.code_desc }}</prism>-->
+                    <prism language="ruby" class="test">{{
+                      result.code_desc
+                    }}</prism>
+                  </v-col>
+                  <v-col v-if="result.message" cols="5">
+                    <!--<prism language="ruby">Message: {{ result.message }}</prism>-->
+                    <prism language="ruby" class="test">{{
+                      result.message
+                    }}</prism>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-tab-item>
 
-          <v-tab>Details</v-tab>
-          <v-tab-item>
-            <table>
-              <tr>
-                <td>Control:</td>
-                <td>{{ item.wraps.id }}</td>
-              </tr>
-              <tr>
-                <td>Title:</td>
-                <td>{{ item.wraps.title }}</td>
-              </tr>
-              <tr>
-                <td>Desc:</td>
-                <td>{{ item.wraps.desc }}</td>
-              </tr>
-              <tr>
-                <td>Severity:</td>
-                <td>{{ item.severity }}</td>
-              </tr>
-              <tr>
-                <td>Impact:</td>
-                <td>{{ item.wraps.impact }}</td>
-              </tr>
-              <tr>
-                <td>Nist Ref:</td>
-                <td>{{ getNist(item.nist_tags) }}</td>
-              </tr>
-              <tr>
-                <td>Check Text:</td>
-                <td class="newline">{{ item.wraps.tags.check }}</td>
-              </tr>
-              <tr>
-                <td>Fix Text:</td>
-                <td class="newline">{{ item.wraps.tags.fix }}</td>
-              </tr>
-            </table>
-          </v-tab-item>
+            <v-tab>Details</v-tab>
+            <v-tab-item>
+              <table>
+                <tr>
+                  <td>Control:</td>
+                  <td>{{ item.wraps.id }}</td>
+                </tr>
+                <tr>
+                  <td>Title:</td>
+                  <td>{{ item.wraps.title }}</td>
+                </tr>
+                <tr>
+                  <td>Desc:</td>
+                  <td>{{ item.wraps.desc }}</td>
+                </tr>
+                <tr>
+                  <td>Severity:</td>
+                  <td>{{ item.severity }}</td>
+                </tr>
+                <tr>
+                  <td>Impact:</td>
+                  <td>{{ item.wraps.impact }}</td>
+                </tr>
+                <tr>
+                  <td>Nist Ref:</td>
+                  <td>{{ getNist(item.nist_tags) }}</td>
+                </tr>
+                <tr>
+                  <td>Check Text:</td>
+                  <td class="newline">{{ item.wraps.tags.check }}</td>
+                </tr>
+                <tr>
+                  <td>Fix Text:</td>
+                  <td class="newline">{{ item.wraps.tags.fix }}</td>
+                </tr>
+              </table>
+            </v-tab-item>
 
-          <v-tab>Inspec Code</v-tab>
-          <v-tab-item>
-            <prism language="ruby">{{ item.wraps.code }}</prism>
-          </v-tab-item>
-        </v-tabs>
+            <v-tab>Inspec Code</v-tab>
+            <v-tab-item>
+              <!--<prism language="ruby">{{ item.wraps.code }}</prism>-->
+              <prism language="ruby" class="test2">{{ item.wraps.code }}</prism>
+            </v-tab-item>
+          </v-tabs>
+        </v-card>
       </td>
     </template>
   </v-data-table>
@@ -111,13 +126,19 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { getModule } from "vuex-module-decorators";
+import InspecDataModule from "../store/data_store";
 import { hdfWrapControl, HDFControl } from "inspecjs";
 
-//highlighting component -- TODO: add line numbers
-import "prismjs/prism";
+//TODO: add line numbers
+import "prismjs";
+import Prism from "vue-prism-component";
+//import Prism from "prismjs";
+//Prism.highlightAll();
+//var nw = Prism.plugins.NormalizeWhitespace;
+
 import "prismjs/themes/prism-coy.css";
-import "prismjs/components/prism-ruby";
-const Prism = require("vue-prism-component");
+import "prismjs/components/prism-ruby.js";
 
 interface Header {
   text: string;
@@ -135,16 +156,15 @@ const ControlTableProps = Vue.extend({
 })
 export default class ControlTable extends ControlTableProps {
   get items() {
-    var arr = this.$store.getters["data/contextualControls"].map(
-      (item: any) => {
-        return item.data;
-      }
-    );
+    let temp = getModule(InspecDataModule, this.$store);
+    var arr = temp.contextualControls.map((item: any) => {
+      return item.data;
+    });
     for (var i = 0; i < arr.length; i++) arr[i] = hdfWrapControl(arr[i]);
     return arr;
   }
   getColor(def: string) {
-    var color = null;
+    var color;
     switch (def) {
       case "Passed":
         color = "#0f0";
@@ -161,6 +181,8 @@ export default class ControlTable extends ControlTableProps {
       case "Profile Error":
         color = "#000";
         break;
+      default:
+        color = null;
     }
     return color;
   }
@@ -185,12 +207,32 @@ export default class ControlTable extends ControlTableProps {
 }
 </script>
 
-<style>
+<style scoped>
 .newline {
   white-space: pre;
 }
 .wset {
   min-width: 125px;
   justify-content: center;
+}
+
+.test {
+  white-space: pre-line;
+  max-width: 500px;
+  word-wrap: break-word;
+}
+.test2 {
+  white-space: pre-line;
+  max-width: 600px;
+  word-wrap: break-word;
+}
+code[class*="language-"] {
+  word-break: break-word;
+}
+code[class*="test2"] {
+  background-color: #000;
+}
+div[class*="stripes"]:nth-of-type(even) {
+  background-color: rgba(190, 173, 173, 0.05);
 }
 </style>
