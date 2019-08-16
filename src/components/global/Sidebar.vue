@@ -51,7 +51,7 @@
       <v-flex xs6 class="text-center">
         <v-switch
           label="Light/Dark"
-          v-model="goDark"
+          v-model="dark"
           v-on:change="updateDark"
           align-center
         ></v-switch>
@@ -125,6 +125,14 @@ export default class Sidebar extends SidebarProps {
     let data_store = getModule(InspecDataModule, this.$store);
     let files = data_store.allFiles;
     return files;
+  }
+
+  /** Whether or not we're dark mode */
+  dark: boolean = true;
+
+  /** Updates theme darkness */
+  updateDark() {
+    this.$vuetify.theme.dark = this.dark;
   }
 }
 </script>
