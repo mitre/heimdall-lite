@@ -9,7 +9,10 @@ import {
   Severity,
   hdfWrapControl as hdf,
   HDFControl,
-  AnyFullControl
+  AnyFullControl,
+  NistFamily,
+  NistCategory,
+  hdfWrapControl
 } from "inspecjs";
 import { FileID, isInspecFile } from "./report_intake";
 import Store from "./store";
@@ -40,7 +43,15 @@ export interface Filter {
    * - code
    */
   search_term?: string;
-  // Add more as necessary
+
+  /** The current state of the Nist Treemap. Used to further filter by nist categories etc. */
+  nist_filters?: NistMapState;
+}
+
+export interface NistMapState {
+  selectedFamily: string | null;
+  selectedCategory: string | null;
+  selectedControlID: string | null;
 }
 
 /**
@@ -163,6 +174,28 @@ class FilteredDataModule extends VuexModule {
 
         // Filter controls to those that contain search term
         controls = controls.filter(c => contains_term(c, term));
+      }
+
+      // Filter by nist stuff
+      if (filter.nist_filters !== undefined) {
+        let f = filter.nist_filters;
+        controls = controls.filter(c => {
+          let as_hdf = hdfWrapControl(c.data);
+          if (f.selectedControlID !== null) {
+            return as_hdf.wraps.id.includes(f.selectedControlID);
+          } else if (f.selectedCategory !== null) {
+            return as_hdf.nist_tags.some((tag: string) =>
+              tag.includes(f.selectedCategory!)
+            );
+          } else if (f.selectedFamily !== null) {
+            return as_hdf.nist_tags.some((tag: string) =>
+              tag.includes(f.selectedFamily!)
+            );
+          } else {
+            // No filters - so we don't!
+            return true;
+          }
+        });
       }
 
       // Save to cache

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <v-icon icon="chart" /> NIST SP 800-53 Coverage<v-btn @:click="clear">
+      <v-icon icon="chart" /> NIST SP 800-53 Coverage<v-btn @click="clear">
         Clear Filter
       </v-btn>
     </v-card-title>
@@ -27,7 +27,7 @@
               <g
                 class="children"
                 v-for="child in selectedNode.children"
-                :key="`child_group_${child.data.name}`"
+                :key="`child_group_${label(child.data)}`"
               >
                 <!-- Generate the children squares (only visible on hover of a square) FIX THIS-->
                 <rect
@@ -128,7 +128,7 @@ import * as d3 from "d3";
 // import { scaleLinear, scaleOrdinal } from "d3-scale";
 // import { json } from "d3-request";
 // import { hierarchy, treemap } from "d3-hierarchy";
-import FilteredDataModule from "@/store/data_filters";
+import FilteredDataModule, { NistMapState } from "@/store/data_filters";
 import {
   nistHashToTreeMap,
   TreemapNode,
@@ -141,6 +141,10 @@ import ColorHackModule from "@/store/color_hack";
 // We declare the props separately to make props types inferable.
 const TreemapProps = Vue.extend({
   props: {
+    value: {
+      type: Object, // Of type NistMapState
+      required: true
+    },
     filter: {
       type: Object, // Of type Filter
       required: true
@@ -156,50 +160,74 @@ const TreemapProps = Vue.extend({
   components: {}
 })
 export default class Treemap extends TreemapProps {
-  /** The currently selected NIST family, if any */
-  get selectedFamily(): string | null {
-    let ancestors = this.selectedNode.ancestors().reverse();
-    if (ancestors.length < 2) {
-      // Too short a chain; we must not have anything selected
-      return null;
-    } else {
-      // One down from root
-      return (ancestors[1].data as NistFamily).name;
-    }
-  }
-
-  /** The currently selected NIST category, if any. */
-  get selectedSubFamily(): string | null {
-    let ancestors = this.selectedNode.ancestors().reverse();
-    if (ancestors.length < 3) {
-      // Too short a chain; we must not have enough selected
-      return null;
-    } else {
-      // One down from root
-      return (ancestors[2].data as NistCategory).name;
-    }
-  }
-
-  /**  The currently selected NIST control, if any. Value should be a unique ID, not the control ID */
-  get selectedControlID(): number | null {
-    return null;
-  }
-
   /** Current size allowance */
   width: number = 1000;
   height: number = 530;
   top_margin: number = 20;
 
   /** The currently selected treemap node. Wrapped to avoid initialization woes */
-  selectedNodeState: d3.HierarchyRectangularNode<
-    TreemapDatumType
-  > | null = null;
   get selectedNode(): d3.HierarchyRectangularNode<TreemapDatumType> {
-    if (this.selectedNodeState === null) {
-      return this.treemapLayout;
-    } else {
-      return this.selectedNodeState;
+    // Get typed versions of the curr state
+    let val: NistMapState = this.value;
+    let curr = this.treemapLayout;
+
+    // Try to go to the selected family
+    // If we cannot go, fail out and update the state
+    if (val.selectedFamily) {
+      let new_curr = curr.children!.find(
+        child => (child.data as NistFamily).name === val.selectedFamily
+      );
+      if (new_curr !== undefined) {
+        curr = new_curr;
+      } else {
+        // Unable to go to the specified family
+        let revised: NistMapState = {
+          selectedFamily: null, // This one failed
+          selectedCategory: null,
+          selectedControlID: null
+        };
+        this.$emit("input", revised);
+        return curr;
+      }
     }
+    // Try to go to the selected category
+    // If we cannot go, fail out and update the state
+    if (val.selectedCategory) {
+      let new_curr = curr.children!.find(
+        child => (child.data as NistCategory).name === val.selectedCategory
+      );
+      if (new_curr !== undefined) {
+        curr = new_curr;
+      } else {
+        // Unable to go to the specified category
+        let revised: NistMapState = {
+          selectedFamily: val.selectedFamily, // This one went off ok
+          selectedCategory: null, // This one failed
+          selectedControlID: null
+        };
+        this.$emit("input", revised);
+        return curr;
+      }
+    }
+
+    // Check the selected category. We don't actually go to it, just validate that it exists
+    if (val.selectedControlID) {
+      let test_curr = curr.children!.find(
+        child => (child.data as HDFControl).wraps.id === val.selectedControlID
+      );
+      if (test_curr == undefined) {
+        // Unable to go to the specified control
+        let revised: NistMapState = {
+          selectedFamily: val.selectedFamily, // This one went off ok
+          selectedCategory: val.selectedCategory, // This one as well
+          selectedControlID: null // This one failed
+        };
+        this.$emit("input", revised);
+      }
+    }
+
+    // Return as deep as we travelled
+    return curr;
   }
 
   /**
@@ -214,7 +242,8 @@ export default class Treemap extends TreemapProps {
     let data: FilteredDataModule = getModule(FilteredDataModule, this.$store);
 
     // Get the current filtered data
-    return data.controls(this.filter).map(c => hdfWrapControl(c.data));
+    let controls = data.controls(this.filter).map(c => hdfWrapControl(c.data));
+    return controls;
   }
 
   /** Generates the nist hash for our currently visible controls */
@@ -232,18 +261,42 @@ export default class Treemap extends TreemapProps {
       .size([this.width, this.height])
       .round(false)
       .paddingInner(0)(heirarchy);
-    console.log(treemap);
     return treemap;
   }
 
   // Callbacks for our tree
-  selectNode(n: d3.HierarchyRectangularNode<TreemapDatumType>) {
-    this.selectedNodeState = n;
+  selectNode(n: d3.HierarchyRectangularNode<TreemapDatumType>): void {
+    // Get our path to the selected node
+    let route = n.ancestors().reverse();
+
+    // Initialize all as null
+    let selectedFamily: string | null = null;
+    let selectedCategory: string | null = null;
+    let selectedControlID: string | null = null;
+
+    // Depending on length of route, assign values
+    if (route.length > 1) {
+      selectedFamily = (route[1].data as NistFamily).name;
+    }
+    if (route.length > 2) {
+      selectedCategory = (route[2].data as NistCategory).name;
+    }
+    if (route.length > 3) {
+      selectedControlID = (route[3].data as HDFControl).wraps.id;
+    }
+
+    // Construct the state and emit
+    let new_state: NistMapState = {
+      selectedFamily,
+      selectedCategory,
+      selectedControlID
+    };
+    this.$emit("input", new_state);
   }
 
-  /** Resets treemap selection back to root. */
+  /** Submits an event to clear all filters */
   clear(): void {
-    this.selectedNodeState = null;
+    this.$emit("clear");
   }
 
   // These functions define the current viewport on the treeview
