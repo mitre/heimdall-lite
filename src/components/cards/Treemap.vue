@@ -1,7 +1,9 @@
 <template>
   <v-card>
     <v-card-title>
-      <v-icon icon="chart" /> NIST SP 800-53 Coverage<v-btn @click="clear">
+      <v-icon icon="chart" class="float-right" /> NIST SP 800-53 Coverage<v-btn
+        @click="clear"
+      >
         Clear Filter
       </v-btn>
     </v-card-title>
@@ -65,20 +67,7 @@
                 >
                   <!-- The title attribute -->
                   <title>
-                    TEST
                     {{ `${label(child.data)} | ${child.data.count}` }}
-                    {{ child.data.wraps && child.data.wraps.id }}
-                    {{ value.selectedControlID }}
-                    {{
-                      (child.data.wraps && child.data.wraps.id) ===
-                        value.selectedControlID
-                    }}
-                    {{
-                      (child.data.wraps && child.data.wraps.id) ===
-                      value.selectedControlID
-                        ? 5
-                        : 0
-                    }}
                   </title>
                 </rect>
 
@@ -430,7 +419,7 @@ rect.parent,
 }
 .children:hover rect.child {
   fill: #bbb;
-  fill-opacity: 0.5;
+  fill-opacity: 0.8;
 }
 
 .children text {
