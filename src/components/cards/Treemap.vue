@@ -65,10 +65,11 @@
                       : 0
                   "
                 >
-                  <!-- The title attribute -->
-                  <title>
+                  <!-- The title attribute, shown on hover -->
+                  <title v-if="child.data.count">
                     {{ `${label(child.data)} | ${child.data.count}` }}
                   </title>
+                  <title v-else>{{ label(child.data) }}</title>
                 </rect>
 
                 <!-- The visible square text element with the title and value of the child node -->

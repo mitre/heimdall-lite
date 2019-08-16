@@ -18,7 +18,7 @@
     "core-js": "^2.6.5",
     "prismjs": "^1.17.1",
     "d3": "^5.9.7",
-    "inspecjs": "0.2.2",
+    "inspecjs": "0.2.3",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.4.0",
