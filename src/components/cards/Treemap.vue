@@ -56,10 +56,29 @@
                   :width="x(child.x1 - child.x0 + selectedNode.x0)"
                   :height="y(child.y1 - child.y0 + selectedNode.y0)"
                   :style="{ fill: color(child.data) }"
+                  :rx="
+                    (child.data.wraps && child.data.wraps.id) ===
+                    value.selectedControlID
+                      ? 15
+                      : 0
+                  "
                 >
                   <!-- The title attribute -->
                   <title>
-                    {{ `${child.data.desc} | ${child.data.count}` }}
+                    TEST
+                    {{ `${label(child.data)} | ${child.data.count}` }}
+                    {{ child.data.wraps && child.data.wraps.id }}
+                    {{ value.selectedControlID }}
+                    {{
+                      (child.data.wraps && child.data.wraps.id) ===
+                        value.selectedControlID
+                    }}
+                    {{
+                      (child.data.wraps && child.data.wraps.id) ===
+                      value.selectedControlID
+                        ? 5
+                        : 0
+                    }}
                   </title>
                 </rect>
 
@@ -283,6 +302,10 @@ export default class Treemap extends TreemapProps {
     }
     if (route.length > 3) {
       selectedControlID = (route[3].data as HDFControl).wraps.id;
+      // If they click the same one, clear
+      if (selectedControlID === this.value.selectedControlID) {
+        selectedControlID = null;
+      }
     }
 
     // Construct the state and emit
