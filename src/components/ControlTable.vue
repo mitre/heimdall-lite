@@ -10,13 +10,13 @@
     class="my-4 px-4"
   >
     <template v-slot:item.status="{ item }">
-      <v-chip :color="getColor(item.status)" :label="true" class="wset">{{
-        item.status
-      }}</v-chip>
+      <v-chip :color="getColor(item.status)" :label="true" class="wset">
+        {{ item.status }}
+      </v-chip>
     </template>
-    <template v-slot:item.nist_tags="{ item }">{{
-      getNist(item.nist_tags)
-    }}</template>
+    <template v-slot:item.nist_tags="{ item }">
+      {{ getNist(item.nist_tags) }}
+    </template>
 
     <template v-slot:top>
       <v-toolbar flat>
@@ -54,20 +54,21 @@
                 <v-row
                   v-for="(result, index) in item.wraps.results"
                   :key="index"
-                  class="stripes"
                 >
-                  <v-col cols="2">{{ result.status.toUpperCase() }}</v-col>
-                  <v-col cols="5">
+                  <v-col cols="1" class="stripes">{{
+                    result.status.toUpperCase()
+                  }}</v-col>
+                  <v-col cols="5.5" class="stripes right">
                     <!--<prism language="ruby">Test: {{ result.code_desc }}</prism>-->
-                    <prism language="ruby" class="test">{{
-                      result.code_desc
-                    }}</prism>
+                    <prism language="ruby" class="test">
+                      {{ result.code_desc }}
+                    </prism>
                   </v-col>
-                  <v-col v-if="result.message" cols="5">
+                  <v-col v-if="result.message" cols="5.5" class="stripes right">
                     <!--<prism language="ruby">Message: {{ result.message }}</prism>-->
-                    <prism language="ruby" class="test">{{
-                      result.message
-                    }}</prism>
+                    <prism language="ruby" class="test">
+                      {{ result.message }}
+                    </prism>
                   </v-col>
                 </v-row>
               </v-container>
@@ -75,40 +76,51 @@
 
             <v-tab>Details</v-tab>
             <v-tab-item>
-              <table>
-                <tr>
-                  <td>Control:</td>
-                  <td>{{ item.wraps.id }}</td>
-                </tr>
-                <tr>
-                  <td>Title:</td>
-                  <td>{{ item.wraps.title }}</td>
-                </tr>
-                <tr>
-                  <td>Desc:</td>
-                  <td>{{ item.wraps.desc }}</td>
-                </tr>
-                <tr>
-                  <td>Severity:</td>
-                  <td>{{ item.severity }}</td>
-                </tr>
-                <tr>
-                  <td>Impact:</td>
-                  <td>{{ item.wraps.impact }}</td>
-                </tr>
-                <tr>
-                  <td>Nist Ref:</td>
-                  <td>{{ getNist(item.nist_tags) }}</td>
-                </tr>
-                <tr>
-                  <td>Check Text:</td>
-                  <td class="newline">{{ item.wraps.tags.check }}</td>
-                </tr>
-                <tr>
-                  <td>Fix Text:</td>
-                  <td class="newline">{{ item.wraps.tags.fix }}</td>
-                </tr>
-              </table>
+              <v-container>
+                <v-row>
+                  <v-col cols="1">Control:</v-col>
+                  <v-col cols="11">{{ item.wraps.id }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Title:</v-col>
+                  <v-col cols="11">{{ item.wraps.title }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Desc:</v-col>
+                  <v-col cols="11">{{ item.wraps.desc }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Severity:</v-col>
+                  <v-col cols="11">{{ item.severity }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Impact:</v-col>
+                  <v-col cols="11">{{ item.wraps.impact }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Nist Ref:</v-col>
+                  <v-col cols="11">{{ getNist(item.nist_tags) }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Check Text:</v-col>
+                  <v-col cols="11" class="newline">{{
+                    item.wraps.tags.check
+                  }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-row>
+                  <v-col cols="1">Fix Text:</v-col>
+                  <v-col cols="11" class="newline">{{
+                    item.wraps.tags.fix
+                  }}</v-col>
+                </v-row>
+              </v-container>
             </v-tab-item>
 
             <v-tab>Inspec Code</v-tab>
@@ -137,7 +149,7 @@ import Prism from "vue-prism-component";
 //Prism.highlightAll();
 //var nw = Prism.plugins.NormalizeWhitespace;
 
-import "prismjs/themes/prism-coy.css";
+import "prismjs/themes/prism.css";
 import "prismjs/components/prism-ruby.js";
 
 interface Header {
@@ -217,12 +229,12 @@ export default class ControlTable extends ControlTableProps {
 }
 
 .test {
-  white-space: pre-line;
+  white-space: pre-wrap;
   max-width: 500px;
   word-wrap: break-word;
 }
 .test2 {
-  white-space: pre-line;
+  white-space: pre-wrap;
   max-width: 600px;
   word-wrap: break-word;
 }
@@ -232,7 +244,11 @@ code[class*="language-"] {
 code[class*="test2"] {
   background-color: #000;
 }
-div[class*="stripes"]:nth-of-type(even) {
-  background-color: rgba(190, 173, 173, 0.05);
+div[class*="stripes"] {
+  border-style: solid;
+  border-width: 1px;
+}
+.right {
+  margin-left: -1px;
 }
 </style>
