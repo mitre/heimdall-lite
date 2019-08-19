@@ -14,7 +14,7 @@
           <v-icon large left>mdi-{{ card.icon }}</v-icon>
           <span class="title">{{ card.title + ": " + card.number }}</span>
         </v-card-title>
-        <v-card-text v-text="card.subtitle" />
+        <v-card-text class="d-none d-sm-block" v-text="card.subtitle" />
       </v-card>
     </v-col>
   </v-row>
