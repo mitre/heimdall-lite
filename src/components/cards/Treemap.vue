@@ -273,7 +273,7 @@ export default class Treemap extends TreemapProps {
   }
 
   // Callbacks for our tree
-  selectNode(n: d3.HierarchyRectangularNode<TreemapDatumType>): void {
+  selectNode(n: null | d3.HierarchyRectangularNode<TreemapDatumType>): void {
     // Avoid selecting falsey nodes
     if (!n) {
       console.log("Attempted to select Null Node in Treemap");

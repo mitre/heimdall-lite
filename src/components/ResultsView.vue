@@ -7,7 +7,7 @@
     <v-row justify="space-around">
       <v-col xs-4>
         <v-card class="fill-height">
-          <v-card-title>Status Counts</v-card-title>
+          <v-card-title class="justify-center">Status Counts</v-card-title>
           <v-card-actions class="justify-center">
             <StatusChart :filter="all_filter" v-model="statusFilter" />
           </v-card-actions>
@@ -15,7 +15,7 @@
       </v-col>
       <v-col xs-4>
         <v-card class="fill-height">
-          <v-card-title>Severity Counts</v-card-title>
+          <v-card-title class="justify-center">Severity Counts</v-card-title>
           <v-card-actions class="justify-center">
             <SeverityChart :filter="all_filter" v-model="severityFilter" />
           </v-card-actions>
@@ -23,11 +23,11 @@
       </v-col>
       <v-col xs-4>
         <v-card class="fill-height">
-          <v-card-title>Compliance Level</v-card-title>
+          <v-card-title class="justify-center">Compliance Level</v-card-title>
           <v-card-actions class="justify-center">
             <ComplianceChart :filter="all_filter" />
           </v-card-actions>
-          <v-card-text>
+          <v-card-text style="text-align: center">
             [Passed/(Passed + Failed + Not Reviewed + Profile Error) * 100]
           </v-card-text>
         </v-card>
