@@ -8,25 +8,28 @@
       <v-col xs-4>
         <v-card class="fill-height">
           <v-card-title>Status Counts</v-card-title>
-          <v-card-text
-            ><StatusChart :filter="all_filter" v-model="statusFilter"
-          /></v-card-text>
+          <v-card-actions class="justify-center">
+            <StatusChart :filter="all_filter" v-model="statusFilter" />
+          </v-card-actions>
         </v-card>
       </v-col>
       <v-col xs-4>
         <v-card class="fill-height">
           <v-card-title>Severity Counts</v-card-title>
-          <v-card-text
-            ><SeverityChart :filter="all_filter" v-model="severityFilter"
-          /></v-card-text>
+          <v-card-actions class="justify-center">
+            <SeverityChart :filter="all_filter" v-model="severityFilter" />
+          </v-card-actions>
         </v-card>
       </v-col>
       <v-col xs-4>
         <v-card class="fill-height">
           <v-card-title>Compliance Level</v-card-title>
+          <ComplianceFormula />
+          <v-card-actions class="justify-center">
+            <ComplianceChart :filter="all_filter" />
+          </v-card-actions>
           <v-card-text>
-            <ComplianceChart :filter="all_filter" />[Passed/(Passed + Failed +
-            Not Reviewed + Profile Error) * 100]
+            [Passed/(Passed + Failed + Not Reviewed + Profile Error) * 100]
           </v-card-text>
         </v-card>
       </v-col>
@@ -37,12 +40,13 @@
       <v-col xs-12>
         <v-card elevation="2" title="test">
           <v-card-title>TreeMap</v-card-title>
-          <v-card-text
-            ><Treemap
+          <v-card-text>
+            <Treemap
               :filter="treemap_filter"
               v-model="nistFilters"
               @clear="clear"
-          /></v-card-text>
+            />
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
