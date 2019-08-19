@@ -9,7 +9,7 @@
         <v-card class="fill-height">
           <v-card-title>Status Counts</v-card-title>
           <v-card-text
-            ><StatusChart :filter="all_filter" v-model="statusFilter"
+            ><StatusChart :filter="all_filter" v-model="status_filter"
           /></v-card-text>
         </v-card>
       </v-col>
@@ -17,7 +17,7 @@
         <v-card class="fill-height">
           <v-card-title>Severity Counts</v-card-title>
           <v-card-text
-            ><SeverityChart :filter="all_filter" v-model="severityFilter"
+            ><SeverityChart :filter="all_filter" v-model="severity_filter"
           /></v-card-text>
         </v-card>
       </v-col>
@@ -40,7 +40,7 @@
           <v-card-text
             ><Treemap
               :filter="treemap_filter"
-              v-model="nistFilters"
+              v-model="nist_filters"
               @clear="clear"
           /></v-card-text>
         </v-card>
@@ -52,7 +52,7 @@
       <v-col xs-12>
         <v-sheet class="my-4 px-4" elevation="2">
           <h2>Results View Data</h2>
-          <ControlTable />
+          <ControlTable :filter="all_filter" />
         </v-sheet>
       </v-col>
     </v-row>
@@ -92,18 +92,18 @@ export default class Results extends ResultsProps {
   /**
    * The currently selected severity, as modeled by the severity chart
    */
-  severityFilter: Severity | null = null;
+  severity_filter: Severity | null = null;
 
   /**
    * The currently selected status, as modeled by the status chart
    */
-  statusFilter: ControlStatus | null = null;
+  status_filter: ControlStatus | null = null;
 
   /**
    * The current state of the treemap as modeled by the treemap (duh).
    * Once can reliably expect that if a "deep" selection is not null, then its parent should also be not-null.
    */
-  nistFilters: NistMapState = {
+  nist_filters: NistMapState = {
     selectedFamily: null,
     selectedCategory: null,
     selectedControlID: null
@@ -113,13 +113,13 @@ export default class Results extends ResultsProps {
    * The current search term, as modeled by <NOTHING YET>
    * Never empty - should in that case be null
    */
-  searchTerm: string | null = null;
+  search_term: string | null = null;
 
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
    */
-  get fileFilter(): FileID | null {
+  get file_filter(): FileID | null {
     let id_string: string = this.$route.params.id;
     let as_int = parseInt(id_string);
     if (isNaN(as_int)) {
@@ -135,10 +135,10 @@ export default class Results extends ResultsProps {
   get all_filter(): Filter {
     // console.log(`New filter: status = ${this.statusFilter}, severity = ${this.severityFilter}, fromFile = ${this.fileFilter}`);
     return {
-      status: this.statusFilter || undefined,
-      severity: this.severityFilter || undefined,
-      fromFile: this.fileFilter || undefined,
-      nist_filters: this.nistFilters,
+      status: this.status_filter || undefined,
+      severity: this.severity_filter || undefined,
+      fromFile: this.file_filter || undefined,
+      nist_filters: this.nist_filters,
       omit_overlayed_controls: true
     };
   }
@@ -149,9 +149,9 @@ export default class Results extends ResultsProps {
   get treemap_filter(): Filter {
     // console.log(`New filter: status = ${this.statusFilter}, severity = ${this.severityFilter}, fromFile = ${this.fileFilter}`);
     return {
-      status: this.statusFilter || undefined,
-      severity: this.severityFilter || undefined,
-      fromFile: this.fileFilter || undefined,
+      status: this.status_filter || undefined,
+      severity: this.severity_filter || undefined,
+      fromFile: this.file_filter || undefined,
       omit_overlayed_controls: true
     };
   }
@@ -160,10 +160,10 @@ export default class Results extends ResultsProps {
    * Clear all filters
    */
   clear() {
-    this.severityFilter = null;
-    this.statusFilter = null;
-    this.searchTerm = null;
-    this.nistFilters = {
+    this.severity_filter = null;
+    this.status_filter = null;
+    this.search_term = null;
+    this.nist_filters = {
       selectedFamily: null,
       selectedCategory: null,
       selectedControlID: null
@@ -171,13 +171,3 @@ export default class Results extends ResultsProps {
   }
 }
 </script>
-
-<!--
-<style scoped>
-.card {
-  overflow: hidden;
-  flex-grow: 1;
-  height: 107%; /*ehhh*/
-}
-</style>
--->

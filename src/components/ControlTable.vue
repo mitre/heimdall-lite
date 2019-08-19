@@ -2,7 +2,6 @@
   <v-data-table
     :headers="headers"
     :items="items"
-    :search="search"
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     item-key="vuln_num"
@@ -15,19 +14,11 @@
       </v-chip>
     </template>
     <template v-slot:item.nist_tags="{ item }">
-      {{ getNist(item.nist_tags) }}
+      {{ fmtNist(item.nist_tags) }}
     </template>
 
     <template v-slot:top>
       <v-toolbar flat>
-        <v-text-field
-          v-model="search"
-          append-icon="search"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
-        <v-spacer></v-spacer>
         <v-switch
           v-model="singleExpand"
           label="Single expand"
@@ -104,7 +95,7 @@
                 <v-divider></v-divider>
                 <v-row>
                   <v-col cols="1">Nist Ref:</v-col>
-                  <v-col cols="11">{{ getNist(item.nist_tags) }}</v-col>
+                  <v-col cols="11">{{ fmtNist(item.nist_tags) }}</v-col>
                 </v-row>
                 <v-divider></v-divider>
                 <v-row>
@@ -140,7 +131,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
-import { hdfWrapControl, HDFControl } from "inspecjs";
+import { hdfWrapControl, HDFControl, ControlStatus } from "inspecjs";
 
 //TODO: add line numbers
 import "prismjs";
@@ -152,6 +143,7 @@ import Prism from "vue-prism-component";
 
 import "prismjs/themes/prism.css";
 import "prismjs/components/prism-ruby.js";
+import FilteredDataModule from "../store/data_filters";
 
 interface Header {
   text: string;
@@ -161,51 +153,37 @@ interface Header {
 }
 // We declare the props separately to make props types inferable.
 const ControlTableProps = Vue.extend({
-  props: {}
+  props: {
+    filter: {
+      type: Object, // Of type filter
+      required: true
+    }
+  }
 });
 
 @Component({
   components: { Prism }
 })
 export default class ControlTable extends ControlTableProps {
-  get items() {
-    let temp = getModule(InspecDataModule, this.$store);
-    var arr = temp.contextualControls.map((item: any) => {
-      return item.data;
-    });
-    for (var i = 0; i < arr.length; i++) arr[i] = hdfWrapControl(arr[i]);
-    return arr;
+  get items(): HDFControl[] {
+    let mod = getModule(FilteredDataModule, this.$store);
+    return mod.controls(this.filter).map(d => hdfWrapControl(d.data));
   }
-  getColor(def: string) {
-    var color;
-    switch (def) {
-      case "Passed":
-        color = "#0f0";
-        break;
-      case "Failed":
-        color = "#f00";
-        break;
-      case "Not Applicable":
-        color = "#00f";
-        break;
-      case "Not Reviewed":
-        color = "#888";
-        break;
-      case "Profile Error":
-        color = "#000";
-        break;
-      default:
-        color = null;
-    }
-    return color;
+
+  getColor(def: ControlStatus): string {
+    // Maps stuff like "Not Applicable" -> "statusNotApplicable"
+    return `status${def.replace(" ", "")}`;
   }
-  getNist(nist: any) {
+
+  fmtNist(nist: string[]): string {
     return nist.join(", ");
   }
+
+  // The currently expanded row(s)
   expanded: any[] = [];
-  search: string = "";
+  // Whether to allow multiple expansions
   singleExpand: boolean = false;
-  var: boolean = false;
+  // Table headers
   headers: Header[] = [
     {
       text: "Status",
