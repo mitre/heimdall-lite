@@ -1,6 +1,14 @@
 <template>
-  <v-row align-start justify-space-around row>
-    <v-col xs-3 v-for="card in cardProps" :key="card.title">
+  <v-row align-start justify-space-around row cols="12">
+    <v-col
+      cols="12"
+      sm="6"
+      md="6"
+      lg="3"
+      xl="3"
+      v-for="card in cardProps"
+      :key="card.title"
+    >
       <v-card height="100%" :color="card.color">
         <v-card-title>
           <v-icon large left>mdi-{{ card.icon }}</v-icon>
