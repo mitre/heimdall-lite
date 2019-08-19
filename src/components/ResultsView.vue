@@ -64,7 +64,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
 import Treemap from "@/components/cards/Treemap.vue";
-import ControlTable from "@/components/ControlTable.vue";
+import ControlTable from "@/components/cards/controltable/ControlTable.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import SeverityChart from "@/components/cards/SeverityChart.vue";
 import ComplianceChart from "@/components/cards/ComplianceChart.vue";
