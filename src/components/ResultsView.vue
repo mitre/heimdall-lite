@@ -24,7 +24,6 @@
       <v-col xs-4>
         <v-card class="fill-height">
           <v-card-title>Compliance Level</v-card-title>
-          <ComplianceFormula />
           <v-card-actions class="justify-center">
             <ComplianceChart :filter="all_filter" />
           </v-card-actions>
