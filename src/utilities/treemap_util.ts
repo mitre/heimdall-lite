@@ -35,17 +35,19 @@ export function nistHashToTreeMap(hash: NistHash): TreemapNode {
         a_s = a.data.name;
         b_s = b.data.name;
       } else {
-        a_s = (a.data as HDFControl).wraps.id;
-        b_s = (b.data as HDFControl).wraps.id;
+        a_s = (a.data as HDFControl).status;
+        b_s = (b.data as HDFControl).status;
       }
       return a_s.localeCompare(b_s);
     })
+    // Determines the weight of the table
+    // We want the families to have a fixed layout, so this is fairly constant
     .sum(d => {
-      // We punish the type system a bit here but it doesn't really matter
+      // Note that these give individual weightings - d3 does the actual summing for us
       if (isNistGrouping(d)) {
-        return 0; //d.count;
-      } else {
         return 1;
+      } else {
+        return 0;
       }
     });
   return ret;
