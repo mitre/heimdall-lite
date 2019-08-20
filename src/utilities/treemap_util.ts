@@ -45,9 +45,16 @@ export function nistHashToTreeMap(hash: NistHash): TreemapNode {
     .sum(d => {
       // Note that these give individual weightings - d3 does the actual summing for us
       if (isNistGrouping(d)) {
-        return 1;
+        // We don't want the number of controls to influence anything
+        if (d.children.length && isHDFControl(d.children[0])) {
+          // Counteract d3's summing
+          return 1 - d.count;
+        } else {
+          // We're empty or at least not a parent to controls
+          return 1;
+        }
       } else {
-        return 0;
+        return 1;
       }
     });
   return ret;

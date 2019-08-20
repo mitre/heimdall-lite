@@ -1,74 +1,41 @@
 <template>
   <!-- We can use Vue transitions too! -->
-  <transition-group name="list" tag="g" class="depth">
-    <!-- Generate each of the visible squares at a given zoom level (the current selected node) -->
-    <g
-      v-for="child in selectedNode.children"
-      :key="`child_group_${label(child.data)}`"
+  <g :key="label">
+    <!-- Generate our children here -->
+    <Cell
+      v-for="(child, index) in node.children"
+      :key="label + index"
+      :selected_node="selected_node"
+      :depth="child_depth"
+      :node="child"
+      @select-node="select_node"
+    />
+
+    <!-- The actual body of this square.  width add selectedNode.x0-->
+    <rect
+      :key="label"
+      :style="cell_style"
+      :x="node.x0"
+      :y="node.y0"
+      :width="width"
+      :height="height"
+      :class="cell_classes"
+      @click="select_node(node)"
+    />
+
+    <text
+      v-if="_depth === 1"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      :transform="
+        `translate(${node.x0 + width / 2} ${node.y0 +
+          height / 3}) scale(${scale} ${scale})`
+      "
+      style="fill-opacity: 1;"
     >
-      <!-- Generate the children squares (only visible on hover of a square) FIX THIS-->
-      <rect
-        v-for="grand_child in child.children"
-        class="child"
-        :id="grand_child.id"
-        :key="`grand_child_hover_${label(grand_child.data)}`"
-        :height="y(grand_child.y1) - y(grand_child.y0)"
-        :width="x(grand_child.x1) - x(grand_child.x0)"
-        :x="x(grand_child.x0)"
-        :y="y(grand_child.y0)"
-        :style="{ fill: color(grand_child.data) }"
-      ></rect>
-
-      <!--
-                  The visible square rect element.
-                  You can attribute directly an event, that fires a method that changes the current node,
-                  restructuring the data tree, that reactivly gets reflected in the template.
-                -->
-      <rect
-        class="parent"
-        @click="selectNode(child)"
-        :key="`child_body_group_${child.id}`"
-        :x="x(child.x0)"
-        :y="y(child.y0)"
-        :width="x(child.x1 - child.x0 + selectedNode.x0)"
-        :height="y(child.y1 - child.y0 + selectedNode.y0)"
-        :style="{ fill: color(child.data) }"
-        :rx="
-          (child.data.wraps && child.data.wraps.id) === value.selectedControlID
-            ? 15
-            : 0
-        "
-      >
-        <!-- The title attribute, shown on hover -->
-        <title v-if="child.data.count">
-          {{ `${label(child.data)} | ${child.data.count}` }}
-        </title>
-        <title v-else>{{ label(child.data) }}</title>
-      </rect>
-
-      <!-- The visible square text element with the title and value of the child node -->
-      <text
-        dy="1em"
-        :key="'t_' + child.id"
-        :x="x(child.x0) + 6"
-        :y="y(child.y0) + 6"
-        style="fill-opacity: 1;"
-      >
-        {{ label(child.data) }}
-      </text>
-
-      <text
-        dy="2.25em"
-        :key="'tt_' + child.id"
-        :x="x(child.x0) + 6"
-        :y="y(child.y0) + 6"
-        style="fill-opacity: 1;"
-        v-if="child.data.count > 0"
-      >
-        {{ child.data.count }}
-      </text>
-    </g>
-  </transition-group>
+      {{ label }}
+    </text>
+  </g>
 </template>
 
 <script lang="ts">
@@ -92,110 +59,148 @@ import { HierarchyRectangularNode } from "d3";
 import ColorHackModule from "@/store/color_hack";
 
 // We declare the props separately to make props types inferable.
-const TreemapProps = Vue.extend({
+const CellProps = Vue.extend({
   props: {
+    selected_node: {
+      type: Object, // Of type d3.HierarchyRectangularNode<TreemapDatumType>,
+      required: true
+    },
     node: {
-      type: Object, // Of type d3.HeirarchyRectangularNode<TreemapDatumType>
+      type: Object, // Of type d3.HierarchyRectangularNode<TreemapDatumType>
       required: true
     },
-    x: {
-      type: Object, // Of type d3.ScaleLinear<number, number>
-      required: true
-    },
-    y: {
-      type: Object,
-      required: true // Of type d3.ScaleLinear<number, number>
+    depth: {
+      type: Number, // Distance of this node to curr selected. 0 => it is curr selected. undefined => Sub root / unknown
+      required: false
     }
   }
 });
 
 /**
  * Categories property must be of type Category
- * Emits "select-node" with payload of type d3.HeirarchyRectangularNode<TreemapDatumType>
+ * Emits "select-node" with payload of type d3.HierarchyRectangularNode<TreemapDatumType>
  */
 @Component({
   components: {},
   name: "Cell"
 })
 export default class Cell extends CellProps {
+  scale: number = 1.0;
+
   /** Provide typed getters */
-  get _node(): d3.HeirarchyRectangularNode<TreemapDatumType> {
+  get _node(): d3.HierarchyRectangularNode<TreemapDatumType> {
     return this.node;
   }
-  get _x(): d3.ScaleLinear<number, number> {
-    return this.x;
-  }
-  get _y(): d3.ScaleLinear<number, number> {
-    return this.y;
+
+  get _selected_node(): d3.HierarchyRectangularNode<TreemapDatumType> {
+    return this.selected_node;
   }
 
-  /** The currently selected treemap node. Wrapped to avoid initialization woes */
+  get _depth(): number | undefined {
+    if (this.depth === undefined) {
+      return this._node === this._selected_node ? 0 : undefined;
+    } else {
+      return this.depth;
+    }
+  }
+
+  /** Depth to pass to childen */
+  get child_depth(): number | undefined {
+    if (this._depth !== undefined) {
+      return this._depth + 1;
+    } else {
+      return undefined;
+    }
+  }
+
+  /** Are we a control? */
+  get is_control(): boolean {
+    return isHDFControl(this._node.data);
+  }
+
+  /** Width and height calculators */
+  get width(): number {
+    return this._node.x1 - this._node.x0;
+  }
+
+  get height(): number {
+    return this._node.y1 - this._node.y0;
+  }
+
+  /** Classes for our "body" */
+  get cell_classes(): string[] {
+    // Type stuff
+    let s: string[] = [];
+    if (this.is_control) {
+      s.push("control");
+    } else {
+      s.push("group");
+    }
+
+    // Depth stuff
+    if (this._depth === undefined) {
+      s.push("unfocused");
+    } else if (this._depth === 0) {
+      s.push("root");
+    } else if (this._depth === 1) {
+      s.push("top");
+    }
+
+    return s;
+  }
+
+  get cell_style(): string {
+    let style: string = "";
+    style += `fill: ${this.color};`;
+    if (this._depth === 1) {
+      style += "pointer-events: auto;";
+    } else {
+      style += "pointer-events: none;";
+    }
+    return style;
+  }
+
   // Callbacks for our tree
-  selectNode(n: null | d3.HierarchyRectangularNode<TreemapDatumType>): void {
+  select_node(n: null | d3.HierarchyRectangularNode<TreemapDatumType>): void {
     // Pass it up to root
-    this.$emit("selectNode", n);
-  }
-
-  // These functions define the current viewport on the treeview
-  /** Returns the current x position within the overall range */
-  child_x(
-    child_node: d3.HeirarchyRectangularNode<TreemapDatumType>
-  ): d3.ScaleLinear<number, number> {
-    return d3
-      .scaleLinear()
-      .domain([node.x0, node.x0 + (node.x1 - node.x0)])
-      .range([0, this.width]);
-  }
-
-  /** Returns the current y position within the overall range */
-  child_y(): d3.ScaleLinear<number, number> {
-    let node = this.selectedNode;
-    return d3
-      .scaleLinear()
-      .domain([node.y0, node.y0 + (node.y1 - node.y0)])
-      .range([0, this.height - this.top_margin]);
-  }
-
-  /** Sets the viewbox on the treemap svg */
-  get viewBoxComp() {
-    return `0 0 ${this.width} ${this.height}`;
-  }
-
-  /** Color lookup scheme */
-  get color_table(): { [key: string]: string } {
-    let cmod = getModule(ColorHackModule, this.$store);
-    return {
-      Passed: cmod.lookupColor("statusPassed"),
-      Failed: cmod.lookupColor("statusFailed"),
-      "No Data": cmod.lookupColor("statusNoData"),
-      "Not Applicable": cmod.lookupColor("statusNotApplicable"),
-      "Not Reviewed": cmod.lookupColor("statusNotReviewed"),
-      "Profile Error": cmod.lookupColor("statusProfileError"),
-      Empty: "rgb(187, 187, 187)"
-    };
+    this.$emit("select-node", n);
   }
 
   /**
    * Looks up a color for the given piece of data
+   * TODO: Shunt this to our color module
    */
-  color(datum: TreemapDatumType): string {
-    let status: ControlGroupStatus = datum.status;
-    if (status in this.color_table) {
-      return this.color_table[status];
-    } else {
-      console.warn(`No treemap color defined for ${status}`);
-      return "#ece2ca";
+  get color(): string {
+    let cmod = getModule(ColorHackModule, this.$store);
+    let status: ControlGroupStatus = this._node.data.status;
+    switch (status) {
+      case "Passed":
+        return cmod.lookupColor("statusPassed");
+      case "Failed":
+        return cmod.lookupColor("statusFailed");
+      case "No Data":
+      case "Empty":
+        return cmod.lookupColor("statusNoData");
+      case "Not Applicable":
+        return cmod.lookupColor("statusNotApplicable");
+      case "Not Reviewed":
+        return cmod.lookupColor("statusNotReviewed");
+      case "Profile Error":
+        return cmod.lookupColor("statusProfileError");
+      default:
+        console.warn(`No treemap color defined for ${status}`);
+        return "rgb(187, 187, 187)";
     }
   }
 
   /**
    * Provides a label for the given piece of data
    */
-  label(datum: TreemapDatumType) {
-    if (isHDFControl(datum)) {
-      return datum.wraps.id;
+  get label() {
+    if (isHDFControl(this._node.data)) {
+      return this._node.data.wraps.id;
     } else {
-      return datum.name;
+      return this._node.data.name;
     }
   }
 }
@@ -206,60 +211,23 @@ text {
   pointer-events: none;
 }
 
-.grandparent text {
-  font-weight: bold;
-  color: red;
-}
-
 rect {
-  fill: none;
   stroke: #fff;
 }
 
-rect.parent,
-.grandparent rect {
-  stroke-width: 2px;
-}
-
-.grandparent rect {
-  fill: #99ccff;
-}
-
-.grandparent:hover rect {
-  fill: #99ccff;
-}
-
-.children rect.parent,
-.grandparent rect {
-  cursor: pointer;
-}
-
-.children rect.parent {
-  fill: #bbb;
+.control {
   fill-opacity: 1;
 }
 
-.children:hover rect.parent {
+.group {
   fill-opacity: 0;
 }
-.children:hover rect.child {
-  fill: #bbb;
-  fill-opacity: 0.8;
+
+.unfocused {
+  opacity: 0.1;
 }
 
-.children text {
-  font-size: 0.8em;
-}
-
-.grandparent text {
-  font-size: 0.9em;
-}
-
-.list-enter-active,
-.list-leave-active {
-  transition: all 1s;
-}
-.list-enter, .list-leave-to /* .list-leave-active for <2.1.8 */ {
-  opacity: 0;
+.top:hover {
+  fill-opacity: 0.2;
 }
 </style>
