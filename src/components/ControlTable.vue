@@ -42,7 +42,7 @@
             <v-tab>Test Details</v-tab>
             <v-tab-item>
               <v-container>
-                <v-row class="newline">
+                <v-row>
                   <v-col cols="12">
                     <span>{{ item.finding_details.split(":")[0] }}:</span>
                     <br />
@@ -52,23 +52,26 @@
                 </v-row>
                 <br />
                 <v-row
+                  cols="12"
                   v-for="(result, index) in item.wraps.results"
                   :key="index"
                 >
                   <v-col cols="1" class="stripes">{{
                     result.status.toUpperCase()
                   }}</v-col>
-                  <v-col cols="5.5" class="stripes right">
-                    <!--<prism language="ruby">Test: {{ result.code_desc }}</prism>-->
-                    <prism language="ruby" class="test">
-                      {{ result.code_desc }}
-                    </prism>
+                  <v-col cols="5" class="stripes right">
+                    <v-card height="100%">
+                      <prism language="yaml" class="code-card"
+                        >Test: {{ result.code_desc }}</prism
+                      >
+                    </v-card>
                   </v-col>
-                  <v-col v-if="result.message" cols="5.5" class="stripes right">
-                    <!--<prism language="ruby">Message: {{ result.message }}</prism>-->
-                    <prism language="ruby" class="test">
-                      {{ result.message }}
-                    </prism>
+                  <v-col v-if="result.message" cols="6" class="stripes right">
+                    <v-card height="100%">
+                      <prism language="yaml" class="code-card"
+                        >Result: {{ result.message }}</prism
+                      >
+                    </v-card>
                   </v-col>
                 </v-row>
               </v-container>
@@ -125,8 +128,11 @@
 
             <v-tab>Inspec Code</v-tab>
             <v-tab-item>
-              <!--<prism language="ruby">{{ item.wraps.code }}</prism>-->
-              <prism language="ruby" class="test2">{{ item.wraps.code }}</prism>
+              <v-card class="line-numbers">
+                <prism language="ruby" class="code-card">{{
+                  item.wraps.code
+                }}</prism>
+              </v-card>
             </v-tab-item>
           </v-tabs>
         </v-card>
@@ -145,13 +151,19 @@ import { hdfWrapControl, HDFControl } from "inspecjs";
 //TODO: add line numbers
 import "prismjs";
 //@ts-ignore
+//Prism.languages.rb.string[5].pattern = /("|')(?:#\{[^}]+\}|\\(?:|[\s\S])|(?!\1)[^\\])*\1/g;
 import Prism from "vue-prism-component";
 //import Prism from "prismjs";
 //Prism.highlightAll();
 //var nw = Prism.plugins.NormalizeWhitespace;
 
-import "prismjs/themes/prism.css";
+import "prismjs/themes/prism-twilight.css";
+import "prismjs/components/prism-scss.min";
+import "prismjs/components/prism-yaml.js";
 import "prismjs/components/prism-ruby.js";
+import "prismjs/plugins/line-numbers/prism-line-numbers.css";
+import "prismjs/plugins/line-numbers/prism-line-numbers.min.js";
+Vue.component("prism", Prism);
 
 interface Header {
   text: string;
@@ -221,30 +233,28 @@ export default class ControlTable extends ControlTableProps {
 </script>
 
 <style scoped>
-.newline {
-  white-space: pre;
+.v-application code {
+  background-color: revert;
+  color: revert;
+  display: revert;
+  font-size: revert;
+  -webkit-box-shadow: revert;
+  box-shadow: revert;
+  border-radius: revert;
+  white-space: auto;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.code-card {
+  height: inherit;
+  margin: inherit;
+  white-space: auto;
 }
 .wset {
   min-width: 125px;
   justify-content: center;
 }
 
-.test {
-  white-space: pre-wrap;
-  max-width: 500px;
-  word-wrap: break-word;
-}
-.test2 {
-  white-space: pre-wrap;
-  max-width: 600px;
-  word-wrap: break-word;
-}
-code[class*="language-"] {
-  word-break: break-word;
-}
-code[class*="test2"] {
-  background-color: #000;
-}
 div[class*="stripes"] {
   border-style: solid;
   border-width: 1px;
