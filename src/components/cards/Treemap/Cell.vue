@@ -6,6 +6,7 @@
       v-for="child in node.children"
       :key="key_for(child.data)"
       :selected_node="selected_node"
+      :selected_control_id="selected_control_id"
       :depth="child_depth"
       :node="child"
       :scales="scales"
@@ -23,7 +24,7 @@
       :height="height"
       :class="cell_classes"
       @click="select_node(node)"
-      :rx="is_selected ? 10 : 0"
+      :rx="is_selected ? 20 : 0"
     />
 
     <text
@@ -32,7 +33,6 @@
       text-anchor="middle"
       :x="x + width / 2"
       :y="y + height / 2"
-      style="fill-opacity: 1;"
     >
       {{ label }}
     </text>
@@ -47,7 +47,8 @@ import {
   ControlStatus,
   HDFControl,
   NistHash,
-  ControlGroupStatus
+  ControlGroupStatus,
+  NistCategory
 } from "inspecjs";
 import * as d3 from "d3";
 import {
@@ -72,7 +73,7 @@ const CellProps = Vue.extend({
       required: true
     },
     selected_control_id: {
-      type: String,
+      type: String, // Of type string
       required: false
     },
     node: {
@@ -142,8 +143,10 @@ export default class Cell extends CellProps {
 
   /** Are we selected? */
   get is_selected(): boolean {
-    // TODO: FIX
-    return false; //this.is_control;
+    return (
+      this.is_control &&
+      (this._node.data as CCWrapper).ctrl.data.id === this.selected_control_id
+    );
   }
 
   /** X, Y, Width and height calculators. All must be scaled */
@@ -172,6 +175,9 @@ export default class Cell extends CellProps {
       s.push("control");
     } else {
       s.push("group");
+      if ((this._node.data as NistCategory<CCWrapper>).children.length === 0) {
+        s.push("empty");
+      }
     }
 
     // Depth stuff
@@ -208,6 +214,8 @@ export default class Cell extends CellProps {
    * TODO: Shunt this to our color module
    */
   get color(): string {
+    // Observe color
+    let observed = this.$vuetify.theme.dark;
     let cmod = getModule(ColorHackModule, this.$store);
     let status: ControlGroupStatus = this._node.data.status;
     switch (status) {
@@ -216,7 +224,6 @@ export default class Cell extends CellProps {
       case "Failed":
         return cmod.lookupColor("statusFailed");
       case "No Data":
-      case "Empty":
         return cmod.lookupColor("statusNoData");
       case "Not Applicable":
         return cmod.lookupColor("statusNotApplicable");
@@ -224,6 +231,8 @@ export default class Cell extends CellProps {
         return cmod.lookupColor("statusNotReviewed");
       case "Profile Error":
         return cmod.lookupColor("statusProfileError");
+      case "Empty":
+        return "black";
       default:
         console.warn(`No treemap color defined for ${status}`);
         return "rgb(187, 187, 187)";
@@ -259,28 +268,36 @@ text {
   pointer-events: none;
 }
 
-rect {
-  stroke: #fff;
+.theme--dark text {
+  fill: #fff;
+  font-size: large;
 }
 
-.control {
+.theme--light text {
+  fill: #000;
+}
+
+rect {
+  stroke: #888;
+  fill-opacity: 0;
+  stroke-width: 1;
+}
+
+rect.control {
   fill-opacity: 1;
   stroke-width: 0;
 }
 
-.control.top {
+rect.control.top {
   stroke-width: 1;
 }
 
-.group {
-  fill-opacity: 0;
+rect.group.empty {
+  fill-opacity: 0.1;
+  fill: black;
 }
 
-.unfocused {
-  opacity: 0.1;
-}
-
-.top.group:hover {
+rect.top.group:hover {
   fill-opacity: 0.1;
 }
 </style>

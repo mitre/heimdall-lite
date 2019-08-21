@@ -20,17 +20,16 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col :cols="12">
-            <svg
-              id="chartBody"
-              preserveAspectRatio="xMidYMid meet"
-              width="100%"
-              :height="height"
-            >
-              <g style="shape-rendering: crispEdges;">
+          <v-col :cols="12" v-resize:debounce="on_resize">
+            <svg id="chartBody" :width="width" :height="height">
+              <g
+                style="shape-rendering: crispEdges;"
+                preserveAspectRatio="xMidYMid meet"
+              >
                 <!-- The body -->
                 <Cell
                   :selected_node="selected_node"
+                  :selected_control_id="value.selectedControlID"
                   :node="treemap_layout"
                   :scales="scales"
                   @select-node="select_node"
@@ -45,6 +44,7 @@
 </template>
 
 <script lang="ts">
+//               preserveAspectRatio="xMidYMid meet"
 import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
@@ -70,6 +70,8 @@ import {
 } from "@/utilities/treemap_util";
 import { HierarchyRectangularNode, tree } from "d3";
 import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
+//@ts-ignore
+import resize from "vue-resize-directive";
 
 // We declare the props separately to make props types inferable.
 const TreemapProps = Vue.extend({
@@ -92,6 +94,9 @@ const TreemapProps = Vue.extend({
 @Component({
   components: {
     Cell
+  },
+  directives: {
+    resize
   }
 })
 export default class Treemap extends TreemapProps {
@@ -264,6 +269,13 @@ export default class Treemap extends TreemapProps {
   /** Controls whether we should allow up */
   get allow_up(): boolean {
     return this.selected_node.parent !== null;
+  }
+
+  /** Called on resize */
+  on_resize(elt: any) {
+    if (elt.clientWidth !== undefined && elt.clientWidth > 1) {
+      this.width = elt.clientWidth - 24;
+    }
   }
 }
 </script>

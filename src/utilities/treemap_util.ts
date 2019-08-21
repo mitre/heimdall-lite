@@ -120,13 +120,11 @@ export function nistHashToTreeMap(hash: NistHash<CCWrapper>): TreemapNode {
     .sum(d => {
       // Note that these give individual weightings - d3 does the actual summing for us
       if (isNistGrouping(d)) {
-        // We don't want the number of controls to influence anything
-        if (d.children.length && isCCWrapper(d.children[0])) {
-          // Counteract d3's summing
-          return 0;
-        } else {
-          // We're empty or at least not a parent to controls
+        if (d.children.length === 0) {
+          // Empty elements given a base size
           return 1;
+        } else {
+          return 0;
         }
       } else {
         // Controls fill their parent, proportionally
