@@ -1,26 +1,94 @@
-import { HDFControl, NistHash, NistFamily, NistCategory } from "inspecjs";
+import {
+  HDFControl,
+  NistHash,
+  NistFamily,
+  NistCategory,
+  hdfWrapControl,
+  ControlStatus,
+  generateNewNistHash,
+  populateNistHash
+} from "inspecjs";
 import * as d3 from "d3";
+import { ContextualizedControl } from "@/store/data_store";
+
+/**
+ * A simple wrapping class needed to facilitate inspecjs nist function usage
+ */
+export class CCWrapper {
+  ctrl: ContextualizedControl;
+  hdf: HDFControl;
+  category?: NistCategory<CCWrapper>;
+
+  constructor(ctrl: ContextualizedControl) {
+    this.ctrl = ctrl;
+    this.hdf = hdfWrapControl(ctrl.data);
+    this.category = undefined;
+  }
+
+  get fixed_nist_tags(): string[] {
+    return this.hdf.fixed_nist_tags;
+  }
+
+  get status(): ControlStatus {
+    return this.hdf.status;
+  }
+}
 
 // The type accepted by d3 treemap functions
 export type TreemapDatumType =
-  | NistHash
-  | NistFamily
-  | NistCategory
-  | HDFControl;
+  | NistHash<CCWrapper>
+  | NistFamily<CCWrapper>
+  | NistCategory<CCWrapper>
+  | CCWrapper;
 export type TreemapNode = d3.HierarchyNode<TreemapDatumType>;
 
 // Crappy type checkers; don't expect these to be safe elsewehre
-export function isHDFControl(ctrl: TreemapDatumType): ctrl is HDFControl {
-  return (ctrl as HDFControl).wraps !== undefined;
+export function isCCWrapper(ctrl: TreemapDatumType): ctrl is CCWrapper {
+  return (ctrl as CCWrapper).hdf !== undefined;
 }
 
 export function isNistGrouping(
   grp: TreemapDatumType
-): grp is NistHash | NistFamily | NistCategory {
-  return !isHDFControl(grp);
+): grp is
+  | NistHash<CCWrapper>
+  | NistFamily<CCWrapper>
+  | NistCategory<CCWrapper> {
+  return !isCCWrapper(grp);
 }
 
-export function nistHashToTreeMap(hash: NistHash): TreemapNode {
+export function nistHashForControls(
+  controls: ContextualizedControl[]
+): NistHash<CCWrapper> {
+  // Generate the hash
+  let wrapped_controls = controls.map(c => new CCWrapper(c));
+  let hash = generateNewNistHash<CCWrapper>();
+  populateNistHash(wrapped_controls, hash);
+
+  // Bind the categories
+  hash.children.forEach(family => {
+    family.children.forEach(category => {
+      category.children = category.children.map(cc => {
+        let specific = new CCWrapper(cc.ctrl);
+        specific.category = category;
+        return specific;
+      });
+    });
+  });
+
+  return hash;
+}
+
+export function nistHashToTreeMap(hash: NistHash<CCWrapper>): TreemapNode {
+  // Find the largest count category. We use this to set the weights in individual controls so they fill their parent
+  let biggest = 1;
+  hash.children.forEach(family => {
+    family.children.forEach(category => {
+      if (category.count > biggest) {
+        biggest = category.count;
+      }
+    });
+  });
+
   // Build the heirarchy
   let ret = d3
     .hierarchy<TreemapDatumType>(hash, (d: TreemapDatumType) => {
@@ -31,13 +99,20 @@ export function nistHashToTreeMap(hash: NistHash): TreemapNode {
     .sort((a, b) => {
       let a_s: string;
       let b_s: string;
-      if (isNistGrouping(a.data) && isNistGrouping(b.data)) {
+      // If a group, give the name. If a control, give status+name
+      if (isNistGrouping(a.data)) {
         a_s = a.data.name;
+      } else {
+        a_s = a.data.status + a.data.ctrl.data.id;
+      }
+
+      //ditto
+      if (isNistGrouping(b.data)) {
         b_s = b.data.name;
       } else {
-        a_s = (a.data as HDFControl).status;
-        b_s = (b.data as HDFControl).status;
+        b_s = b.data.status + b.data.ctrl.data.id;
       }
+
       return a_s.localeCompare(b_s);
     })
     // Determines the weight of the table
@@ -46,15 +121,16 @@ export function nistHashToTreeMap(hash: NistHash): TreemapNode {
       // Note that these give individual weightings - d3 does the actual summing for us
       if (isNistGrouping(d)) {
         // We don't want the number of controls to influence anything
-        if (d.children.length && isHDFControl(d.children[0])) {
+        if (d.children.length && isCCWrapper(d.children[0])) {
           // Counteract d3's summing
-          return 1 - d.count;
+          return 0;
         } else {
           // We're empty or at least not a parent to controls
           return 1;
         }
       } else {
-        return 1;
+        // Controls fill their parent, proportionally
+        return 1.0 / d.category!.count;
       }
     });
   return ret;

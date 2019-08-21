@@ -1,36 +1,37 @@
 <template>
   <!-- We can use Vue transitions too! -->
-  <g :key="label">
+  <g>
     <!-- Generate our children here -->
     <Cell
-      v-for="(child, index) in node.children"
-      :key="label + index"
+      v-for="child in node.children"
+      :key="key_for(child.data)"
       :selected_node="selected_node"
       :depth="child_depth"
       :node="child"
+      :scales="scales"
       @select-node="select_node"
     />
 
     <!-- The actual body of this square.  width add selectedNode.x0-->
     <rect
+      v-if="_depth >= 0"
       :key="label"
       :style="cell_style"
-      :x="node.x0"
-      :y="node.y0"
+      :x="x"
+      :y="y"
       :width="width"
       :height="height"
       :class="cell_classes"
       @click="select_node(node)"
+      :rx="is_selected ? 10 : 0"
     />
 
     <text
       v-if="_depth === 1"
       dominant-baseline="middle"
       text-anchor="middle"
-      :transform="
-        `translate(${node.x0 + width / 2} ${node.y0 +
-          height / 3}) scale(${scale} ${scale})`
-      "
+      :x="x + width / 2"
+      :y="y + height / 2"
       style="fill-opacity: 1;"
     >
       {{ label }}
@@ -46,17 +47,22 @@ import {
   ControlStatus,
   HDFControl,
   NistHash,
-  hdfWrapControl,
-  NistFamily,
-  NistCategory,
-  generateNewNistHash,
-  populateNistHash,
   ControlGroupStatus
 } from "inspecjs";
 import * as d3 from "d3";
-import { TreemapDatumType, isHDFControl } from "@/utilities/treemap_util";
+import {
+  TreemapDatumType,
+  CCWrapper,
+  isCCWrapper
+} from "@/utilities/treemap_util";
+import { control_unique_key } from "@/utilities/format_util";
 import { HierarchyRectangularNode } from "d3";
 import ColorHackModule from "@/store/color_hack";
+
+export interface XYScale {
+  scale_x: d3.ScaleLinear<number, number>;
+  scale_y: d3.ScaleLinear<number, number>;
+}
 
 // We declare the props separately to make props types inferable.
 const CellProps = Vue.extend({
@@ -65,6 +71,10 @@ const CellProps = Vue.extend({
       type: Object, // Of type d3.HierarchyRectangularNode<TreemapDatumType>,
       required: true
     },
+    selected_control_id: {
+      type: String,
+      required: false
+    },
     node: {
       type: Object, // Of type d3.HierarchyRectangularNode<TreemapDatumType>
       required: true
@@ -72,6 +82,10 @@ const CellProps = Vue.extend({
     depth: {
       type: Number, // Distance of this node to curr selected. 0 => it is curr selected. undefined => Sub root / unknown
       required: false
+    },
+    scales: {
+      type: Object, // Of type XYScale
+      required: true
     }
   }
 });
@@ -104,6 +118,14 @@ export default class Cell extends CellProps {
     }
   }
 
+  get _scale_x(): d3.ScaleLinear<number, number> {
+    return this.scales.scale_x;
+  }
+
+  get _scale_y(): d3.ScaleLinear<number, number> {
+    return this.scales.scale_y;
+  }
+
   /** Depth to pass to childen */
   get child_depth(): number | undefined {
     if (this._depth !== undefined) {
@@ -115,16 +137,31 @@ export default class Cell extends CellProps {
 
   /** Are we a control? */
   get is_control(): boolean {
-    return isHDFControl(this._node.data);
+    return isCCWrapper(this._node.data);
   }
 
-  /** Width and height calculators */
+  /** Are we selected? */
+  get is_selected(): boolean {
+    // TODO: FIX
+    return false; //this.is_control;
+  }
+
+  /** X, Y, Width and height calculators. All must be scaled */
+  get x(): number {
+    return this._scale_x(this._node.x0);
+  }
+
+  get y(): number {
+    return this._scale_y(this._node.y0);
+  }
+
   get width(): number {
-    return this._node.x1 - this._node.x0;
+    // Scale x0 and x1 required
+    return this._scale_x(this._node.x1) - this.x;
   }
 
   get height(): number {
-    return this._node.y1 - this._node.y0;
+    return this._scale_y(this._node.y1) - this.y;
   }
 
   /** Classes for our "body" */
@@ -197,10 +234,21 @@ export default class Cell extends CellProps {
    * Provides a label for the given piece of data
    */
   get label() {
-    if (isHDFControl(this._node.data)) {
-      return this._node.data.wraps.id;
+    if (isCCWrapper(this._node.data)) {
+      return this._node.data.ctrl.data.id;
     } else {
       return this._node.data.name;
+    }
+  }
+
+  /**
+   * Generates unique keys
+   */
+  key_for(data: TreemapDatumType): string {
+    if (isCCWrapper(data)) {
+      return control_unique_key(data.ctrl);
+    } else {
+      return data.name;
     }
   }
 }
@@ -217,6 +265,11 @@ rect {
 
 .control {
   fill-opacity: 1;
+  stroke-width: 0;
+}
+
+.control.top {
+  stroke-width: 1;
 }
 
 .group {
@@ -227,7 +280,7 @@ rect {
   opacity: 0.1;
 }
 
-.top:hover {
-  fill-opacity: 0.2;
+.top.group:hover {
+  fill-opacity: 0.1;
 }
 </style>

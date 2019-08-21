@@ -1,59 +1,45 @@
 <template>
   <v-card>
-    <v-card-title>
+    <v-card-text>
       <v-container>
-        <v-row>
-          <v-col :cols="6">
+        <v-row dense>
+          <v-col :cols="2">
             NIST SP 800-53 Coverage
           </v-col>
-          <v-col :cols="3">
-            <v-btn @click="up" :disabled="!allow_up" block>
+          <v-col :cols="8">
+            <v-btn @click="up" :disabled="!allow_up" block x-small>
               <v-icon v-if="allow_up"> arrow_back </v-icon>
               {{ selected_node.data.name }}
             </v-btn>
           </v-col>
-          <v-col :colr="3">
-            <v-btn @click="clear" block>
+          <v-col :cols="2">
+            <v-btn @click="clear" block x-small>
               <v-icon icon="chart" />
               Clear Filter
             </v-btn>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col :cols="12">
+            <svg
+              id="chartBody"
+              preserveAspectRatio="xMidYMid meet"
+              width="100%"
+              :height="height"
+            >
+              <g style="shape-rendering: crispEdges;">
+                <!-- The body -->
+                <Cell
+                  :selected_node="selected_node"
+                  :node="treemap_layout"
+                  :scales="scales"
+                  @select-node="select_node"
+                />
+              </g>
+            </svg>
+          </v-col>
+        </v-row>
       </v-container>
-    </v-card-title>
-    <v-card-text>
-      <div class="treemap">
-        <svg
-          id="chartBody"
-          preserveAspectRatio="xMidYMid meet"
-          width="100%"
-          height="500"
-        >
-          <svg :viewBox="view_box">
-            <g style="shape-rendering: crispEdges;">
-              <!-- The body -->
-              <Cell
-                :selected_node="selected_node"
-                :node="treemap_layout"
-                @select-node="select_node"
-              />
-            </g>
-          </svg>
-
-          <!-- The current labels, floating in the void -->
-          <text
-            v-for="label in labels"
-            :key="label.text"
-            :x="label.x"
-            :y="label.y"
-            dominant-baseline="middle"
-            text-anchor="middle"
-            style="fill-opacity: 1;"
-          >
-            {{ label.text }}
-          </text>
-        </svg>
-      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -74,28 +60,16 @@ import {
   ControlGroupStatus
 } from "inspecjs";
 import * as d3 from "d3";
-// import { scaleLinear, scaleOrdinal } from "d3-scale";
-// import { json } from "d3-request";
-// import { hierarchy, treemap } from "d3-hierarchy";
 import FilteredDataModule, { NistMapState } from "@/store/data_filters";
 import {
   nistHashToTreeMap,
   TreemapNode,
   TreemapDatumType,
-  isHDFControl
+  nistHashForControls,
+  CCWrapper
 } from "@/utilities/treemap_util";
 import { HierarchyRectangularNode, tree } from "d3";
-import Cell from "@/components/cards/treemap/Cell.vue";
-
-// Type of labels shown on the screen
-interface Label {
-  // The x and y coordinates in screen space
-  x: number;
-  y: number;
-
-  // The text
-  text: string;
-}
+import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
 
 // We declare the props separately to make props types inferable.
 const TreemapProps = Vue.extend({
@@ -121,6 +95,10 @@ const TreemapProps = Vue.extend({
   }
 })
 export default class Treemap extends TreemapProps {
+  /** The svg internal coordinate space */
+  width: number = 1200;
+  height: number = 530;
+
   /** The currently selected treemap node. Wrapped to avoid initialization woes */
   get selected_node(): d3.HierarchyRectangularNode<TreemapDatumType> {
     // Get typed versions of the curr state
@@ -131,7 +109,8 @@ export default class Treemap extends TreemapProps {
     // If we cannot go, fail out and update the state
     if (val.selectedFamily) {
       let new_curr = curr.children!.find(
-        child => (child.data as NistFamily).name === val.selectedFamily
+        child =>
+          (child.data as NistFamily<CCWrapper>).name === val.selectedFamily
       );
       if (new_curr !== undefined) {
         curr = new_curr;
@@ -150,7 +129,8 @@ export default class Treemap extends TreemapProps {
     // If we cannot go, fail out and update the state
     if (val.selectedCategory) {
       let new_curr = curr.children!.find(
-        child => (child.data as NistCategory).name === val.selectedCategory
+        child =>
+          (child.data as NistCategory<CCWrapper>).name === val.selectedCategory
       );
       if (new_curr !== undefined) {
         curr = new_curr;
@@ -169,7 +149,8 @@ export default class Treemap extends TreemapProps {
     // Check the selected category. We don't actually go to it, just validate that it exists
     if (val.selectedControlID) {
       let test_curr = curr.children!.find(
-        child => (child.data as HDFControl).wraps.id === val.selectedControlID
+        child =>
+          (child.data as CCWrapper).ctrl.data.id === val.selectedControlID
       );
       if (test_curr == undefined) {
         // Unable to go to the specified control
@@ -188,51 +169,45 @@ export default class Treemap extends TreemapProps {
 
   /** Get our viewbox */
   get view_box(): string {
-    let n = this.selected_node;
-    return `${n.x0} ${n.y0} ${n.x1 - n.x0} ${n.y1 - n.y0}`;
+    return `0 0 ${this.width} ${this.height}`;
   }
 
-  /** Get our current labels */
-  get labels(): Label[] {
-    // Get our current tops
-    let tops = this.selected_node.children!;
-
-    // Create linear scales to map x/y to viewport x/y
-
-    return [];
+  /** Get our scales */
+  get scales(): XYScale {
+    return {
+      scale_x: d3
+        .scaleLinear()
+        .domain([this.selected_node.x0, this.selected_node.x1])
+        .range([0, this.width]),
+      scale_y: d3
+        .scaleLinear()
+        .domain([this.selected_node.y0, this.selected_node.y1])
+        .range([0, this.height])
+    };
   }
 
   /**
-   * Fetches the controls we want to display in this tree.
+   * Fetches the controls we want to display in this tree, and turns them into a hash
    * Note that regardless of what filtering this treeview applies,
    * we want the treeview itself to remain unaffected.
-   *
-   * TODO: Make sure that this filter is stripped of unwanted fields!
-   * */
-  get nist_controls(): HDFControl[] {
+   */
+  get nist_hash(): NistHash<CCWrapper> {
     // Get our data module
     let data: FilteredDataModule = getModule(FilteredDataModule, this.$store);
 
     // Get the current filtered data
-    let controls = data.controls(this.filter).map(c => hdfWrapControl(c.data));
-    return controls;
-  }
-
-  /** Generates the nist hash for our currently visible controls */
-  get nist_hash(): NistHash {
-    let hash = generateNewNistHash();
-    populateNistHash(this.nist_controls, hash);
-    return hash;
+    let controls = data.controls(this.filter);
+    return nistHashForControls(controls);
   }
 
   /** Generates a d3 heirarchy structure outlining all of the data in the nist hash */
   get treemap_layout(): d3.HierarchyRectangularNode<TreemapDatumType> {
-    let heirarchy = nistHashToTreeMap(this.nist_hash);
+    let hierarchy = nistHashToTreeMap(this.nist_hash);
     let treemap = d3
       .treemap<TreemapDatumType>()
-      .size([1000, 500])
+      .size([this.width, this.height])
       .round(false)
-      .paddingInner(0)(heirarchy);
+      .paddingInner(0)(hierarchy);
     return treemap;
   }
 
@@ -254,13 +229,13 @@ export default class Treemap extends TreemapProps {
 
     // Depending on length of route, assign values
     if (route.length > 1) {
-      selected_family = (route[1].data as NistFamily).name;
+      selected_family = (route[1].data as NistFamily<CCWrapper>).name;
     }
     if (route.length > 2) {
-      selected_category = (route[2].data as NistCategory).name;
+      selected_category = (route[2].data as NistCategory<CCWrapper>).name;
     }
     if (route.length > 3) {
-      selected_control_id = (route[3].data as HDFControl).wraps.id;
+      selected_control_id = (route[3].data as CCWrapper).ctrl.data.id;
       // If they click the same one, clear
       if (selected_control_id === this.value.selectedControlID) {
         selected_control_id = null;
@@ -296,10 +271,13 @@ export default class Treemap extends TreemapProps {
 <style scoped>
 text {
   pointer-events: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  fill: "primary";
 }
 
 rect {
   fill: none;
-  stroke: #fff;
+  stroke: ;
 }
 </style>
