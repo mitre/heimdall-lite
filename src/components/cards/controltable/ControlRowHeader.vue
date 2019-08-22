@@ -1,73 +1,47 @@
 <template>
-  <v-row no-gutters>
-    <!-- Expand/collapse button -->
-    <v-col cols="1" align-cener="center">
+  <ResponsiveRowSwitch>
+    <template #expand>
       <v-btn @click="$emit('toggle', !expanded)" icon>
-        <v-icon>{{ expanded ? "expand_more" : "expand_less" }}</v-icon>
+        <v-icon large>{{ expanded ? "expand_more" : "expand_less" }}</v-icon>
       </v-btn>
-    </v-col>
+    </template>
 
-    <!-- Status and Severity -->
-    <v-col cols="4">
-      <DoubleCollapseCol :proportion="6">
-        <template #left>
-          <v-card
-            class="pa-0"
-            outlined
-            tile
-            :color="getStatusColor(control.status)"
-          >
-            <v-card-text class="center">
-              {{ control.status }}
-            </v-card-text>
-          </v-card>
-        </template>
-        <template #right>
-          <v-card class="pa-0" outlined tile>
-            <v-card-text class="center">
-              <v-icon
-                v-for="i in severityArrowCount(control.severity)"
-                :key="i"
-                class="stack-icon"
-                >chevron_right</v-icon
-              >
-              {{ control.severity }}
-            </v-card-text>
-          </v-card>
-        </template>
-      </DoubleCollapseCol>
-    </v-col>
-
-    <!-- Title Column -->
-    <v-col cols="4" class="text-start">
-      <v-card class="pa-0 text-truncate" outlined tile>
-        <v-card-text>{{ control.wraps.title }}</v-card-text>
+    <template #status>
+      <v-card :color="status_color" outlined tile class="fill-height">
+        <v-card-text class="pa-2 center">
+          {{ control.status }}
+        </v-card-text>
       </v-card>
-    </v-col>
+    </template>
+
+    <template #severity>
+      <v-card-text class="pa-2">
+        <v-icon v-for="i in severity_arrow_count" :key="i" class="stack-icon">
+          chevron_right
+        </v-icon>
+        {{ control.severity }}
+      </v-card-text>
+    </template>
+
+    <template #title>
+      <v-card-text class="pa-2">{{ truncated_title }}</v-card-text>
+    </template>
 
     <!-- ID and Tags -->
-    <v-col cols="3">
-      <DoubleCollapseCol :proportion="4">
-        <template #left>
-          <v-card class="pa-0" outlined tile>
-            <v-card-text>{{ control.wraps.id }}</v-card-text>
-          </v-card>
-        </template>
-        <template #right>
-          <v-card class="pa-0" outlined tile>
-            <v-card-text>{{ fmtNist(control.nist_tags) }}</v-card-text>
-          </v-card>
-        </template>
-      </DoubleCollapseCol>
-    </v-col>
-  </v-row>
+    <template #id>
+      <v-card-text class="pa-2">{{ control.wraps.id }}</v-card-text>
+    </template>
+    <template #tags>
+      <v-card-text class="pa-2">{{ fmtNist(control.nist_tags) }}</v-card-text>
+    </template>
+  </ResponsiveRowSwitch>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { HDFControl, ControlStatus, Severity } from "inspecjs";
-import DoubleCollapseCol from "@/components/generic/DoubleCollapseCol.vue";
+import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -85,17 +59,25 @@ const ControlRowHeaderProps = Vue.extend({
 
 @Component({
   components: {
-    DoubleCollapseCol
+    ResponsiveRowSwitch
   }
 })
 export default class ControlRowHeader extends ControlRowHeaderProps {
-  getStatusColor(status: ControlStatus): string {
-    // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
-    return `status${status.replace(" ", "")}`;
+  get truncated_title(): string {
+    if (this.control.wraps.title.length > 80) {
+      return this.control.wraps.title.substr(0, 80) + "...";
+    } else {
+      return this.control.wraps.title;
+    }
   }
 
-  severityArrowCount(severity: Severity): number {
-    switch (severity) {
+  get status_color(): string {
+    // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
+    return `status${this.control.status.replace(" ", "")}`;
+  }
+
+  get severity_arrow_count(): number {
+    switch (this.control.severity) {
       default:
       case "none":
         return 0;

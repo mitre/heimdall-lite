@@ -14,40 +14,31 @@
     </v-row>
 
     <!-- Header. This should mirror the structure of ControlRowHeader -->
-    <v-row>
-      <!-- Expand/collapse button gap -->
-      <v-spacer cols="1" />
+    <ResponsiveRowSwitch>
+      <template #expand> </template>
 
-      <!-- Status and Severity -->
-      <v-col cols="4">
-        <DoubleCollapseCol :proportion="6">
-          <template #left>
-            <ColumnHeader text="Status" />
-          </template>
-          <template #right>
-            <ColumnHeader text="Severity" />
-          </template>
-        </DoubleCollapseCol>
-      </v-col>
+      <template #id>
+        <ColumnHeader text="ID" />
+      </template>
 
-      <!-- Title Column -->
-      <v-col cols="4" class="text-start">
+      <template #status>
+        <ColumnHeader text="Status" />
+      </template>
+
+      <template #severity>
+        <ColumnHeader text="Severity" />
+      </template>
+
+      <template #title>
         <ColumnHeader text="Title" />
-      </v-col>
+      </template>
 
-      <!-- ID and Tags -->
-      <v-col cols="3">
-        <DoubleCollapseCol :proportion="4">
-          <template #left>
-            <ColumnHeader text="Control ID" />
-          </template>
-          <template #right>
-            <ColumnHeader text="Nist Tags" />
-          </template>
-        </DoubleCollapseCol>
-      </v-col>
-    </v-row>
+      <template #tags>
+        <ColumnHeader text="Tags" />
+      </template>
+    </ResponsiveRowSwitch>
 
+    <!-- Body -->
     <template v-for="item in items">
       <ControlRowHeader
         :key="item.key + 'h'"
@@ -76,7 +67,7 @@ import { isInspecFile, InspecFile } from "@/store/report_intake";
 import ControlRowHeader from "@/components/cards/controltable/ControlRowHeader.vue";
 import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
 import ColumnHeader from "@/components/generic/ColumnHeader.vue";
-import DoubleCollapseCol from "@/components/generic/DoubleCollapseCol.vue";
+import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
 
 interface Header {
   text: string;
@@ -106,7 +97,7 @@ const ControlTableProps = Vue.extend({
     ControlRowHeader,
     ControlRowDetails,
     ColumnHeader,
-    DoubleCollapseCol
+    ResponsiveRowSwitch
   }
 })
 export default class ControlTable extends ControlTableProps {
