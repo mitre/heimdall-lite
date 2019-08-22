@@ -48,7 +48,7 @@
       </template>
     </v-list>
     <v-layout align-center>
-      <v-flex xs6 class="text-center">
+      <v-flex class="text-center">
         <v-switch
           label="Light/Dark"
           v-model="dark"
