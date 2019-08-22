@@ -15,10 +15,6 @@
       </v-col>
       <v-col xs-4>
         <v-card class="fill-height">
-          <v-card-title>Severity Counts</v-card-title>
-          <v-card-text
-            ><SeverityChart :filter="all_filter" v-model="severity_filter"
-          /></v-card-text>
           <v-card-title class="justify-center">Severity Counts</v-card-title>
           <v-card-actions class="justify-center">
             <SeverityChart :filter="all_filter" v-model="severity_filter" />
