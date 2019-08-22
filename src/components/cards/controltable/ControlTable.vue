@@ -1,40 +1,69 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="items"
-    :single-expand="singleExpand"
-    item-key="id"
-    show-expand
-    class="my-4 px-4"
-  >
-    <template #body>
-      <tbody>
-        <template v-for="item in items">
-          <ControlRowHeader
-            :key="item.unique_id + 'h'"
-            :control="item"
-            :expanded="expanded.includes(item.unique_id)"
-            @toggle="toggle(item.unique_id)"
-          />
-          <ControlRowDetails
-            v-if="expanded.includes(item.unique_id)"
-            :key="item.unique_id + 'b'"
-            :control="item"
-          />
-        </template>
-      </tbody>
-    </template>
+  <v-container>
+    <!-- Toolbar -->
+    <v-row>
+      <v-col cols="12">
+        <v-toolbar flat>
+          <v-switch
+            v-model="singleExpand"
+            label="Single expand"
+            class="mt-2"
+          ></v-switch>
+        </v-toolbar>
+      </v-col>
+    </v-row>
 
-    <template v-slot:top>
-      <v-toolbar flat>
-        <v-switch
-          v-model="singleExpand"
-          label="Single expand"
-          class="mt-2"
-        ></v-switch>
-      </v-toolbar>
+    <!-- Header. This should mirror the structure of ControlRowHeader -->
+    <v-row>
+      <!-- Expand/collapse button gap -->
+      <v-spacer cols="1" />
+
+      <!-- Status and Severity -->
+      <v-col cols="4">
+        <DoubleCollapseCol :proportion="6">
+          <template #left>
+            <ColumnHeader text="Status" />
+          </template>
+          <template #right>
+            <ColumnHeader text="Severity" />
+          </template>
+        </DoubleCollapseCol>
+      </v-col>
+
+      <!-- Title Column -->
+      <v-col cols="4" class="text-start">
+        <ColumnHeader text="Title" />
+      </v-col>
+
+      <!-- ID and Tags -->
+      <v-col cols="3">
+        <DoubleCollapseCol :proportion="4">
+          <template #left>
+            <ColumnHeader text="Control ID" />
+          </template>
+          <template #right>
+            <ColumnHeader text="Nist Tags" />
+          </template>
+        </DoubleCollapseCol>
+      </v-col>
+    </v-row>
+
+    <template v-for="item in items">
+      <ControlRowHeader
+        :key="item.key + 'h'"
+        :control="item"
+        :expanded="expanded.includes(item.key)"
+        @toggle="toggle(item.key)"
+      />
+      <v-divider :key="item.key + 'd1'" v-if="!expanded.includes(item.key)" />
+      <ControlRowDetails
+        v-if="expanded.includes(item.key)"
+        :key="item.key + 'b'"
+        :control="item"
+      />
+      <v-divider :key="item.key + 'd2'" v-if="expanded.includes(item.key)" />
     </template>
-  </v-data-table>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -46,6 +75,8 @@ import FilteredDataModule from "@/store/data_filters";
 import { isInspecFile, InspecFile } from "@/store/report_intake";
 import ControlRowHeader from "@/components/cards/controltable/ControlRowHeader.vue";
 import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
+import ColumnHeader from "@/components/generic/ColumnHeader.vue";
+import DoubleCollapseCol from "@/components/generic/DoubleCollapseCol.vue";
 
 interface Header {
   text: string;
@@ -57,7 +88,7 @@ interface Header {
 // Tracks the visibility of an HDF control
 interface ListElt extends HDFControl {
   // A unique id to be used as a key.
-  unique_id: string;
+  key: string;
 }
 
 // We declare the props separately to make props types inferable.
@@ -71,7 +102,12 @@ const ControlTableProps = Vue.extend({
 });
 
 @Component({
-  components: { ControlRowHeader, ControlRowDetails }
+  components: {
+    ControlRowHeader,
+    ControlRowDetails,
+    ColumnHeader,
+    DoubleCollapseCol
+  }
 })
 export default class ControlTable extends ControlTableProps {
   // Whether to allow multiple expansions
@@ -81,23 +117,23 @@ export default class ControlTable extends ControlTableProps {
   expanded: Array<string> = [];
 
   /** Toggles the given expansion */
-  toggle(unique_id: string) {
+  toggle(key: string) {
     if (this.singleExpand) {
-      // Check if unique_id already there
-      let had = this.expanded.includes(unique_id);
+      // Check if key already there
+      let had = this.expanded.includes(key);
 
       // Clear
       this.expanded = [];
 
-      // If unique_id is new, add it
+      // If key is new, add it
       if (!had) {
-        this.expanded.push(unique_id);
+        this.expanded.push(key);
       }
     } else {
       // Add or remove it from the set, as appropriate. Shortcut this by only adding if delete fails
-      let i = this.expanded.indexOf(unique_id);
+      let i = this.expanded.indexOf(key);
       if (i < 0) {
-        this.expanded.push(unique_id);
+        this.expanded.push(key);
       } else {
         this.expanded.splice(i);
       }
@@ -108,17 +144,12 @@ export default class ControlTable extends ControlTableProps {
   get items(): ListElt[] {
     let mod = getModule(FilteredDataModule, this.$store);
     return mod.controls(this.filter).map(d => {
-      let src: InspecFile;
-      // This is dumb but effective. We should probably break it out into its own method in a utility class somewhere
-      if (isInspecFile(d.sourced_from.sourced_from)) {
-        src = d.sourced_from.sourced_from;
-      } else {
-        src = d.sourced_from.sourced_from.sourced_from;
-      }
+      console.log("Should use unique utils once they are merged here");
+      let key = d.data.id;
 
       // File, hdf wrapper
       let with_id = Object.assign(hdfWrapControl(d.data), {
-        unique_id: `${src.unique_id}-${d.data.id}`
+        key
       });
       return with_id;
     });

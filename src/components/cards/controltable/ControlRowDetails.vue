@@ -1,6 +1,6 @@
 <template>
-  <tr>
-    <td :colspan="6">
+  <v-row no-gutters>
+    <v-col :cols="12">
       <v-card>
         <v-tabs>
           <v-tabs-slider></v-tabs-slider>
@@ -74,8 +74,8 @@
           </v-tab-item>
         </v-tabs>
       </v-card>
-    </td>
-  </tr>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
