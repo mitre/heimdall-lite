@@ -56,7 +56,7 @@ import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSw
 const ControlRowHeaderProps = Vue.extend({
   props: {
     control: {
-      type: Object, // Of type HDFControl
+      type: Object, // Of type HDFControl (but with added key field)
       required: true
     },
     expanded: {

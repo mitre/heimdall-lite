@@ -8,7 +8,7 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="7">
+    <v-col class="pa-0" :cols="6">
       <v-card outlined tile class="d-flex flex-column fill-height">
         <slot name="id" />
         <v-divider />
@@ -16,7 +16,7 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="2">
+    <v-col class="pa-0" :cols="3">
       <v-card outlined tile class="d-flex flex-column fill-height">
         <slot name="tags" />
       </v-card>
