@@ -68,6 +68,7 @@ import ControlRowHeader from "@/components/cards/controltable/ControlRowHeader.v
 import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
 import ColumnHeader from "@/components/generic/ColumnHeader.vue";
 import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
+import { control_unique_key } from "@/utilities/format_util";
 
 interface Header {
   text: string;
@@ -135,8 +136,7 @@ export default class ControlTable extends ControlTableProps {
   get items(): ListElt[] {
     let mod = getModule(FilteredDataModule, this.$store);
     return mod.controls(this.filter).map(d => {
-      console.log("Should use unique utils once they are merged here");
-      let key = d.data.id;
+      let key = control_unique_key(d);
 
       // File, hdf wrapper
       let with_id = Object.assign(hdfWrapControl(d.data), {

@@ -1,5 +1,6 @@
 <template>
-  <ResponsiveRowSwitch>
+  <!-- Need to catch for ResponsiveRowSwitch @toggle events for small view -->
+  <ResponsiveRowSwitch @toggle="$emit('toggle', !expanded)">
     <template #expand>
       <v-btn @click="$emit('toggle', !expanded)" icon>
         <v-icon large>{{ expanded ? "expand_more" : "expand_less" }}</v-icon>
@@ -32,7 +33,15 @@
       <v-card-text class="pa-2">{{ control.wraps.id }}</v-card-text>
     </template>
     <template #tags>
-      <v-card-text class="pa-2">{{ fmtNist(control.nist_tags) }}</v-card-text>
+      <v-chip-group column active-class="NONE">
+        <v-chip
+          v-for="tag in control.fixed_nist_tags"
+          :key="tag"
+          active-class="NONE"
+        >
+          {{ tag }}
+        </v-chip>
+      </v-chip-group>
     </template>
   </ResponsiveRowSwitch>
 </template>
