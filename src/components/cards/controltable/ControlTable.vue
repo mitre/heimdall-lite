@@ -15,8 +15,6 @@
 
     <!-- Header. This should mirror the structure of ControlRowHeader -->
     <ResponsiveRowSwitch>
-      <template #expand> </template>
-
       <template #id>
         <ColumnHeader
           text="ID"

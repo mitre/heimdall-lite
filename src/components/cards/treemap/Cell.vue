@@ -171,10 +171,7 @@ export default class Cell extends CellProps {
   get cell_classes(): string[] {
     // Type stuff
     let s: string[] = [];
-    if (this.is_control) {
-      s.push("control");
-    } else {
-      s.push("group");
+    if (!this.is_control) {
       if ((this._node.data as NistCategory<CCWrapper>).children.length === 0) {
         s.push("empty");
       }
@@ -189,17 +186,26 @@ export default class Cell extends CellProps {
       s.push("top");
     }
 
+    // More depth stuff
+    switch (this._node.depth) {
+      case 0:
+        s.push("hash");
+        break;
+      case 1:
+        s.push("family");
+        break;
+      case 2:
+        s.push("category");
+        break;
+      case 3:
+        s.push("control");
+    }
+
     return s;
   }
 
   get cell_style(): string {
-    let style: string = "";
-    style += `fill: ${this.color};`;
-    if (this._depth === 1) {
-      style += "pointer-events: auto;";
-    } else {
-      style += "pointer-events: none;";
-    }
+    let style = `fill: ${this.color};`;
     return style;
   }
 
@@ -281,6 +287,11 @@ rect {
   stroke: #888;
   fill-opacity: 0;
   stroke-width: 1;
+  pointer-events: none;
+}
+
+rect.top {
+  pointer-events: auto;
 }
 
 rect.control {
@@ -292,12 +303,21 @@ rect.control.top {
   stroke-width: 1;
 }
 
-rect.group.empty {
+rect.family.empty,
+rect.category.empty {
   fill-opacity: 0.1;
   fill: black;
 }
+rect.family:hover,
+rect.category:hover {
+  fill: #222;
+}
 
-rect.top.group:hover {
+rect.top:hover {
   fill-opacity: 0.1;
+}
+
+rect.family {
+  stroke-width: 3;
 }
 </style>

@@ -23,9 +23,6 @@
       </ResponsiveRowSmall>
 
       <ResponsiveRowMedium v-else-if="$vuetify.breakpoint.mdAndDown">
-        <template #expand>
-          <slot name="expand" />
-        </template>
         <template #status>
           <slot name="status" />
         </template>
@@ -44,9 +41,6 @@
       </ResponsiveRowMedium>
 
       <ResponsiveRowLarge v-else>
-        <template #expand>
-          <slot name="expand" />
-        </template>
         <template #status>
           <slot name="status" />
         </template>

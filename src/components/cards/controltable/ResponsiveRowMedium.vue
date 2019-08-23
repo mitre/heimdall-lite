@@ -1,11 +1,5 @@
 <template>
   <v-row no-gutters>
-    <v-col class="pa-0" :cols="1">
-      <v-card outlined tile class="fill-height">
-        <slot name="expand" />
-      </v-card>
-    </v-col>
-
     <v-col class="pa-0" :cols="3">
       <v-card outlined tile class="d-flex flex-column fill-height">
         <slot name="status" />
@@ -14,7 +8,7 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="5">
+    <v-col class="pa-0" :cols="6">
       <v-card outlined tile class="fill-height">
         <slot name="title" />
       </v-card>

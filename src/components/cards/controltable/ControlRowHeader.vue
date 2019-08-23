@@ -1,16 +1,13 @@
 <template>
   <!-- Need to catch for ResponsiveRowSwitch @toggle events for small view -->
-  <ResponsiveRowSwitch @toggle="$emit('toggle', !expanded)">
-    <template #expand>
-      <v-btn @click="$emit('toggle', !expanded)" icon>
-        <v-icon large>{{ expanded ? "expand_more" : "expand_less" }}</v-icon>
-      </v-btn>
-    </template>
-
+  <ResponsiveRowSwitch>
     <template #status>
-      <v-card :color="status_color" outlined tile class="fill-height">
-        <v-card-text class="pa-2 center">
+      <v-card :color="status_color" outlined tile>
+        <v-card-text class="pa-2">
           {{ control.status }}
+          <v-icon class="float-right" @click="$emit('toggle', !expanded)">{{
+            expanded ? "expand_more" : "expand_less"
+          }}</v-icon>
         </v-card-text>
       </v-card>
     </template>
@@ -113,7 +110,8 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
 }
 
 .stack-icon {
-  margin-left: -16px;
+  margin-left: -8px;
+  margin-right: -8px;
   margin-top: -8px;
   margin-bottom: -8px;
 }

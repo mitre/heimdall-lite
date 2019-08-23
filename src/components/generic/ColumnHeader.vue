@@ -1,5 +1,5 @@
 <template>
-  <div class="fill-height justify-center">
+  <div class="fill-height" style="text-align: center">
     <span :class="classes"> {{ text }} </span>
     <v-btn v-if="allow_sort" icon @click="toggle_sort">
       <v-icon class="pa-0"> {{ icon }} </v-icon>
