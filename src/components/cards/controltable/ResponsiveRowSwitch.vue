@@ -1,62 +1,64 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <ResponsiveRowSmall
-        v-if="$vuetify.breakpoint.xsOnly"
-        @toggle="$emit('toggle')"
-      >
-        <template #status>
-          <slot name="status" />
-        </template>
-        <template #severity>
-          <slot name="severity" />
-        </template>
-        <template #title>
-          <slot name="title" />
-        </template>
-        <template #id>
-          <slot name="id" />
-        </template>
-        <template #tags>
-          <slot name="tags" />
-        </template>
-      </ResponsiveRowSmall>
+      <v-card class="lighter-card" elevation="2">
+        <ResponsiveRowSmall
+          v-if="$vuetify.breakpoint.xsOnly"
+          @toggle="$emit('toggle')"
+        >
+          <template #status>
+            <slot name="status" />
+          </template>
+          <template #severity>
+            <slot name="severity" />
+          </template>
+          <template #title>
+            <slot name="title" />
+          </template>
+          <template #id>
+            <slot name="id" />
+          </template>
+          <template #tags>
+            <slot name="tags" />
+          </template>
+        </ResponsiveRowSmall>
 
-      <ResponsiveRowMedium v-else-if="$vuetify.breakpoint.mdAndDown">
-        <template #status>
-          <slot name="status" />
-        </template>
-        <template #severity>
-          <slot name="severity" />
-        </template>
-        <template #title>
-          <slot name="title" />
-        </template>
-        <template #id>
-          <slot name="id" />
-        </template>
-        <template #tags>
-          <slot name="tags" />
-        </template>
-      </ResponsiveRowMedium>
+        <ResponsiveRowMedium v-else-if="$vuetify.breakpoint.mdAndDown">
+          <template #status>
+            <slot name="status" />
+          </template>
+          <template #severity>
+            <slot name="severity" />
+          </template>
+          <template #title>
+            <slot name="title" />
+          </template>
+          <template #id>
+            <slot name="id" />
+          </template>
+          <template #tags>
+            <slot name="tags" />
+          </template>
+        </ResponsiveRowMedium>
 
-      <ResponsiveRowLarge v-else>
-        <template #status>
-          <slot name="status" />
-        </template>
-        <template #severity>
-          <slot name="severity" />
-        </template>
-        <template #title>
-          <slot name="title" />
-        </template>
-        <template #id>
-          <slot name="id" />
-        </template>
-        <template #tags>
-          <slot name="tags" />
-        </template>
-      </ResponsiveRowLarge>
+        <ResponsiveRowLarge v-else>
+          <template #status>
+            <slot name="status" />
+          </template>
+          <template #severity>
+            <slot name="severity" />
+          </template>
+          <template #title>
+            <slot name="title" />
+          </template>
+          <template #id>
+            <slot name="id" />
+          </template>
+          <template #tags>
+            <slot name="tags" />
+          </template>
+        </ResponsiveRowLarge>
+      </v-card>
     </v-col>
   </v-row>
 </template>
@@ -83,3 +85,12 @@ const Props = Vue.extend({
 })
 export default class ControlRowHeader extends Props {}
 </script>
+
+<style>
+.lighter-card .theme--dark.v-card {
+  background: #525252;
+}
+.lighter-card .theme--light.v-card {
+  background: #e2e2e2;
+}
+</style>

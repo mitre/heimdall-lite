@@ -1,7 +1,7 @@
 <template>
   <v-row no-gutters>
     <v-col class="pa-0" :cols="3">
-      <v-card outlined tile class="d-flex flex-column fill-height">
+      <v-card tile flat class="d-flex flex-column fill-height">
         <slot name="status" />
         <v-divider />
         <slot name="severity" />
@@ -9,13 +9,13 @@
     </v-col>
 
     <v-col class="pa-0" :cols="6">
-      <v-card outlined tile class="fill-height">
+      <v-card tile flat class="fill-height">
         <slot name="title" />
       </v-card>
     </v-col>
 
     <v-col class="pa-0" :cols="3">
-      <v-card outlined tile class="d-flex flex-column fill-height">
+      <v-card tile flat class="d-flex flex-column fill-height">
         <slot name="id" />
         <v-divider />
         <slot name="tags" />

@@ -53,10 +53,10 @@
     <!-- DataTable -->
     <v-row>
       <v-col xs-12>
-        <v-sheet class="my-4 px-4" elevation="2">
-          <h2>Results View Data</h2>
+        <v-card elevation="2">
+          <v-card-title>Results View Data</v-card-title>
           <ControlTable :filter="all_filter" />
-        </v-sheet>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>

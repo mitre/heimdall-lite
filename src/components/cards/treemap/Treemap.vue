@@ -1,46 +1,42 @@
 <template>
-  <v-card>
-    <v-card-text>
-      <v-container>
-        <v-row dense>
-          <v-col :cols="2">
-            NIST SP 800-53 Coverage
-          </v-col>
-          <v-col :cols="8">
-            <v-btn @click="up" :disabled="!allow_up" block x-small>
-              <v-icon v-if="allow_up"> arrow_back </v-icon>
-              {{ selected_node.data.name }}
-            </v-btn>
-          </v-col>
-          <v-col :cols="2">
-            <v-btn @click="clear" block x-small>
-              <v-icon icon="chart" />
-              Clear Filter
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col :cols="12" v-resize:debounce="on_resize">
-            <svg id="chartBody" :width="width" :height="height">
-              <g
-                style="shape-rendering: crispEdges;"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <!-- The body -->
-                <Cell
-                  :selected_node="selected_node"
-                  :selected_control_id="value.selectedControlID"
-                  :node="treemap_layout"
-                  :scales="scales"
-                  @select-node="select_node"
-                />
-              </g>
-            </svg>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-  </v-card>
+  <v-container fluid>
+    <v-row dense>
+      <v-col :cols="2">
+        NIST SP 800-53 Coverage
+      </v-col>
+      <v-col :cols="8">
+        <v-btn @click="up" :disabled="!allow_up" block x-small>
+          <v-icon v-if="allow_up"> arrow_back </v-icon>
+          {{ selected_node.data.name }}
+        </v-btn>
+      </v-col>
+      <v-col :cols="2">
+        <v-btn @click="clear" block x-small>
+          <v-icon icon="chart" />
+          Clear Filter
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col :cols="12" v-resize:debounce="on_resize">
+        <svg id="chartBody" :width="width" :height="height">
+          <g
+            style="shape-rendering: crispEdges;"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <!-- The body -->
+            <Cell
+              :selected_node="selected_node"
+              :selected_control_id="value.selectedControlID"
+              :node="treemap_layout"
+              :scales="scales"
+              @select-node="select_node"
+            />
+          </g>
+        </svg>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -101,7 +97,7 @@ const TreemapProps = Vue.extend({
 })
 export default class Treemap extends TreemapProps {
   /** The svg internal coordinate space */
-  width: number = 1200;
+  width: number = 1600;
   height: number = 530;
 
   /** The currently selected treemap node. Wrapped to avoid initialization woes */
@@ -290,6 +286,5 @@ text {
 
 rect {
   fill: none;
-  stroke: ;
 }
 </style>
