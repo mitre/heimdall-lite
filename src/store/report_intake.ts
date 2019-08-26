@@ -1,5 +1,5 @@
 /**
- * Counts the severities of controls.
+ * Reads and parses inspec files
  */
 
 import { convertFile, ConversionResult } from "inspecjs";
