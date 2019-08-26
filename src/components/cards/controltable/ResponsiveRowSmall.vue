@@ -32,3 +32,9 @@ const Props = Vue.extend({
 @Component
 export default class Row extends Props {}
 </script>
+
+<style scoped>
+.v-card {
+  background-color: rgba(0, 0, 0, 0);
+}
+</style>

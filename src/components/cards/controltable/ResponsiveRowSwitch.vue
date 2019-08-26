@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card class="lighter-card" elevation="2">
+      <v-card color="background lighten-2" elevation="2">
         <ResponsiveRowSmall
           v-if="$vuetify.breakpoint.xsOnly"
           @toggle="$emit('toggle')"
@@ -85,12 +85,3 @@ const Props = Vue.extend({
 })
 export default class ControlRowHeader extends Props {}
 </script>
-
-<style>
-.lighter-card .theme--dark.v-card {
-  background: #525252;
-}
-.lighter-card .theme--light.v-card {
-  background: #e2e2e2;
-}
-</style>
