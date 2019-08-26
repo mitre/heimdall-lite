@@ -52,7 +52,6 @@
                 </v-row>
                 <br />
                 <v-row
-                  cols="12"
                   v-for="(result, index) in item.wraps.results"
                   :key="index"
                 >
@@ -61,14 +60,14 @@
                   }}</v-col>
                   <v-col cols="5" class="stripes right">
                     <v-card height="100%">
-                      <prism language="yaml" class="code-card"
+                      <prism language="makefile" class="code-card"
                         >Test: {{ result.code_desc }}</prism
                       >
                     </v-card>
                   </v-col>
                   <v-col v-if="result.message" cols="6" class="stripes right">
                     <v-card height="100%">
-                      <prism language="yaml" class="code-card"
+                      <prism language="makefile" class="code-card"
                         >Result: {{ result.message }}</prism
                       >
                     </v-card>
@@ -112,16 +111,12 @@
                 <v-divider></v-divider>
                 <v-row>
                   <v-col cols="1">Check Text:</v-col>
-                  <v-col cols="11" class="newline">{{
-                    item.wraps.tags.check
-                  }}</v-col>
+                  <v-col cols="11">{{ item.wraps.tags.check }}</v-col>
                 </v-row>
                 <v-divider></v-divider>
                 <v-row>
                   <v-col cols="1">Fix Text:</v-col>
-                  <v-col cols="11" class="newline">{{
-                    item.wraps.tags.fix
-                  }}</v-col>
+                  <v-col cols="11">{{ item.wraps.tags.fix }}</v-col>
                 </v-row>
               </v-container>
             </v-tab-item>
@@ -151,18 +146,13 @@ import { hdfWrapControl, HDFControl } from "inspecjs";
 //TODO: add line numbers
 import "prismjs";
 //@ts-ignore
-//Prism.languages.rb.string[5].pattern = /("|')(?:#\{[^}]+\}|\\(?:|[\s\S])|(?!\1)[^\\])*\1/g;
 import Prism from "vue-prism-component";
-//import Prism from "prismjs";
-//Prism.highlightAll();
-//var nw = Prism.plugins.NormalizeWhitespace;
 
 import "prismjs/themes/prism-twilight.css";
 import "prismjs/components/prism-scss.min";
+import "prismjs/components/prism-makefile.js";
 import "prismjs/components/prism-yaml.js";
 import "prismjs/components/prism-ruby.js";
-import "prismjs/plugins/line-numbers/prism-line-numbers.css";
-import "prismjs/plugins/line-numbers/prism-line-numbers.min.js";
 Vue.component("prism", Prism);
 
 interface Header {
