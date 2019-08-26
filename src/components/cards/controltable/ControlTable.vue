@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="overflow-y: auto; height: 600px;">
     <!-- Toolbar -->
     <v-row>
       <v-col cols="12">
@@ -64,24 +64,32 @@
       />
       <v-divider :key="item.key + 'd2'" v-if="expanded.includes(item.key)" />
     </template>
+
+    <!-- Loading -->
+    <infinite-loading
+      :identifier="infinite_scroller_watch"
+      @infinite="infinite_handler"
+    >
+      <div slot="spinner">Loading...</div>
+      <div slot="no-more">No more</div>
+      <div slot="no-results">No controls</div>
+    </infinite-loading>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { getModule } from "vuex-module-decorators";
-import { hdfWrapControl, HDFControl, ControlStatus } from "inspecjs";
-import FilteredDataModule from "@/store/data_filters";
-import { isInspecFile, InspecFile } from "@/store/report_intake";
 import ControlRowHeader from "@/components/cards/controltable/ControlRowHeader.vue";
 import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
 import ColumnHeader, { Sort } from "@/components/generic/ColumnHeader.vue";
 import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
-import { control_unique_key } from "@/utilities/format_util";
-import { ContextualizedControl } from "../../../store/data_store";
+import InfiniteLoading, { StateChanger } from "vue-infinite-loading";
 
-type ShowCount = "all" | number;
+import { getModule } from "vuex-module-decorators";
+import { hdfWrapControl, HDFControl, ControlStatus } from "inspecjs";
+import FilteredDataModule from "@/store/data_filters";
+import { control_unique_key } from "@/utilities/format_util";
 
 // Tracks the visibility of an HDF control
 interface ListElt extends HDFControl {
@@ -108,7 +116,8 @@ const ControlTableProps = Vue.extend({
     ControlRowHeader,
     ControlRowDetails,
     ColumnHeader,
-    ResponsiveRowSwitch
+    ResponsiveRowSwitch,
+    InfiniteLoading
   }
 })
 export default class ControlTable extends ControlTableProps {
@@ -116,19 +125,37 @@ export default class ControlTable extends ControlTableProps {
   single_expand: boolean = false;
 
   // How many items to show per page
-  show_count: ShowCount = 20;
-
-  // Our page start index, if we aren't showing all
-  index: number = 0;
 
   // List of currently expanded options. If unique id is in here, it is expanded
   expanded: Array<string> = [];
+
+  /** Currently loaded infinite items */
+  visible_items: ListElt[] = [];
+
+  /** Identifier for infinite scroller tracking */
+  infinite_scroller_id: number = 1;
 
   // Sorts
   sort_id: Sort = "none";
   sort_status: Sort = "none";
   sort_severity: Sort = "none";
 
+  /** utility getter that acts as a watch,
+   * incrementing infinite_scroller_id when called
+   */
+  get infinite_scroller_watch() {
+    // Increment our internal
+    this.visible_items = [];
+    this.infinite_scroller_id += 1;
+
+    // We care about our items!
+    let watched_vals = this.items;
+
+    // Return our internal
+    return this.infinite_scroller_id;
+  }
+
+  /** Callback to handle setting a new sort */
   set_sort(column: "id" | "status" | "severity", new_sort: Sort) {
     this.sort_id = "none";
     this.sort_status = "none";
@@ -146,7 +173,7 @@ export default class ControlTable extends ControlTableProps {
     }
   }
 
-  /** Toggles the given expansion */
+  /** Toggles the given expansion of a control details panel */
   toggle(key: string) {
     if (this.single_expand) {
       // Check if key already there
@@ -230,12 +257,19 @@ export default class ControlTable extends ControlTableProps {
     return this.raw_items.sort((a, b) => cmp(a, b) * factor);
   }
 
-  /** Return the items we should be showing */
-  get visible_items(): ListElt[] {
-    if (this.show_count === "all") {
-      return this.items;
+  /** Show one more page worth of stuff */
+  infinite_handler(state: StateChanger) {
+    // Budget for more items
+    let base = this.visible_items.length;
+
+    // If we've hit capacity already, abort
+    if (base >= this.items.length) {
+      // Say we've loaded all we can
+      state.complete();
     } else {
-      return this.items.slice(this.index, this.index + this.show_count);
+      // Push on the next item
+      this.visible_items.push(this.items[base]);
+      state.loaded();
     }
   }
 }
