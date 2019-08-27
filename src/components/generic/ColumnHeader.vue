@@ -1,8 +1,9 @@
 <template>
-  <div class="fill-height">
-    <span :class="classes"> {{ text }} </span>
-    <v-btn v-if="allow_sort" text icon @click="toggle_sort">
-      <v-icon class="pa-0" @click="toggle_sort"> {{ icon }} </v-icon>
+  <div class="fill-height px-2">
+    <span> {{ text }} </span>
+    <!-- Note: always have button for spacing consistency. Just disable and invis -->
+    <v-btn :disabled="!allow_sort" text icon @click="toggle_sort">
+      <v-icon class="pa-0"> {{ icon }} </v-icon>
     </v-btn>
   </div>
 </template>
@@ -29,23 +30,18 @@ const Props = Vue.extend({
 
 @Component
 export default class ColumnHeader extends Props {
+  /**
+   * Simple boolean deciding whether or not to actually show/allow sorting
+   */
   get allow_sort(): boolean {
+    // return true;
     return this.sort !== "disabled";
   }
 
-  get classes(): string[] {
-    let ret = ["text-start", "justify-center"];
-    if (this.allow_sort) {
-      ret.push("sortable");
-      if ((this.sort as Sort) === "ascending") {
-        ret.push("active", "asc");
-      } else if ((this.sort as Sort) === "descending") {
-        ret.push("active", "desc");
-      }
-    }
-    return ret;
-  }
-
+  /**
+   * Callback fired upon clicking the column header.
+   * Toggles between the sort modes, and emits them as an "input" event.
+   */
   toggle_sort(): void {
     let new_sort: string;
     switch (this.sort as Sort) {
@@ -57,12 +53,15 @@ export default class ColumnHeader extends Props {
         new_sort = "ascending";
         break;
       case "ascending":
-        new_sort = "none";
+        new_sort = "descending";
         break;
     }
     this.$emit("input", new_sort);
   }
 
+  /**
+   * Computes the material theme getter to use for the sort icon
+   */
   get icon(): string {
     switch (this.sort as Sort) {
       default:
@@ -72,6 +71,8 @@ export default class ColumnHeader extends Props {
         return "arrow_upward";
       case "descending":
         return "arrow_downward";
+      case "disabled":
+        return "";
     }
   }
 }

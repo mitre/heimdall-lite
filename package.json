@@ -37,6 +37,7 @@
   "devDependencies": {
     "@mdi/font": "^3.9.97",
     "@types/chai": "^4.2.0",
+    "@types/lru-cache": "^5.1.0",
     "@types/mocha": "^5.2.4",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",

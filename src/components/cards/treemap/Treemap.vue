@@ -45,8 +45,6 @@ import {
   hdfWrapControl,
   NistFamily,
   NistCategory,
-  generateNewNistHash,
-  populateNistHash,
   ControlGroupStatus
 } from "inspecjs";
 import * as d3 from "d3";
@@ -195,7 +193,8 @@ export default class Treemap extends TreemapProps {
     return nistHashForControls(controls);
   }
 
-  /** Generates a d3 heirarchy structure outlining all of the data in the nist hash */
+  /** Generates a d3 heirarchy structure, with appropriate bounds to our width
+   *  detailing all of the controls in the nist hash */
   get treemap_layout(): d3.HierarchyRectangularNode<TreemapDatumType> {
     let hierarchy = nistHashToTreeMap(this.nist_hash);
     let treemap = d3
@@ -207,13 +206,7 @@ export default class Treemap extends TreemapProps {
   }
 
   // Callbacks for our tree
-  select_node(n: null | d3.HierarchyRectangularNode<TreemapDatumType>): void {
-    // Avoid selecting falsey nodes
-    if (!n) {
-      console.log("Attempted to select Null Node in Treemap");
-      return;
-    }
-
+  select_node(n: d3.HierarchyRectangularNode<TreemapDatumType>): void {
     // Get our path to the selected node
     let route = n.ancestors().reverse();
 
@@ -248,7 +241,9 @@ export default class Treemap extends TreemapProps {
 
   /** Submits an event to go up one node */
   up(): void {
-    this.select_node(this.selected_node.parent);
+    if (this.selected_node.parent !== null) {
+      this.select_node(this.selected_node.parent);
+    }
   }
 
   /** Controls whether we should allow up */

@@ -48,7 +48,8 @@ import {
   HDFControl,
   NistHash,
   ControlGroupStatus,
-  NistCategory
+  NistCategory,
+  NistFamily
 } from "inspecjs";
 import * as d3 from "d3";
 import {
@@ -102,32 +103,54 @@ const CellProps = Vue.extend({
 export default class Cell extends CellProps {
   scale: number = 1.0;
 
-  /** Provide typed getters */
+  /**
+   * Typed getter for this Cell's node, IE the rectangle that it is in charge of drawing.
+   */
   get _node(): d3.HierarchyRectangularNode<TreemapDatumType> {
     return this.node;
   }
 
+  /**
+   * Typed getter for the selected node, which defines which node we are "zoomed into".
+   * Note that the selected control will NEVER be the selected node, since we do not zoom into that level.
+   * Use selected_node_id for that purpose!
+   */
   get _selected_node(): d3.HierarchyRectangularNode<TreemapDatumType> {
     return this.selected_node;
   }
 
+  /**
+   * Typed getter for depth that also automatically substitutes "undefined" for 0 where appropriate
+   * To be clear, "appropriate" is when this is the selected node, using Object.is
+   */
   get _depth(): number | undefined {
     if (this.depth === undefined) {
-      return this._node === this._selected_node ? 0 : undefined;
+      return Object.is(this._node, this._selected_node) ? 0 : undefined;
     } else {
       return this.depth;
     }
   }
 
+  /** Typed getter for scale_x prop. Performs no type checking.
+   * The scale_x prop is the x domain of the current "viewport",
+   * except not using svg viewports due to their text scaling properties.
+   * It is shared and equal between all nodes, changing in response to the selected node changing.
+   */
   get _scale_x(): d3.ScaleLinear<number, number> {
     return this.scales.scale_x;
   }
 
+  /** Typed getter for scale_y prop. Performs no type checking.
+   * The scale_y prop is the y domain of the current "viewport",
+   * except not using svg viewports due to their text scaling properties.
+   * It is shared and equal between all nodes, changing in response to the selected node changing.
+   */
   get _scale_y(): d3.ScaleLinear<number, number> {
     return this.scales.scale_y;
   }
 
-  /** Depth to pass to childen */
+  /** Depth to pass to childen.
+   * Using a getter here to avoid having to deal with consequences of what undefined + 1 comes out to */
   get child_depth(): number | undefined {
     if (this._depth !== undefined) {
       return this._depth + 1;
@@ -136,38 +159,47 @@ export default class Cell extends CellProps {
     }
   }
 
-  /** Are we a control? */
+  /** Are we a control? Use treemap util type checker */
   get is_control(): boolean {
     return isCCWrapper(this._node.data);
   }
 
-  /** Are we selected? */
+  /** Are we selected? True if selected_control_id matches our id, and we are in selected heirarchy */
   get is_selected(): boolean {
     return (
-      this.is_control &&
-      (this._node.data as CCWrapper).ctrl.data.id === this.selected_control_id
+      this.is_control && // We are a control
+      this._depth !== undefined && // Implies an ancesrtor is selected
+      (this._node.data as CCWrapper).ctrl.data.id === this.selected_control_id // Our control id matches
     );
   }
 
-  /** X, Y, Width and height calculators. All must be scaled */
+  /** Compute the top-left x coord of this cell rect based on the provided scale_x prop */
   get x(): number {
     return this._scale_x(this._node.x0);
   }
 
+  /** Compute the top-left y coord of this cell rect based on the provided scale_y prop */
   get y(): number {
     return this._scale_y(this._node.y0);
   }
 
+  /**
+   * Compute the width of this rect based on scale, and base x position
+   */
   get width(): number {
-    // Scale x0 and x1 required
     return this._scale_x(this._node.x1) - this.x;
   }
 
+  /**
+   * Compute the height of this rect based on scale, and base y position
+   */
   get height(): number {
     return this._scale_y(this._node.y1) - this.y;
   }
 
-  /** Classes for our "body" */
+  /** Returns a list of classes appropriate to this nodes Rect
+   * These are contextual based on type of data, and depth within the tree
+   */
   get cell_classes(): string[] {
     // Type stuff
     let s: string[] = [];
@@ -209,46 +241,29 @@ export default class Cell extends CellProps {
     return style;
   }
 
-  // Callbacks for our tree
+  /**
+   * Callback fired when the user clicks a node. Passes up from cell to cell until it reaches Treemap
+   */
   select_node(n: null | d3.HierarchyRectangularNode<TreemapDatumType>): void {
     // Pass it up to root
     this.$emit("select-node", n);
   }
 
   /**
-   * Looks up a color for the given piece of data
-   * TODO: Shunt this to our color module
+   * Looks up a fill color for this node based on its status.
    */
   get color(): string {
     // Observe color
     let observed = this.$vuetify.theme.dark;
     let cmod = getModule(ColorHackModule, this.$store);
-    let status: ControlGroupStatus = this._node.data.status;
-    switch (status) {
-      case "Passed":
-        return cmod.lookupColor("statusPassed");
-      case "Failed":
-        return cmod.lookupColor("statusFailed");
-      case "No Data":
-        return cmod.lookupColor("statusNoData");
-      case "Not Applicable":
-        return cmod.lookupColor("statusNotApplicable");
-      case "Not Reviewed":
-        return cmod.lookupColor("statusNotReviewed");
-      case "Profile Error":
-        return cmod.lookupColor("statusProfileError");
-      case "Empty":
-        return "black";
-      default:
-        console.warn(`No treemap color defined for ${status}`);
-        return "rgb(187, 187, 187)";
-    }
+    return cmod.colorForStatus(this._node.data.status);
   }
 
   /**
-   * Provides a label for the given piece of data
+   * Provides a label for this node's data.
+   * This is shown as centered text in the main cell
    */
-  get label() {
+  get label(): string {
     if (isCCWrapper(this._node.data)) {
       return this._node.data.ctrl.data.id;
     } else {
@@ -257,7 +272,7 @@ export default class Cell extends CellProps {
   }
 
   /**
-   * Generates unique keys
+   * Generates unique keys for treemap datums.
    */
   key_for(data: TreemapDatumType): string {
     if (isCCWrapper(data)) {

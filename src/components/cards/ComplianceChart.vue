@@ -112,15 +112,3 @@ export default class ComplianceChart extends ComplianceChartProps {
   }
 }
 </script>
-
-<!--
-<style scoped>
-.card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-grow: 1;
-  height: 107%; /*ehhh*/
-}
-</style>
--->
