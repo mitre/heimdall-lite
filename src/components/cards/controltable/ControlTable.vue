@@ -1,5 +1,5 @@
 <template>
-  <v-container style="overflow-y: auto; height: 600px;">
+  <v-container fluid>
     <!-- Toolbar -->
     <v-row>
       <v-col cols="12">
@@ -49,31 +49,31 @@
     </ResponsiveRowSwitch>
 
     <!-- Body -->
-    <template v-for="item in visible_items">
-      <ControlRowHeader
-        :key="item.key + 'h'"
-        :control="item"
-        :expanded="expanded.includes(item.key)"
-        @toggle="toggle(item.key)"
-      />
-      <v-divider :key="item.key + 'd1'" v-if="!expanded.includes(item.key)" />
-      <ControlRowDetails
-        v-if="expanded.includes(item.key)"
-        :key="item.key + 'b'"
-        :control="item"
-      />
-      <v-divider :key="item.key + 'd2'" v-if="expanded.includes(item.key)" />
-    </template>
+    <div class="scrollzone" style="overflow-y: auto; height: 600px;">
+      <template v-for="item in visible_items">
+        <ControlRowHeader
+          :key="item.key + 'h'"
+          :control="item"
+          :expanded="expanded.includes(item.key)"
+          @toggle="toggle(item.key)"
+        />
+        <ControlRowDetails
+          v-if="expanded.includes(item.key)"
+          :key="item.key + 'b'"
+          :control="item"
+        />
+      </template>
 
-    <!-- Loading -->
-    <infinite-loading
-      :identifier="infinite_scroller_watch"
-      @infinite="infinite_handler"
-    >
-      <div slot="spinner">Loading...</div>
-      <div slot="no-more">No more</div>
-      <div slot="no-results">No controls</div>
-    </infinite-loading>
+      <!-- Loading -->
+      <infinite-loading
+        :identifier="infinite_scroller_watch"
+        @infinite="infinite_handler"
+      >
+        <div slot="spinner">Loading...</div>
+        <div slot="no-more">No more</div>
+        <div slot="no-results">No controls</div>
+      </infinite-loading>
+    </div>
   </v-container>
 </template>
 
@@ -274,3 +274,14 @@ export default class ControlTable extends ControlTableProps {
   }
 }
 </script>
+
+<style scoped>
+.scrollzone {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow: -moz-scrollbars-none;
+}
+.scrollzone::-webkit-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>

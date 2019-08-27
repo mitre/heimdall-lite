@@ -20,11 +20,8 @@
       class="hidden-sm-and-down"
     ></v-text-field>
     <v-spacer></v-spacer>
-    <v-btn icon>
-      <v-icon>apps</v-icon>
-    </v-btn>
-    <v-btn icon>
-      <v-icon>notifications</v-icon>
+    <v-btn @click="clear">
+      Clear Filter
     </v-btn>
     <v-btn icon large>
       <v-avatar size="32px" item>
@@ -46,5 +43,10 @@ const TopbarProps = Vue.extend({
 @Component({
   components: {}
 })
-export default class Topbar extends TopbarProps {}
+export default class Topbar extends TopbarProps {
+  /** Submits an event to clear all filters */
+  clear(): void {
+    this.$emit("clear");
+  }
+}
 </script>

@@ -18,13 +18,13 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="2">
+    <v-col class="pa-0" :cols="1">
       <v-card tile flat class="fill-height">
         <slot name="id" />
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="1">
+    <v-col class="pa-0" :cols="2">
       <v-card tile flat class="fill-height">
         <slot name="tags" />
       </v-card>

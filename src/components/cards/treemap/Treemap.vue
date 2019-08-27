@@ -1,19 +1,13 @@
 <template>
   <v-container fluid>
     <v-row dense>
-      <v-col :cols="2">
+      <v-col :cols="4">
         NIST SP 800-53 Coverage
       </v-col>
       <v-col :cols="8">
         <v-btn @click="up" :disabled="!allow_up" block x-small>
           <v-icon v-if="allow_up"> arrow_back </v-icon>
           {{ selected_node.data.name }}
-        </v-btn>
-      </v-col>
-      <v-col :cols="2">
-        <v-btn @click="clear" block x-small>
-          <v-icon icon="chart" />
-          Clear Filter
         </v-btn>
       </v-col>
     </v-row>
@@ -250,11 +244,6 @@ export default class Treemap extends TreemapProps {
       selectedControlID: selected_control_id
     };
     this.$emit("input", new_state);
-  }
-
-  /** Submits an event to clear all filters */
-  clear(): void {
-    this.$emit("clear");
   }
 
   /** Submits an event to go up one node */
