@@ -6,15 +6,15 @@ import { Module, VuexModule, getModule } from "vuex-module-decorators";
 import DataModule, {
   ContextualizedProfile,
   ContextualizedControl
-} from "./data_store";
+} from "@/store/data_store";
 import {
   ControlStatus,
   Severity,
   hdfWrapControl as hdf,
   hdfWrapControl
 } from "inspecjs";
-import { FileID, isInspecFile } from "./report_intake";
-import Store from "./store";
+import { FileID, isInspecFile } from "@/store/report_intake";
+import Store from "@/store/store";
 import LRUCache from "lru-cache";
 
 const MAX_CACHE_ENTRIES = 20;

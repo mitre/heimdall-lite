@@ -65,9 +65,9 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { InspecFile, ExecutionFile, ProfileFile } from "@/store/report_intake";
 import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "../../store/data_store";
-import FileItem from "./sidebaritems/SidebarFile.vue";
-import LinkItem from "./sidebaritems/SidebarLink.vue";
+import InspecDataModule from "@/store/data_store";
+import FileItem from "@/components/global/sidebaritems/SidebarFile.vue";
+import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 
 interface LinkProps {
   text: string; // To label the item

@@ -5,8 +5,8 @@
  * - Control ID -> All controls with that id
  */
 import { Module, VuexModule, getModule } from "vuex-module-decorators";
-import DataModule, { ContextualizedControl } from "./data_store";
-import Store from "./store";
+import DataModule, { ContextualizedControl } from "@/store/data_store";
+import Store from "@/store/store";
 
 // Control ID hash
 export type ControlHash = { [key: string]: ContextualizedControl[] };

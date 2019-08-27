@@ -14,8 +14,8 @@ import {
   ExecutionFile,
   ProfileFile,
   InspecFile
-} from "./report_intake";
-import Store from "./store";
+} from "@/store/report_intake";
+import Store from "@/store/store";
 import { ExecJSONProfile } from "inspecjs/dist/generated-parsers/exec-json";
 
 /**

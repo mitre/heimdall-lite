@@ -1,5 +1,5 @@
 import { Module, VuexModule, getModule } from "vuex-module-decorators";
-import Store from "./store";
+import Store from "@/store/store";
 import { ControlStatus, ControlGroupStatus, Severity } from "inspecjs";
 
 /**

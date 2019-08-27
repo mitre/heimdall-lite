@@ -5,8 +5,8 @@
 import { convertFile, ConversionResult } from "inspecjs";
 import { Module, VuexModule, getModule, Action } from "vuex-module-decorators";
 import { AnyExec, AnyProfile, AnyFullControl } from "inspecjs";
-import DataModule from "./data_store";
-import Store from "./store";
+import DataModule from "@/store/data_store";
+import Store from "@/store/store";
 
 /** Each FileID corresponds to a unique File in this store */
 export type FileID = number;

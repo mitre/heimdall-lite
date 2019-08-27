@@ -37,7 +37,7 @@ import Topbar from "@/components/global/Topbar.vue";
 import Toolbar from "@/components/global/Toolbar.vue";
 import Modal from "@/components/global/Modal.vue";
 import Footer from "@/components/global/Footer.vue";
-import ColorHackModule from "./store/color_hack";
+import ColorHackModule from "@/store/color_hack";
 
 // We declare the props separately
 // to make props types inferable.

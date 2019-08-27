@@ -3,11 +3,11 @@
  */
 
 import { Module, VuexModule, getModule } from "vuex-module-decorators";
-import FilteredData, { Filter, filter_cache_key } from "./data_filters";
-import Store from "./store";
+import FilteredData, { Filter, filter_cache_key } from "@/store/data_filters";
+import Store from "@/store/store";
 import LRUCache from "lru-cache";
 import { ControlStatus, hdfWrapControl } from "inspecjs";
-import InspecDataModule from "./data_store";
+import InspecDataModule from "@/store/data_store";
 
 // The hash that we will generally be working with herein
 type StatusHash = { [key in ControlStatus]: number };
@@ -24,7 +24,7 @@ function count_statuses(data: FilteredData, filter: Filter): StatusHash {
   let controls = data.controls(new_filter);
 
   // Count 'em out
-  let hash: { [key in ControlStatus]: number } = {
+  let hash: StatusHash = {
     Failed: 0,
     "From Profile": 0,
     "No Data": 0,
@@ -60,7 +60,7 @@ class StatusCountModule extends VuexModule {
   }
 
   /** Generates a hash mapping each status -> a count of its members */
-  get hash(): (filter: Filter) => { [key in ControlStatus]: number } {
+  get hash(): (filter: Filter) => StatusHash {
     // Establish our cache and dependency
     let depends: any = this.inspec_data.contextualControls;
     let cache: LRUCache<string, StatusHash> = new LRUCache(10);
