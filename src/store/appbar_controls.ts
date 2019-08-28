@@ -11,6 +11,13 @@ import Store from "@/store/store";
   store: Store,
   name: "appbar_controls"
 })
-class AppbarControlsModule extends VuexModule {}
+class AppbarControlsModule extends VuexModule {
+  /** Configurables */
+  mode: "results" | "compare" = "results";
+
+  /** Watchable values */
+  pressed_button: string | undefined;
+  search_text: string | undefined;
+}
 
 export default AppbarControlsModule;

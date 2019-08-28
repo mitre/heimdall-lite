@@ -1,29 +1,12 @@
 <template>
   <v-app id="inspire" style="background: var(--v-background-base)">
-    <!-- Top+Sidebar -->
+    <!-- Sidebar to naviage between things -->
     <Sidebar v-model="drawer" />
-    <Topbar @toggle-drawer="drawer = !drawer" />
 
-    <v-content>
-      <Toolbar />
-      <router-view></router-view>
-    </v-content>
+    <!-- Router view -->
+    <router-view></router-view>
 
-    <v-btn
-      bottom
-      color="teal"
-      dark
-      fab
-      fixed
-      right
-      @click="dialog = !dialog"
-      :hidden="dialog"
-    >
-      <v-icon>add</v-icon>
-    </v-btn>
-
-    <Modal :dialog="dialog" @modal-dismissed="dialog = false" />
-
+    <!-- Footer -->
     <v-spacer />
     <Footer />
   </v-app>
@@ -33,37 +16,19 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import Sidebar from "@/components/global/Sidebar.vue";
-import Topbar from "@/components/global/Topbar.vue";
-import Toolbar from "@/components/global/Toolbar.vue";
-import Modal from "@/components/global/Modal.vue";
 import Footer from "@/components/global/Footer.vue";
-import ColorHackModule from "@/store/color_hack";
 
 // We declare the props separately
 // to make props types inferable.
-const AppProps = Vue.extend({
-  props: {
-    source: String
-  }
-});
+const AppProps = Vue.extend({});
 
 @Component({
   components: {
     Sidebar,
-    Topbar,
-    Toolbar,
-    Footer,
-    Modal
+    Footer
   }
 })
-export default class App extends AppProps {
-  drawer: boolean = false;
-  dialog: boolean = false;
-
-  get background() {
-    return "background";
-  }
-}
+export default class App extends AppProps {}
 </script>
 
 <style>
