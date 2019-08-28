@@ -1,5 +1,5 @@
 <template>
-  <ApexPieChart
+  <PieChart
     :categories="categories"
     :series="series"
     @category-selected="onSelect"
@@ -9,7 +9,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import ApexPieChart, { Category } from "@/components/generic/ApexPieChart.vue";
+import PieChart, { Category } from "@/components/generic/PieChart.vue";
 import { getModule } from "vuex-module-decorators";
 import StatusCountModule from "@/store/status_counts";
 import { ControlStatus } from "inspecjs";
@@ -28,7 +28,7 @@ const StatusChartProps = Vue.extend({
  */
 @Component({
   components: {
-    ApexPieChart
+    PieChart
   }
 })
 export default class StatusChart extends StatusChartProps {

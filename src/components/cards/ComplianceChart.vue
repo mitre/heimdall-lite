@@ -1,19 +1,11 @@
 <template>
-  <div slot="no-body">
-    <vue-apex-charts
-      id="chart"
-      type="radialBar"
-      width="350"
-      :options="chartOptions"
-      :series="series"
-    />
-  </div>
+  <PieChart :categories="categories" :series="series" :arc_span="180" />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import VueApexCharts from "vue-apexcharts";
+import PieChart, { Category } from "@/components/generic/PieChart.vue";
 import { getModule } from "vuex-module-decorators";
 import ColorHackModule from "@/store/color_hack";
 import FilteredDataModule, { Filter } from "@/store/data_filters";
@@ -30,68 +22,16 @@ const ComplianceChartProps = Vue.extend({
   }
 });
 
+/**
+ * Categories property must be of type Category
+ * Model is of type Severity | null - reflects selected severity
+ */
 @Component({
   components: {
-    VueApexCharts
+    PieChart
   }
 })
 export default class ComplianceChart extends ComplianceChartProps {
-  get chartOptions(): ApexOptions {
-    // Get our color module
-    let colors = getModule(ColorHackModule, this.$store);
-
-    // Produce our options
-    let result: ApexOptions = {
-      plotOptions: {
-        radialBar: {
-          startAngle: -150,
-          endAngle: 150,
-          hollow: {
-            size: "70%"
-          },
-          track: {
-            opacity: 0
-          },
-          dataLabels: {
-            show: true,
-            value: {
-              color: "#99a2ac",
-              fontSize: "2rem"
-            }
-          }
-        }
-      },
-      fill: {
-        type: "solid",
-        colors: [
-          function(data: { value: number }) {
-            if (data.value < 60) {
-              return colors.lookupColor("complianceLow");
-            } else if (data.value >= 60 && data.value < 90) {
-              return colors.lookupColor("complianceMedium");
-            } else {
-              return colors.lookupColor("complianceHigh");
-            }
-          }
-        ]
-      },
-      chart: {
-        dropShadow: {
-          enabled: true,
-          top: 0,
-          left: 0,
-          blur: 3,
-          opacity: 0.35
-        }
-      },
-      stroke: {
-        dashArray: 8
-      },
-      labels: ["Compliance Level"]
-    };
-    return result;
-  }
-
   /**
    * We actuall generate our series ourself! This is what shows up in the chart. It should be a single value
    */
@@ -99,16 +39,35 @@ export default class ComplianceChart extends ComplianceChartProps {
     // Get access to the status counts, to compute compliance percentages
     let counts = getModule(StatusCountModule, this.$store);
     let passed = counts.passed(this.filter);
-    let total =
-      passed +
-      counts.failed(this.filter) +
-      counts.profileError(this.filter) +
-      counts.notReviewed(this.filter);
+    let failed = counts.failed(this.filter) + counts.profileError(this.filter);
+    let not_reviewed = counts.notReviewed(this.filter);
+
+    let total = passed + failed + not_reviewed;
     if (total == 0) {
-      return [0];
+      return [0, 0];
     } else {
-      return [Math.round((100.0 * passed) / total)];
+      return [passed / total, not_reviewed / total, failed / total].map(x =>
+        Math.round(100.0 * x)
+      );
     }
   }
+
+  categories: Category<string>[] = [
+    {
+      label: "Passed %",
+      value: "n/a",
+      color: "statusPassed"
+    },
+    {
+      label: "Not Reviewed %",
+      value: "n/a",
+      color: "statusNotReviewed"
+    },
+    {
+      label: "Failed + Errored %",
+      value: "n/a",
+      color: "statusFailed"
+    }
+  ];
 }
 </script>
