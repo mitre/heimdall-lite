@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Results from "@/views/Results.vue";
+import Compare from "@/views/Compare.vue";
 
 Vue.use(Router);
 
@@ -10,6 +11,11 @@ export default new Router({
       path: "/results/:id",
       name: "results",
       component: Results
+    },
+    {
+      path: "/compare/:old/:new",
+      name: "compare",
+      component: Compare
     },
     {
       path: "/about",
