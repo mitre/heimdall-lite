@@ -8,11 +8,11 @@
         hide-details
         prepend-inner-icon="search"
         label="Search"
-        class="hidden-sm-and-down"
         v-model="search_term"
       ></v-text-field>
-      <v-btn @click="clear">
-        Clear Filter
+      <v-spacer />
+      <v-btn @click="clear" title="Clear all set filters">
+        Clear
       </v-btn>
     </template>
 
