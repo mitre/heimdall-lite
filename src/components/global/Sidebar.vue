@@ -1,6 +1,7 @@
 <template>
   <v-navigation-drawer
     :value="value"
+    @input="$emit('input', $event)"
     :clipped="$vuetify.breakpoint.lgAndUp"
     app
   >
