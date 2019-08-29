@@ -18,6 +18,7 @@
     "core-js": "^2.6.5",
     "d3": "^5.11.0",
     "inspecjs": "0.3.0",
+    "lru-cache": "^5.1.1",
     "prismjs": "^1.17.1",
     "roboto-fontface": "*",
     "vue": "^2.6.10",

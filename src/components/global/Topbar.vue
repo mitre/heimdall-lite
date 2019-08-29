@@ -5,24 +5,18 @@
     color="blue darken-3"
     dark
   >
+    <!-- The title and nav bar -->
     <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
       <v-app-bar-nav-icon
         @click.stop="$emit('toggle-drawer')"
       ></v-app-bar-nav-icon>
       <span class="hidden-sm-and-down">Heimdall Lite</span>
     </v-toolbar-title>
-    <v-text-field
-      flat
-      solo-inverted
-      hide-details
-      prepend-inner-icon="search"
-      label="Search"
-      class="hidden-sm-and-down"
-    ></v-text-field>
-    <v-spacer></v-spacer>
-    <v-btn @click="clear">
-      Clear Filter
-    </v-btn>
+
+    <!-- Our customizable content -->
+    <slot> </slot>
+
+    <!-- Login information or whatever -->
     <v-btn icon large>
       <v-avatar size="32px" item>
         <v-img :src="require('@/assets/logo.png')" alt="Heimdall"></v-img>

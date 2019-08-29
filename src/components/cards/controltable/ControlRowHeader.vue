@@ -2,10 +2,15 @@
   <!-- Need to catch for ResponsiveRowSwitch @toggle events for small view -->
   <ResponsiveRowSwitch>
     <template #status>
-      <v-card :color="status_color" outlined tile>
+      <v-card
+        class="ma-1"
+        :color="status_color"
+        hover
+        @click="$emit('toggle', !expanded)"
+      >
         <v-card-text class="pa-2">
           {{ control.status }}
-          <v-icon class="float-right" @click="$emit('toggle', !expanded)">{{
+          <v-icon class="float-right">{{
             expanded ? "expand_more" : "expand_less"
           }}</v-icon>
         </v-card-text>

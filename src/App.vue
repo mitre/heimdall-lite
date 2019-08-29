@@ -1,9 +1,6 @@
 <template>
   <v-app id="inspire" style="background: var(--v-background-base)">
-    <!-- Sidebar to naviage between things -->
-    <Sidebar v-model="drawer" />
-
-    <!-- Router view -->
+    <!-- Router view. Typically a "subclass" of Base -->
     <router-view></router-view>
 
     <!-- Footer -->
@@ -15,7 +12,6 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import Sidebar from "@/components/global/Sidebar.vue";
 import Footer from "@/components/global/Footer.vue";
 
 // We declare the props separately
@@ -24,13 +20,13 @@ const AppProps = Vue.extend({});
 
 @Component({
   components: {
-    Sidebar,
     Footer
   }
 })
 export default class App extends AppProps {}
 </script>
 
+<!-- Style to fix dark mode to use our color scheme -->
 <style>
 .theme--light.v-card,
 .theme--light.v-sheet,

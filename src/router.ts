@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Home from "@/views/Home.vue";
+import Results from "@/views/Results.vue";
 
 Vue.use(Router);
 
@@ -9,7 +9,7 @@ export default new Router({
     {
       path: "/results/:id",
       name: "results",
-      component: Home
+      component: Results
     },
     {
       path: "/about",

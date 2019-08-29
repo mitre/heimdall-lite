@@ -1,13 +1,12 @@
 <template>
   <v-dialog :value="value" @click:outside="$emit('input', false)" width="400px">
-    <slot />
+    <slot> Default Modal </slot>
   </v-dialog>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import FileReader from "@/components/FileReader.vue";
 
 // We declare the props separately to make props types inferable.
 const ModalProps = Vue.extend({
