@@ -1,5 +1,6 @@
 import { Module, VuexModule, getModule } from "vuex-module-decorators";
-import Store from "./store";
+import Store from "@/store/store";
+import { ControlStatus, ControlGroupStatus, Severity } from "inspecjs";
 
 /**
  * Gets a hex code for the given color
@@ -69,6 +70,56 @@ class ColorHackModule extends VuexModule {
 
         localCache[colorName] = color;
         return color;
+      }
+    };
+  }
+
+  /**
+   * Parameterized getter that returns an appropriate rgb color code for a given control (group) status
+   */
+  get colorForStatus(): (status: ControlGroupStatus) => string {
+    return (status: ControlGroupStatus) => {
+      switch (status) {
+        case "Passed":
+          return this.lookupColor("statusPassed");
+        case "Failed":
+          return this.lookupColor("statusFailed");
+        case "No Data":
+          return this.lookupColor("statusNoData");
+        case "Not Applicable":
+          return this.lookupColor("statusNotApplicable");
+        case "Not Reviewed":
+          return this.lookupColor("statusNotReviewed");
+        case "Profile Error":
+          return this.lookupColor("statusProfileError");
+        case "Empty":
+          return "black";
+        default:
+          console.warn(`No color defined for ${status}`);
+          return "rgb(187, 187, 187)";
+      }
+    };
+  }
+
+  /**
+   * Parameterized getter that returns an appropriate rgb color code for a given control severity
+   */
+  get colorForSeverity(): (severity: Severity) => string {
+    return (severity: Severity) => {
+      switch (status) {
+        case "none":
+          return this.lookupColor("severityNone");
+        case "low":
+          return this.lookupColor("severityLow");
+        case "medium":
+          return this.lookupColor("severityMedium");
+        case "high":
+          return this.lookupColor("severityHigh");
+        case "critical":
+          return this.lookupColor("severityCritical");
+        default:
+          console.warn(`No color defined for ${status}`);
+          return "rgb(187, 187, 187)";
       }
     };
   }

@@ -35,8 +35,18 @@ export default new Vuetify({
   theme: {
     dark: true,
     themes: {
-      dark: { ...statuses, ...severities, ...compliances },
-      light: { ...statuses, ...severities, ...compliances }
+      dark: {
+        ...statuses,
+        ...severities,
+        ...compliances,
+        background: "#303030"
+      },
+      light: {
+        ...statuses,
+        ...severities,
+        ...compliances,
+        background: "#d0d0d0"
+      }
     },
     options: {
       customProperties: true
