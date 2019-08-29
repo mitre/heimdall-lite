@@ -20,7 +20,7 @@
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
         <!-- Count Cards -->
-        <StatusCardRow />
+        <StatusCardRow :filter="all_filter" />
 
         <!-- Compliance Cards -->
         <v-row justify="space-around">

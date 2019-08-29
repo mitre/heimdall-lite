@@ -1,5 +1,5 @@
 <template>
-  <v-row align-start justify-space-around row cols="12">
+  <v-row>
     <v-col
       cols="12"
       sm="6"
@@ -36,7 +36,9 @@ interface CardProps {
 
 // We declare the props separately to make props types inferable.
 const StatusCardRowProps = Vue.extend({
-  props: {}
+  props: {
+    filter: Object // Of type Filter
+  }
 });
 
 @Component({
@@ -46,7 +48,7 @@ export default class StatusCardRow extends StatusCardRowProps {
   // Cards
   get cardProps(): CardProps[] {
     let counts = getModule(StatusCountModule, this.$store);
-    let filter = {};
+    let filter = this.filter;
     return [
       {
         icon: "check-circle",
