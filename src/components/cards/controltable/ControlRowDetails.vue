@@ -17,7 +17,7 @@
 
           <v-tab-item value="tab-test">
             <v-container>
-              <v-row class="newline">
+              <v-row>
                 <v-col cols="12">
                   <span>{{ control.finding_details.split(":")[0] }}:</span>
                   <br />
@@ -32,14 +32,14 @@
                 <v-col cols="1" class="stripes">{{
                   result.status.toUpperCase()
                 }}</v-col>
-                <v-col cols="5.5" class="stripes right">
-                  <prism language="ruby" class="test">
-                    {{ result.code_desc }}
-                  </prism>
+                <v-col cols="5" class="stripes right">
+                  <prism language="makefile" class="fill-height"
+                    >Test: {{ result.code_desc }}</prism
+                  >
                 </v-col>
-                <v-col v-if="result.message" cols="5.5" class="stripes right">
-                  <prism language="ruby" class="test">
-                    {{ result.message }}
+                <v-col v-if="result.message" cols="6" class="stripes right">
+                  <prism language="makefile" class="fill-height"
+                    >Result: {{ result.message }}
                   </prism>
                 </v-col>
               </v-row>
@@ -65,9 +65,7 @@
             <v-container>
               <v-row>
                 <v-col cols="12">
-                  <prism language="ruby" class="test2">
-                    {{ control.wraps.code }}
-                  </prism>
+                  <prism language="ruby">{{ control.wraps.code }}</prism>
                 </v-col>
               </v-row>
             </v-container>
@@ -85,13 +83,14 @@ import { HDFControl, ControlStatus } from "inspecjs";
 
 //TODO: add line numbers
 import "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-scss.min";
+import "prismjs/components/prism-makefile.js";
+import "prismjs/components/prism-ruby.js";
 //@ts-ignore
 import Prism from "vue-prism-component";
-//import Prism from "prismjs";
-//Prism.highlightAll();
-//var nw = Prism.plugins.NormalizeWhitespace;
+Vue.component("prism", Prism);
 
-import "prismjs/themes/prism.css";
 import "prismjs/components/prism-ruby.js";
 
 interface Detail {
@@ -142,13 +141,11 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
       },
       {
         name: "Check Text",
-        value: this.control.wraps.tags.check,
-        class: "newline"
+        value: this.control.wraps.tags.check
       },
       {
         name: "Fix Text",
-        value: this.control.wraps.tags.fix,
-        class: "newline"
+        value: this.control.wraps.tags.fix
       }
     ];
   }
@@ -156,29 +153,29 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
 </script>
 
 <style scoped>
-.newline {
-  white-space: pre;
+.v-application code {
+  background-color: revert;
+  color: revert;
+  display: revert;
+  font-size: revert;
+  -webkit-box-shadow: revert;
+  box-shadow: revert;
+  border-radius: revert;
+  white-space: auto;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.code-card {
+  height: inherit;
+  margin: inherit;
+  white-space: auto;
 }
 .wset {
   min-width: 125px;
   justify-content: center;
 }
-
-.test {
-  white-space: pre-wrap;
-  max-width: 500px;
-  word-wrap: break-word;
-}
-.test2 {
-  white-space: pre-wrap;
-  max-width: 600px;
-  word-wrap: break-word;
-}
 code[class*="language-"] {
   word-break: break-word;
-}
-code[class*="test2"] {
-  background-color: #000;
 }
 div[class*="stripes"] {
   border-style: solid;
