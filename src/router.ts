@@ -13,7 +13,7 @@ export default new Router({
       component: Results
     },
     {
-      path: "/compare/:old/:new",
+      path: "/compare",
       name: "compare",
       component: Compare
     },

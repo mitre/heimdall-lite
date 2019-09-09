@@ -1,23 +1,38 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <v-chip-group multiple max="2">
-        <v-chip
-          v-for="(control, index) in hdf_controls"
-          :key="index"
-          :value="index"
-        >
-          {{ control.status }}
-        </v-chip>
-      </v-chip-group>
-    </v-col>
-    <v-col cols="12" v-if="delta">
-      Delta goes here
-    </v-col>
-    <v-col cols="12" v-if="details">
-      Details goes here
-    </v-col>
-  </v-row>
+  <v-card>
+    <v-row>
+      <!-- Control ID -->
+      <v-col cols="2" class="pt-0">
+        <v-card class="fill-height" color="info">
+          <v-card-title> {{ hdf_controls[0].wraps.id }} </v-card-title>
+        </v-card>
+      </v-col>
+
+      <!-- Various Statuses -->
+      <v-col cols="10">
+        <v-chip-group multiple max="2" v-model="selection">
+          <v-chip
+            v-for="(control, index) in hdf_controls"
+            filter
+            :key="index"
+            :value="index"
+          >
+            {{ control.status }}
+          </v-chip>
+        </v-chip-group>
+      </v-col>
+
+      <!-- Depending on selection, more details -->
+      <!-- <transition-group> -->
+      <v-col cols="12" v-if="delta" key="delta">
+        <DeltaView :delta="delta" />
+      </v-col>
+      <v-col cols="12" v-if="details" key="detail">
+        Details goes here
+      </v-col>
+      <!-- </transition-group> -->
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -26,6 +41,7 @@ import Component from "vue-class-component";
 import { ContextualizedControl } from "@/store/data_store";
 import { HDFControl, hdfWrapControl } from "inspecjs";
 import { ControlDelta } from "@/utilities/delta_util";
+import DeltaView from "@/components/cards/comparison/DeltaView.vue";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -35,20 +51,30 @@ const Props = Vue.extend({
 });
 
 @Component({
-  components: {}
+  components: {
+    DeltaView
+  }
 })
 export default class CompareRow extends Props {
   /** Models the currently selected chips. If it's a number */
-  selection: undefined | number[];
+  selection: number[] = [];
+
+  /** Initialize our selection */
+  mounted() {
+    // Pick the first and last control, or as close as we can get to that
+    if (this._controls.length === 0) {
+      this.selection = [];
+    } else if (this._controls.length === 1) {
+      this.selection = [0];
+    } else {
+      this.selection = [0, this._controls.length - 1];
+    }
+  }
 
   /** Provides actual data about which controls we have selected */
   get selected_controls(): ContextualizedControl[] {
-    if (this.selection === undefined) {
-      return [];
-    } else {
-      // Multiple selected
-      return this.selection.map(i => this._controls[i]);
-    }
+    // Multiple selected
+    return this.selection.map(i => this._controls[i]);
   }
 
   /** Typed getter on controls */

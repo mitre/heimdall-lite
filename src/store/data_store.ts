@@ -16,7 +16,7 @@ import {
   InspecFile
 } from "@/store/report_intake";
 import Store from "@/store/store";
-import { ExecJSONProfile } from "inspecjs/dist/generated-parsers/exec-json";
+import { ExecJSONProfile } from "inspecjs/dist/generated_parsers/exec-json";
 
 /**
  * Mixin type to express that this type wraps another data type to add additional fields,
