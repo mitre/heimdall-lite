@@ -20,7 +20,7 @@
     "d3": "^5.11.0",
     "date-fns": "^2.1.0",
     "diff": "^4.0.1",
-    "inspecjs": "0.3.0",
+    "inspecjs": "0.4.0",
     "lru-cache": "^5.1.1",
     "prismjs": "^1.17.1",
     "roboto-fontface": "*",
