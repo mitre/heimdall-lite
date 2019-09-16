@@ -12,7 +12,8 @@ let statuses = {
   statusNoData: colors.orange.lighten1,
   statusNotReviewed: colors.orange.base,
   statusProfileError: colors.indigo.base,
-  statusNotRun: colors.teal.base // for From Profile and No Data
+  statusNotRun: colors.teal.darken2,
+  statusFromProfile: colors.teal.base
 };
 
 let severities = {
