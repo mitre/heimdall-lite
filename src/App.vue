@@ -31,6 +31,6 @@ export default class App extends AppProps {}
 .theme--light.v-card,
 .theme--light.v-sheet,
 .theme--light.v-navigation-drawer {
-  background: var(--v-background-lighten1);
+  background: var(--v-background-lighten-1);
 }
 </style>

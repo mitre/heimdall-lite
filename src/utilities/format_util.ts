@@ -12,7 +12,7 @@ import { isInspecFile } from "@/store/report_intake";
 export function execution_unique_key(
   exec: Readonly<ContextualizedExecution>
 ): string {
-  return `exec${exec.sourced_from.unique_id}`;
+  return `exec_${exec.sourced_from.unique_id}`;
 }
 
 /**
@@ -23,9 +23,9 @@ export function profile_unique_key(
   profile: Readonly<ContextualizedProfile>
 ): string {
   if (isInspecFile(profile.sourced_from)) {
-    return `profile${profile.sourced_from.unique_id}`;
+    return `profile_${profile.sourced_from.unique_id}`;
   } else {
-    return execution_unique_key + "-" + profile.data.name;
+    return execution_unique_key(profile.sourced_from) + "-" + profile.data.name;
   }
 }
 
