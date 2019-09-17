@@ -16,7 +16,7 @@
           </v-tab>
 
           <v-tab-item value="tab-test">
-            <v-container>
+            <v-container fluid>
               <v-row>
                 <v-col cols="12">
                   <span>{{ control.finding_details.split(":")[0] }}:</span>
@@ -47,13 +47,13 @@
           </v-tab-item>
 
           <v-tab-item value="tab-details">
-            <v-container>
+            <v-container fluid>
               <!-- Create a row for each detail -->
               <template v-for="(detail, index) in details">
-                <v-row :key="index">
-                  <v-col cols="1"> {{ detail.name }}: </v-col>
-                  <v-col cols="11" :class="detail.class">
-                    {{ detail.value }}
+                <v-row :key="index" :class="zebra(index)">
+                  <v-col cols="12" :class="detail.class">
+                    <h3>{{ detail.name }}:</h3>
+                    <p>{{ detail.value }}</p>
                   </v-col>
                   <v-divider> </v-divider>
                 </v-row>
@@ -62,7 +62,7 @@
           </v-tab-item>
 
           <v-tab-item value="tab-code">
-            <v-container>
+            <v-container fluid>
               <v-row>
                 <v-col cols="12">
                   <prism language="ruby">{{ control.wraps.code }}</prism>
@@ -149,10 +149,16 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
       }
     ];
   }
+  zebra(ix: number): string {
+    return ix % 2 ? "" : "zebra-table";
+  }
 }
 </script>
 
 <style scoped>
+.zebra-table {
+  background-color: rgba(0, 0, 0, 0.3);
+}
 .v-application code {
   background-color: revert;
   color: revert;
