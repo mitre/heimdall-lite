@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/c3": "^0.7.2",
     "@types/d3": "^5.7.2",
+    "@types/diff": "^4.0.2",
     "@types/prismjs": "^1.16.0",
     "apexcharts": "^3.8.4",
     "babel-plugin-prismjs": "^1.1.1",
@@ -19,7 +20,9 @@
     "d3": "^5.11.0",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
-    "inspecjs": "0.3.0",
+    "date-fns": "^2.1.0",
+    "diff": "^4.0.1",
+    "inspecjs": "0.4.0",
     "lru-cache": "^5.1.1",
     "material-components-web": "^3.2.0",
     "prismjs": "^1.17.1",

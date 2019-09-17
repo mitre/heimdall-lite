@@ -104,7 +104,7 @@
     <Modal v-model="dialog">
       <v-card>
         <v-card-title class="grey darken-2">Load files</v-card-title>
-        <FileReader @got-file="dialog = false" />
+        <FileReader @got-files="on_got_files" />
       </v-card>
     </Modal>
   </BaseView>
@@ -230,6 +230,25 @@ export default class Results extends ResultsProps {
       selectedCategory: null,
       selectedControlID: null
     };
+  }
+
+  /**
+   * Invoked when file(s) are loaded.
+   */
+  on_got_files(ids: FileID[]) {
+    // Close the dialog
+    this.dialog = false;
+
+    // If just one file, focus it
+    if (ids.length === 1) {
+      this.$router.push(`/results/${ids[0]}`);
+    }
+
+    // If more than one, focus all.
+    // TODO: Provide support for focusing a subset of files
+    else if (ids.length > 1) {
+      this.$router.push(`/results/all`);
+    }
   }
 }
 </script>
