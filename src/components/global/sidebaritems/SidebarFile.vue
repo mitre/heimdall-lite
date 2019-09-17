@@ -10,7 +10,7 @@
 
     <v-list-item-action>
       <v-btn icon x-small v-on:click="close_this_file">
-        <v-icon>close</v-icon
+        <v-icon>mdi-close</v-icon
         ><!--close-circle-->
       </v-btn>
     </v-list-item-action>
@@ -43,7 +43,7 @@ export default class FileItem extends FileItemProps {
     if (this.file.profile !== undefined) {
       return "note";
     } else {
-      return "assessment";
+      return "mdi-google-analytics";
     }
   }
 }
