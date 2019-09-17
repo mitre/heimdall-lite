@@ -6,7 +6,7 @@
         flat
         solo-inverted
         hide-details
-        prepend-inner-icon="search"
+        prepend-inner-icon="mdi-magnify"
         label="Search"
         v-model="search_term"
       ></v-text-field>
@@ -97,7 +97,7 @@
       @click="dialog = !dialog"
       :hidden="dialog"
     >
-      <v-icon>add</v-icon>
+      <v-icon large>mdi-plus-circle</v-icon>
     </v-btn>
 
     <!-- File select modal -->
