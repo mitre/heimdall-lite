@@ -32,10 +32,8 @@ function fix_files(f: File | File[] | null | undefined): File[] {
 }
 
 // We declare the props separately to make props types inferable.
-const FileReaderProps = Vue.extend({
-  props: {
-    text: String
-  }
+const Props = Vue.extend({
+  props: {}
 });
 
 /**
@@ -46,7 +44,7 @@ const FileReaderProps = Vue.extend({
 @Component({
   components: {}
 })
-export default class FileReader extends FileReaderProps {
+export default class FileReader extends Props {
   curr_file: File | File[] | null | undefined = null;
 
   /** Callback for our file reader */

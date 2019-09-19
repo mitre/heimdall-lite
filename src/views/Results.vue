@@ -104,7 +104,7 @@
     <Modal v-model="dialog">
       <v-card>
         <v-card-title class="grey darken-2">Load files</v-card-title>
-        <FileReader @got-files="on_got_files" />
+        <UploadNexus @got-files="on_got_files" />
       </v-card>
     </Modal>
   </BaseView>
@@ -115,7 +115,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import BaseView from "@/views/BaseView.vue";
 import Modal from "@/components/global/Modal.vue";
-import FileReader from "@/components/global/FileReader.vue";
+import UploadNexus from "@/components/global/UploadNexus.vue";
 
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
 import ControlTable from "@/components/cards/controltable/ControlTable.vue";
@@ -138,7 +138,7 @@ const ResultsProps = Vue.extend({
   components: {
     BaseView,
     Modal,
-    FileReader,
+    UploadNexus,
     StatusCardRow,
     Treemap,
     ControlTable,
