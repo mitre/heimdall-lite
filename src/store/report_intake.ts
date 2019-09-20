@@ -6,6 +6,7 @@ import { parse } from "inspecjs";
 import { Module, VuexModule, getModule, Action } from "vuex-module-decorators";
 import DataModule from "@/store/data_store";
 import Store from "@/store/store";
+import { read_file_async } from "@/utilities/async_util";
 
 /** Each FileID corresponds to a unique File in this store */
 export type FileID = number;
@@ -33,12 +34,23 @@ export type ExecutionFile = InspecFile & { execution: parse.AnyExec };
 /** Represents a file containing an Inspec Profile (not run) */
 export type ProfileFile = InspecFile & { profile: parse.AnyProfile };
 
-export type LoadOptions = {
+export type FileLoadOptions = {
   /** The file to load */
   file: File;
 
   /** The unique id to grant it */
   unique_id: FileID;
+};
+
+export type TextLoadOptions = {
+  /** The filename to denote this object with */
+  filename: string;
+
+  /** The unique id to grant it */
+  unique_id: FileID;
+
+  /** The text to use for it. */
+  text: string;
 };
 
 @Module({
@@ -50,38 +62,30 @@ export type LoadOptions = {
 class InspecIntakeModule extends VuexModule {
   /** Load a file with the specified options */
   @Action
-  async loadFile(options: LoadOptions) {
-    // Make the reader
-    let reader = new FileReader();
-    // Setup the callback
-    reader.onload = async (event: ProgressEvent) => {
-      // Get our text
-      const text = reader.result as string;
-
-      // Retrieve common elements for either case (profile or report)
-      const filename = options.file.name;
-
-      this.loadText(text, options.unique_id, filename);
-    };
-
-    // Dispatch the read
-    reader.readAsText(options.file);
+  async loadFile(options: FileLoadOptions): Promise<void> {
+    let read = read_file_async(options.file);
+    read.then(text =>
+      this.loadText({
+        text,
+        unique_id: options.unique_id,
+        filename: options.file.name
+      })
+    );
   }
 
   @Action
-  async loadText(text: string, unique_id: number, filename: string) {
+  async loadText(options: TextLoadOptions): Promise<void> {
     // Fetch our data store
     const data = getModule(DataModule, Store);
 
     // Convert it
     let result: parse.ConversionResult;
     try {
-      result = parse.convertFile(text);
+      result = parse.convertFile(options.text);
     } catch (e) {
-      console.error(
-        `Failed to convert file ${filename} due to error "${e}". We should display this as an error modal.`
+      throw new Error(
+        `Failed to convert file ${options.filename} due to error "${e}".`
       );
-      return;
     }
 
     // Determine what sort of file we (hopefully) have, then add it
@@ -90,8 +94,8 @@ class InspecIntakeModule extends VuexModule {
       let execution = result["1_0_ExecJson"];
       execution = Object.freeze(execution);
       let reportFile = {
-        unique_id: unique_id,
-        filename,
+        unique_id: options.unique_id,
+        filename: options.filename,
         execution
       };
       data.addExecution(reportFile);
@@ -99,13 +103,13 @@ class InspecIntakeModule extends VuexModule {
       // Handle as profile
       let profile = result["1_0_ProfileJson"];
       let profileFile = {
-        unique_id: unique_id,
-        filename,
+        unique_id: options.unique_id,
+        filename: options.filename,
         profile
       };
       data.addProfile(profileFile);
     } else {
-      console.error(`Unhandled file type ${Object.keys(result)}`);
+      throw new Error("Couldn't parse data");
     }
   }
 }
