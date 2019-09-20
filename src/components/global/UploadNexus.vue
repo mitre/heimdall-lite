@@ -16,11 +16,11 @@
 
     <!-- Include those components -->
     <v-tab-item value="uploadtab-local">
-      <FileReader @got-files="got_files" />
+      <FileReader class="pa-4" @got-files="got_files" />
     </v-tab-item>
 
     <v-tab-item value="uploadtab-s3">
-      <S3Reader @got-files="got_files" />
+      <S3Reader class="pa-4" @got-files="got_files" />
     </v-tab-item>
 
     <v-tab-item value="uploadtab-splunk">
