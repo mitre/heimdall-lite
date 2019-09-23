@@ -67,7 +67,6 @@ import Modal from "@/components/global/Modal.vue";
 import FileReader from "@/components/global/FileReader.vue";
 
 import { Filter, NistMapState } from "@/store/data_filters";
-import { ControlStatus, Severity } from "inspecjs";
 import { FileID } from "@/store/report_intake";
 
 // We declare the props separately
@@ -86,32 +85,6 @@ const LandingProps = Vue.extend({
 export default class Landing extends LandingProps {
   /** Whether or not the model is showing */
   dialog: boolean = true;
-
-  /**
-   * The currently selected severity, as modeled by the severity chart
-   */
-  severity_filter: Severity | null = null;
-
-  /**
-   * The currently selected status, as modeled by the status chart
-   */
-  status_filter: ControlStatus | null = null;
-
-  /**
-   * The current state of the treemap as modeled by the treemap (duh).
-   * Once can reliably expect that if a "deep" selection is not null, then its parent should also be not-null.
-   */
-  nist_filters: NistMapState = {
-    selectedFamily: null,
-    selectedCategory: null,
-    selectedControlID: null
-  };
-
-  /**
-   * The current search term, as modeled by the search bar
-   * Never empty - should in that case be null
-   */
-  search_term: string = "";
 
   /**
    * Invoked when file(s) are loaded.
