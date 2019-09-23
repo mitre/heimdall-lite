@@ -137,3 +137,10 @@ export default class Sidebar extends SidebarProps {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+nav.v-navigation-drawer {
+  max-height: 100vh !important;
+  z-index: 1;
+}
+</style>
