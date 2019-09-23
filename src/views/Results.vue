@@ -113,7 +113,7 @@
           <v-spacer></v-spacer>
           <v-row justify="center">
             <v-col cols="6" justify="center" align="center">
-              <FileReader @got-files="dialog = false" />
+              <FileReader @got-files="on_got_files" />
             </v-col>
           </v-row>
         </v-col>
