@@ -102,9 +102,24 @@
 
     <!-- File select modal -->
     <Modal v-model="dialog">
+      <v-container fluid align="center" class="grey darken-3">
+        <v-col cols="12" align="center">
+          <v-row justify="center">
+            <img :src="require('@/assets/logo.png')" />
+          </v-row>
+          <v-row justify="center">
+            <div class="display-4">Heimdall-Lite</div>
+          </v-row>
+          <v-spacer></v-spacer>
+          <v-row justify="center">
+            <v-col cols="6" justify="center" align="center">
+              <FileReader @got-files="dialog = false" />
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-container>
       <v-card>
-        <v-card-title class="grey darken-2">Load files</v-card-title>
-        <FileReader @got-files="on_got_files" />
+        <v-card-title class="grey darken-2">Upload InSpec Data</v-card-title>
       </v-card>
     </Modal>
   </BaseView>
@@ -149,7 +164,7 @@ const ResultsProps = Vue.extend({
 })
 export default class Results extends ResultsProps {
   /** Whether or not the model is showing */
-  dialog: boolean = false;
+  dialog: boolean = true;
 
   /**
    * The currently selected severity, as modeled by the severity chart
@@ -176,6 +191,11 @@ export default class Results extends ResultsProps {
    * Never empty - should in that case be null
    */
   search_term: string = "";
+
+  mounted() {
+    if (this.file_filter) this.dialog = false;
+    // console.log("Mounted results")
+  }
 
   /**
    * The currently selected file, if one exists.

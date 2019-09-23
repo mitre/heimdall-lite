@@ -19,23 +19,15 @@
 
     <template #severity>
       <v-card-text class="pa-2">
-        <v-icon
-          color="warning"
-          small
-          v-for="i in severity_arrow_count"
-          :key="i"
-        >
+        <v-icon small v-for="i in severity_arrow_count" :key="i">
           mdi-checkbox-blank-circle
         </v-icon>
-        <v-icon
-          color="warning"
-          small
-          v-for="i in 3 - severity_arrow_count"
-          :key="i"
-        >
+        <v-icon small v-for="i in 4 - severity_arrow_count" :key="i">
           mdi-checkbox-blank-circle-outline
         </v-icon>
-        {{ control.severity }}
+        <br />
+        <v-divider class="lighten-4 mx-1"> </v-divider>
+        {{ control.severity.toUpperCase() }}
       </v-card-text>
     </template>
 

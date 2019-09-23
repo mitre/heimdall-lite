@@ -5,8 +5,13 @@
       display-size
       multiple
       accept=".json,application/json"
-      label="Upload inspec data"
       @change="commitFile"
+      placeholder="Click Here to Upload InSpec JSON!"
+      append-icon="mdi-file-upload"
+      prepend-icon="mdi"
+      filled
+      rounded
+      background-color="info"
     ></v-file-input>
   </div>
 </template>

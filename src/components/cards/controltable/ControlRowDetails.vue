@@ -1,6 +1,6 @@
 <template>
   <v-row no-gutters>
-    <v-col cols="12">
+    <v-col cols="12" class="font-weight-bold">
       <v-card>
         <v-tabs>
           <v-tabs-slider></v-tabs-slider>
@@ -26,21 +26,28 @@
                 </v-col>
               </v-row>
               <v-row
+                cols="12"
                 v-for="(result, index) in control.wraps.results"
                 :key="index"
+                :class="zebra(index)"
               >
-                <v-col cols="1" class="stripes">{{
-                  result.status.toUpperCase()
-                }}</v-col>
-                <v-col cols="5" class="stripes right">
-                  <prism language="makefile" class="fill-height"
-                    >Test: {{ result.code_desc }}</prism
-                  >
+                <v-col sm="12" md="12" lg="1" xl="1"
+                  ><h3>{{ result.status.toUpperCase() }}</h3>
                 </v-col>
-                <v-col v-if="result.message" cols="6" class="stripes right">
-                  <prism language="makefile" class="fill-height"
-                    >Result: {{ result.message }}
-                  </prism>
+                <v-col v-if="!result.message" cols="11" class="right">
+                  <h3>Test</h3>
+                  <v-divider> </v-divider>
+                  <pre>{{ result.code_desc }}</pre>
+                </v-col>
+                <v-col v-if="result.message" cols="5" class="right">
+                  <h3>Test</h3>
+                  <v-divider> </v-divider>
+                  <pre>{{ result.code_desc }}</pre>
+                </v-col>
+                <v-col v-if="result.message" cols="6" class="right">
+                  <h3>Result</h3>
+                  <v-divider> </v-divider>
+                  <pre>{{ result.message }}</pre>
                 </v-col>
               </v-row>
             </v-container>
@@ -53,7 +60,7 @@
                 <v-row :key="index" :class="zebra(index)">
                   <v-col cols="12" :class="detail.class">
                     <h3>{{ detail.name }}:</h3>
-                    <p>{{ detail.value }}</p>
+                    <pre>{{ detail.value }}</pre>
                   </v-col>
                   <v-divider> </v-divider>
                 </v-row>
@@ -156,6 +163,13 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
 </script>
 
 <style scoped>
+pre {
+  white-space: pre-wrap; /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
 .zebra-table {
   background-color: rgba(0, 0, 0, 0.3);
 }
