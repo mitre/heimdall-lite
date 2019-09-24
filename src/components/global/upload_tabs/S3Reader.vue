@@ -4,6 +4,9 @@
       <span>
         Provide S3 credentials
       </span>
+      <div v-if="shown_error">
+        <p class="font-italic error--text">{{ shown_error }}</p>
+      </div>
       <v-form v-model="valid">
         <!-- :rules="nameRules" -->
         <v-text-field
@@ -18,6 +21,9 @@
           label="Secret Token"
           required
           :rules="field_rules"
+          :append-icon="show_secret ? 'visibility' : 'visibility_off'"
+          :type="show_secret ? 'text' : 'password'"
+          @click:append="show_secret = !show_secret"
         />
         <v-text-field
           v-model="s3_role_arn"
@@ -33,11 +39,14 @@
       <div class="d-flex justify-space-between">
         <v-btn small title="Back" @click="back">
           <v-icon>
-            mdi-clear
+            arrow_back
           </v-icon>
         </v-btn>
         <span>MFA Auth Required</span>
         <div />
+      </div>
+      <div v-if="shown_error">
+        <p class="font-italic error--text">{{ shown_error }}</p>
       </div>
       <v-form v-model="valid">
         <v-text-field
@@ -53,7 +62,7 @@
       <div class="d-flex justify-space-between">
         <v-btn small title="Back" @click="back">
           <v-icon>
-            mdi-clear
+            arrow_back
           </v-icon>
         </v-btn>
         <span>From {{ bucket_name }}</span>
@@ -141,6 +150,7 @@ export default class S3Reader extends Props {
    * Shouldn't be used to interpret literally anything else as valid
    */
   valid: boolean = false;
+  show_secret: boolean = false;
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   field_rules = [(v: string) => !!v || "Field is required"];
@@ -169,6 +179,7 @@ export default class S3Reader extends Props {
   async back() {
     this.assumed_role_creds = null;
     this.shown_error = null;
+    this.files = [];
     this.shown_window = "NoAuth";
   }
 
@@ -290,15 +301,7 @@ export default class S3Reader extends Props {
     } else {
       this.shown_window = "NoAuth";
     }
-    /*
-      console.error("WARNING: CLOBBERING LOCAL STORAGE");
-      this.base_access_token = "AKIARBM55D5P7NZQPJXW";
-      this.base_secret_token = "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";
-      this.bucket_name = "heimdall-demo-bucket";
-      // this.mfa_serial =
-      this.s3_role_arn = "arn:aws:iam::071734992735:role/S3_NoMFARole"; // NO MFA
-    }
-    */
+    this.refresh();
   }
 
   /** Save the current credentials to local storage */
@@ -418,7 +421,12 @@ export default class S3Reader extends Props {
       case "InvalidBucketName":
         this.shown_window = "NoAuth";
         this.shown_error =
-          "Invalid bucket name! Ensure you spelled it correctly";
+          "Invalid bucket name! Ensure you spelled it correctly.";
+        break;
+      case "NetworkingError":
+        this.shown_window = "NoAuth";
+        this.shown_error =
+          "Networking error. Ensure that your bucket name and role arn are correct.";
         break;
       case "InvalidBucketState":
         this.shown_window = "NoAuth";

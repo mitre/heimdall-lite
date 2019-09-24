@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="`/results/${file.unique_id}`">
+  <v-list-item :to="`/results/${file.unique_id}`" :title="file.filename">
     <v-list-item-avatar>
       <v-icon v-text="icon" small />
     </v-list-item-avatar>
