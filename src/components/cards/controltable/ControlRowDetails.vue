@@ -32,7 +32,14 @@
                 :class="zebra(index)"
               >
                 <v-col sm="12" md="12" lg="1" xl="1"
-                  ><h3>{{ result.status.toUpperCase() }}</h3>
+                  ><v-card
+                    :color="status_color"
+                    height="100%"
+                    width="100%"
+                    tile
+                  >
+                    <h3>{{ result.status.toUpperCase() }}</h3>
+                  </v-card>
                 </v-col>
                 <v-col v-if="!result.message" cols="11" class="right">
                   <h3>Test</h3>
@@ -90,8 +97,6 @@ import { HDFControl, ControlStatus } from "inspecjs";
 
 //TODO: add line numbers
 import "prismjs";
-import "prismjs/themes/prism-tomorrow.css";
-import "prismjs/components/prism-scss.min";
 import "prismjs/components/prism-makefile.js";
 import "prismjs/components/prism-ruby.js";
 //@ts-ignore
@@ -120,6 +125,11 @@ const ControlRowDetailsProps = Vue.extend({
   components: { Prism }
 })
 export default class ControlRowDetails extends ControlRowDetailsProps {
+  get status_color(): string {
+    // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
+    return `status${this.control.status.replace(" ", "")}`;
+  }
+
   get details(): Detail[] {
     return [
       {
@@ -162,7 +172,24 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.theme--dark {
+  @import "~prismjs/themes/prism-tomorrow.css";
+}
+/*.theme--light {
+  @import "~prismjs/themes/prism.css";
+}*/
+.v-application {
+  pre.language-ruby {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  code.language-ruby {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    box-shadow: none;
+  }
+}
+
 pre {
   white-space: pre-wrap; /* Since CSS 2.1 */
   white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
@@ -173,6 +200,7 @@ pre {
 .zebra-table {
   background-color: rgba(0, 0, 0, 0.3);
 }
+/*
 .v-application code {
   background-color: revert;
   color: revert;
@@ -185,6 +213,7 @@ pre {
   overflow-wrap: break-word;
   max-width: 100%;
 }
+*/
 .code-card {
   height: inherit;
   margin: inherit;
@@ -194,13 +223,11 @@ pre {
   min-width: 125px;
   justify-content: center;
 }
+/*
 code[class*="language-"] {
   word-break: break-word;
 }
-div[class*="stripes"] {
-  border-style: solid;
-  border-width: 1px;
-}
+*/
 .right {
   margin-left: -1px;
 }

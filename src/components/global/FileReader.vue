@@ -82,7 +82,7 @@ export default class FileReader extends FileReaderProps {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 div.v-file-input {
   margin-left: -36px;
 }

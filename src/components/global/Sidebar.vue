@@ -138,12 +138,12 @@ export default class Sidebar extends SidebarProps {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 nav.v-navigation-drawer {
-  // Need !important as a max-height derived from the footer being always
-  // visible is applied directly to element by vuetify
+  /* Need !important as a max-height derived from the footer being always
+     visible is applied directly to element by vuetify */
   max-height: 100vh !important;
-  // z-index hides behind footer and topbar
+  /* z-index hides behind footer and topbar */
   z-index: 1;
 }
 </style>
