@@ -101,27 +101,7 @@
     </v-btn>
 
     <!-- File select modal -->
-    <Modal v-model="dialog">
-      <v-container fluid align="center" class="grey darken-3">
-        <v-col cols="12" align="center">
-          <v-row justify="center">
-            <img :src="require('@/assets/logo.png')" />
-          </v-row>
-          <v-row justify="center">
-            <div class="display-4">Heimdall-Lite</div>
-          </v-row>
-          <v-spacer></v-spacer>
-          <v-row justify="center">
-            <v-col cols="6" justify="center" align="center">
-              <FileReader @got-files="on_got_files" />
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-container>
-      <v-card>
-        <v-card-title class="grey darken-2">Upload InSpec Data</v-card-title>
-      </v-card>
-    </Modal>
+    <UploadNexus :dialog="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -129,8 +109,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import BaseView from "@/views/BaseView.vue";
-import Modal from "@/components/global/Modal.vue";
-import FileReader from "@/components/global/FileReader.vue";
+import UploadNexus from "@/components/global/UploadNexus.vue";
 
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
 import ControlTable from "@/components/cards/controltable/ControlTable.vue";
@@ -152,8 +131,7 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    Modal,
-    FileReader,
+    UploadNexus,
     StatusCardRow,
     Treemap,
     ControlTable,
@@ -192,9 +170,11 @@ export default class Results extends ResultsProps {
    */
   search_term: string = "";
 
+  /* This is supposed to cause the dialog to automatically appear if there is
+   * no file uploaded
+   */
   mounted() {
     if (this.file_filter) this.dialog = false;
-    // console.log("Mounted results")
   }
 
   /**

@@ -1,120 +1,17 @@
 <template>
-  <BaseView>
-    <!-- Same Search bar as is in results view, idea being that this one is non functional -->
-    <template #topbar-content>
-      <v-text-field
-        flat
-        solo-inverted
-        hide-details
-        prepend-inner-icon="mdi-magnify"
-        label="Search"
-        v-model="search_term"
-      ></v-text-field>
-      <v-spacer />
-      <v-btn title="Clear all set filters">
-        Clear
-      </v-btn>
-    </template>
-
-    <!-- The main content: cards, etc -->
-    <template #main-content> </template>
-
-    <!-- File select modal toggle -->
-
-    <v-btn
-      bottom
-      color="teal"
-      dark
-      fab
-      fixed
-      right
-      @click="dialog = !dialog"
-      :hidden="dialog"
-    >
-      <v-icon large>mdi-plus-circle</v-icon>
-    </v-btn>
-
-    <!-- File select modal -->
-    <Modal v-model="dialog">
-      <v-container fluid align="center" class="grey darken-3">
-        <v-tabs vertical>
-          <v-tabs-slider></v-tabs-slider>
-          <!-- Define our tabs -->
-          <v-tab href="#uploadtab-local">
-            Local Files
-          </v-tab>
-
-          <v-tab href="#uploadtab-s3">
-            S3 Bucket
-          </v-tab>
-
-          <v-tab href="#uploadtab-splunk">
-            Splunk
-          </v-tab>
-
-          <!-- Include those components -->
-          <v-tab-item value="uploadtab-local">
-            <v-col cols="12" align="center">
-              <v-row justify="center">
-                <img :src="require('@/assets/logo.png')" />
-              </v-row>
-              <v-row justify="center">
-                <div class="display-4">Heimdall-Lite</div>
-              </v-row>
-              <v-spacer></v-spacer>
-              <v-row justify="center">
-                <v-col cols="6" justify="center" align="center">
-                  <FileReader @got-files="on_got_files" />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-tab-item>
-
-          <v-tab-item value="uploadtab-s3">
-            <v-col cols="12" align="center">
-              <v-row justify="center">
-                <img :src="require('@/assets/logo.png')" />
-              </v-row>
-              <v-row justify="center">
-                <div class="display-4">Heimdall-Lite</div>
-              </v-row>
-              <v-spacer></v-spacer>
-              <v-row justify="center">
-                <v-col cols="6" justify="center" align="center">
-                  Coming Soon
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-tab-item>
-
-          <v-tab-item value="uploadtab-splunk">
-            <v-col cols="12" align="center">
-              <v-row justify="center">
-                <img :src="require('@/assets/logo.png')" />
-              </v-row>
-              <v-row justify="center">
-                <div class="display-4">Heimdall-Lite</div>
-              </v-row>
-              <v-spacer></v-spacer>
-              <v-row justify="center">
-                <v-col cols="6" justify="center" align="center">
-                  Coming soon
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-tab-item>
-        </v-tabs>
-      </v-container>
-    </Modal>
-  </BaseView>
+  <v-container>
+    <v-row>
+      <v-col center xl="8" md="8" sm="12" xs="12">
+        <UploadNexus :dialog="dialog" @got-files="on_got_files" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import BaseView from "@/views/BaseView.vue";
-import Modal from "@/components/global/Modal.vue";
-import FileReader from "@/components/global/FileReader.vue";
+import UploadNexus from "@/components/global/UploadNexus.vue";
 
 import { Filter, NistMapState } from "@/store/data_filters";
 import { FileID } from "@/store/report_intake";
@@ -127,9 +24,7 @@ const LandingProps = Vue.extend({
 
 @Component({
   components: {
-    BaseView,
-    Modal,
-    FileReader
+    UploadNexus
   }
 })
 export default class Landing extends LandingProps {
