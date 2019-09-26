@@ -1,7 +1,7 @@
 <template>
   <Modal v-model="dialog">
     <v-container fluid align="center" class="grey darken-3">
-      <v-tabs vertical grow>
+      <v-tabs vertical active>
         <v-tabs-slider></v-tabs-slider>
         <!-- Define our tabs -->
         <v-tab href="#uploadtab-local">
@@ -59,7 +59,7 @@ import S3Reader from "@/components/global/upload_tabs/S3Reader.vue";
 const Props = Vue.extend({
   props: {
     dialog: {
-      type: boolean,
+      type: Boolean,
       required: true
     }
   }
@@ -77,6 +77,8 @@ const Props = Vue.extend({
   }
 })
 export default class UploadNexus extends Props {
+  activeTab: Number = 0;
+
   // Event passthrough
   got_files(files: FileID[]) {
     this.$emit("got-files", files);
