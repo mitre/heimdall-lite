@@ -6,7 +6,7 @@
         flat
         solo-inverted
         hide-details
-        prepend-inner-icon="search"
+        prepend-inner-icon="mdi-magnify"
         label="Search"
         v-model="search_term"
       ></v-text-field>
@@ -97,16 +97,11 @@
       @click="dialog = !dialog"
       :hidden="dialog"
     >
-      <v-icon>add</v-icon>
+      <v-icon large>mdi-plus-circle</v-icon>
     </v-btn>
 
     <!-- File select modal -->
-    <Modal v-model="dialog">
-      <v-card>
-        <v-card-title class="grey darken-2">Load files</v-card-title>
-        <UploadNexus @got-files="on_got_files" />
-      </v-card>
-    </Modal>
+    <UploadNexus :dialog="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -114,7 +109,6 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import BaseView from "@/views/BaseView.vue";
-import Modal from "@/components/global/Modal.vue";
 import UploadNexus from "@/components/global/UploadNexus.vue";
 
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
@@ -137,7 +131,6 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    Modal,
     UploadNexus,
     StatusCardRow,
     Treemap,
@@ -149,7 +142,7 @@ const ResultsProps = Vue.extend({
 })
 export default class Results extends ResultsProps {
   /** Whether or not the model is showing */
-  dialog: boolean = false;
+  dialog: boolean = true;
 
   /**
    * The currently selected severity, as modeled by the severity chart
@@ -176,6 +169,13 @@ export default class Results extends ResultsProps {
    * Never empty - should in that case be null
    */
   search_term: string = "";
+
+  /* This is supposed to cause the dialog to automatically appear if there is
+   * no file uploaded
+   */
+  mounted() {
+    if (this.file_filter) this.dialog = false;
+  }
 
   /**
    * The currently selected file, if one exists.
