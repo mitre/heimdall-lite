@@ -28,14 +28,14 @@
             <v-spacer></v-spacer>
             <v-row justify="center">
               <v-col cols="6" justify="center" align="center">
-                <FileReader @got-files="got_files" />
+                <FileReader class="pa-4" @got-files="got_files" />
               </v-col>
             </v-row>
           </v-col>
         </v-tab-item>
 
         <v-tab-item value="uploadtab-s3">
-          <S3Reader @got-files="got_files" />
+          <S3Reader class="pa-4" @got-files="got_files" />
         </v-tab-item>
 
         <v-tab-item value="uploadtab-splunk">
