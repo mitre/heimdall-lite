@@ -4,9 +4,9 @@
       v-model="curr_file"
       display-size
       multiple
-      accept=".json,application/json"
+      accept=".json, application/json"
       @change="commitFile"
-      placeholder="Click Here to Upload InSpec JSON!"
+      placeholder="Load InSpec Results"
       append-icon="mdi-file-upload"
       prepend-icon="mdi"
       filled
