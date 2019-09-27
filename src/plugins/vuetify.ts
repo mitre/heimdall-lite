@@ -16,6 +16,10 @@ let statuses = {
   statusFromProfile: colors.teal.base
 };
 
+let branding = {
+  mitreBlue: "#005B95"
+};
+
 let severities = {
   severityLow: colors.yellow.base,
   severityMedium: colors.orange.base,
@@ -40,12 +44,14 @@ export default new Vuetify({
         ...statuses,
         ...severities,
         ...compliances,
+        ...branding,
         background: "#303030"
       },
       light: {
         ...statuses,
         ...severities,
         ...compliances,
+        ...branding,
         background: "#f8f8f8"
       }
     },
