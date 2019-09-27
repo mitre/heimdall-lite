@@ -33,9 +33,8 @@
       text-anchor="middle"
       :x="x + width / 2"
       :y="y + height / 2"
+      >{{ label }}</text
     >
-      {{ label }}
-    </text>
   </g>
 </template>
 
@@ -43,14 +42,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
-import {
-  ControlStatus,
-  HDFControl,
-  NistHash,
-  ControlGroupStatus,
-  NistCategory,
-  NistFamily
-} from "inspecjs";
+import { ControlStatus, HDFControl, nist } from "inspecjs";
 import * as d3 from "d3";
 import {
   TreemapDatumType,
@@ -204,7 +196,9 @@ export default class Cell extends CellProps {
     // Type stuff
     let s: string[] = [];
     if (!this.is_control) {
-      if ((this._node.data as NistCategory<CCWrapper>).children.length === 0) {
+      if (
+        (this._node.data as nist.NistCategory<CCWrapper>).children.length === 0
+      ) {
         s.push("empty");
       }
     }
@@ -290,7 +284,7 @@ text {
 }
 
 .theme--dark text {
-  fill: #fff;
+  fill: #f8f8f8;
   font-size: large;
 }
 
@@ -299,7 +293,7 @@ text {
 }
 
 rect {
-  stroke: #888;
+  stroke: #000000;
   fill-opacity: 0;
   stroke-width: 1;
   pointer-events: none;

@@ -4,6 +4,7 @@
     <template #topbar-content>
       <v-text-field
         flat
+        solo
         solo-inverted
         hide-details
         prepend-inner-icon="search"
@@ -11,9 +12,7 @@
         v-model="search_term"
       ></v-text-field>
       <v-spacer />
-      <v-btn @click="clear" title="Clear all set filters">
-        Clear
-      </v-btn>
+      <v-btn @click="clear" title="Clear all set filters">Clear</v-btn>
     </template>
 
     <!-- The main content: cards, etc -->
@@ -50,9 +49,10 @@
               <v-card-actions class="justify-center">
                 <ComplianceChart :filter="all_filter" />
               </v-card-actions>
-              <v-card-text style="text-align: center">
-                [Passed/(Passed + Failed + Not Reviewed + Profile Error) * 100]
-              </v-card-text>
+              <v-card-text style="text-align: center"
+                >[Passed/(Passed + Failed + Not Reviewed + Profile Error) *
+                100]</v-card-text
+              >
             </v-card>
           </v-col>
         </v-row>
@@ -104,7 +104,7 @@
     <Modal v-model="dialog">
       <v-card>
         <v-card-title class="grey darken-2">Load files</v-card-title>
-        <FileReader @got-file="dialog = false" />
+        <FileReader @got-files="on_got_files" />
       </v-card>
     </Modal>
   </BaseView>
@@ -230,6 +230,25 @@ export default class Results extends ResultsProps {
       selectedCategory: null,
       selectedControlID: null
     };
+  }
+
+  /**
+   * Invoked when file(s) are loaded.
+   */
+  on_got_files(ids: FileID[]) {
+    // Close the dialog
+    this.dialog = false;
+
+    // If just one file, focus it
+    if (ids.length === 1) {
+      this.$router.push(`/results/${ids[0]}`);
+    }
+
+    // If more than one, focus all.
+    // TODO: Provide support for focusing a subset of files
+    else if (ids.length > 1) {
+      this.$router.push(`/results/all`);
+    }
   }
 }
 </script>
