@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :value="value"
-    @click:outside="$emit('input', false)"
+    @click:outside="$emit('input', { target: false })"
     max-width="1000px"
   >
     <slot> Default Modal </slot>

@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col center xl="8" md="8" sm="12" xs="12">
-        <UploadNexus :dialog="dialog" @got-files="on_got_files" />
+        <UploadNexus :value="dialog" @got-files="on_got_files" />
       </v-col>
     </v-row>
   </v-container>

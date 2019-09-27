@@ -94,14 +94,14 @@
       fab
       fixed
       right
-      @click="dialog = !dialog"
+      @click="dialog = true"
       :hidden="dialog"
     >
       <v-icon large>mdi-plus-circle</v-icon>
     </v-btn>
 
     <!-- File select modal -->
-    <UploadNexus :dialog="dialog" @got-files="on_got_files" />
+    <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -142,7 +142,7 @@ const ResultsProps = Vue.extend({
 })
 export default class Results extends ResultsProps {
   /** Whether or not the model is showing */
-  dialog: boolean = true;
+  dialog: boolean = false;
 
   /**
    * The currently selected severity, as modeled by the severity chart

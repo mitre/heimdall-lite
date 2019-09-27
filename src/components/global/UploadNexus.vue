@@ -1,5 +1,5 @@
 <template>
-  <Modal v-model="dialog">
+  <Modal :value="value" @input="$emit('input', $event.target.value)">
     <v-container fluid align="center" class="grey darken-3">
       <v-tabs vertical active>
         <v-tabs-slider></v-tabs-slider>
@@ -58,10 +58,7 @@ import S3Reader from "@/components/global/upload_tabs/S3Reader.vue";
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    dialog: {
-      type: Boolean,
-      required: true
-    }
+    value: Boolean
   }
 });
 

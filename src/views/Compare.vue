@@ -32,12 +32,7 @@
     </v-btn>
 
     <!-- File select modal -->
-    <Modal v-model="dialog">
-      <v-card>
-        <v-card-title class="grey darken-2">Load files</v-card-title>
-        <UploadNexus @got-files="dialog = false" />
-      </v-card>
-    </Modal>
+    <UploadNexus v-model="dialog" @got-files="dialog = false" />
   </BaseView>
 </template>
 
