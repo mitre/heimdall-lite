@@ -1,5 +1,9 @@
 <template>
-  <Modal :value="value" @input="$emit('input', $event.target.value)">
+  <Modal
+    :value="value"
+    @input="$emit('input', $event.target.value)"
+    :persistent="persistent"
+  >
     <v-container fluid align="center" class="grey darken-3">
       <v-tabs vertical active>
         <v-tabs-slider></v-tabs-slider>
@@ -58,7 +62,8 @@ import S3Reader from "@/components/global/upload_tabs/S3Reader.vue";
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    value: Boolean
+    value: Boolean, // Whether it is open. Modelable
+    persistent: Boolean // Whether clicking outside closes
   }
 });
 

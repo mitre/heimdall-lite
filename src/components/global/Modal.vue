@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     :value="value"
+    :persistent="persistent"
     @click:outside="$emit('input', { target: false })"
     max-width="1000px"
   >
@@ -15,7 +16,8 @@ import Component from "vue-class-component";
 // We declare the props separately to make props types inferable.
 const ModalProps = Vue.extend({
   props: {
-    value: Boolean // Whether or not to show
+    value: Boolean, // Whether or not to show,
+    persistent: Boolean // Whether clicking outside closes
   }
 });
 
