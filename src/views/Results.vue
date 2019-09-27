@@ -12,7 +12,13 @@
         v-model="search_term"
       ></v-text-field>
       <v-spacer />
-      <v-btn @click="clear" title="Clear all set filters">Clear</v-btn>
+      <v-btn
+        @click="clear"
+        title="Clear all set filters"
+        :disabled="!can_clear"
+      >
+        Clear
+      </v-btn>
     </template>
 
     <!-- The main content: cards, etc -->
@@ -230,6 +236,26 @@ export default class Results extends ResultsProps {
       selectedCategory: null,
       selectedControlID: null
     };
+  }
+
+  /**
+   * Returns true if we can currently clear.
+   * Essentially, just controls whether the button is available
+   */
+  get can_clear(): boolean {
+    // Return if any params not null/empty
+    if (
+      this.severity_filter ||
+      this.status_filter ||
+      this.search_term !== "" ||
+      this.nist_filters.selectedFamily
+    ) {
+      console.log("Can clear");
+      return true;
+    } else {
+      console.log("Cant clear");
+      return false;
+    }
   }
 
   /**
