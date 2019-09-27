@@ -1,0 +1,42 @@
+<template>
+  <div class="text-center">
+    <v-dialog v-model="dialog" width="500">
+      <template v-slot:activator="{ on }">
+        <v-btn dark v-on="on">
+          About
+        </v-btn>
+      </template>
+
+      <v-card>
+        <v-card-title class="headline grey" primary-title>
+          About Heimdall-Vuetify
+        </v-card-title>
+
+        <v-card-text>
+          <br />
+          Version: 1.0 <br />
+          Github Repository: <a>https://github.com/mitre/heimdall-vuetify</a>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="primary" text @click="dialog = false">
+            Close Window
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      dialog: false
+    };
+  }
+};
+</script>
