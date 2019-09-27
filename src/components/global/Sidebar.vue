@@ -23,6 +23,7 @@
             :key="i"
             :text="child.text"
             :icon="child.icon"
+            @click="child.on_click"
           />
         </v-list-group>
 
@@ -45,7 +46,13 @@
         </v-list-group>
 
         <!-- Simple, independent links -->
-        <LinkItem v-else :key="item.text" :text="item.text" :icon="item.icon" />
+        <LinkItem
+          v-else
+          :key="item.text"
+          :text="item.text"
+          :icon="item.icon"
+          @click="item.on_click"
+        />
       </template>
     </v-list>
     <v-layout align-center>
@@ -73,7 +80,8 @@ import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 interface LinkProps {
   text: string; // To label the item
   icon: string; // Visually but same difference
-  link?: string; // Where to redirect to
+  link?: string; // Where to redirect to, if we want
+  on_click: () => void; // Callback function on click, if desired
 }
 
 interface FolderProps {
@@ -105,7 +113,7 @@ export default class Sidebar extends SidebarProps {
   // Dynamic list setup
   get items(): AnyProp[] {
     return [
-      { icon: "info", text: "Help" },
+      { icon: "info", text: "Help", on_click: () => {} },
       {
         text: "Files",
         files: this.visible_files
@@ -113,12 +121,12 @@ export default class Sidebar extends SidebarProps {
       {
         text: "Tools",
         children: [
-          { text: "Import", icon: "printer" },
-          { text: "Export", icon: "printer" },
-          { text: "Print", icon: "printer" }
+          { text: "Import", icon: "printer", on_click: () => {} },
+          { text: "Export", icon: "printer", on_click: () => {} },
+          { text: "Print", icon: "printer", on_click: () => {} }
         ]
       },
-      { icon: "info", text: "About" }
+      { icon: "info", text: "About", on_click: () => {} }
     ];
   }
 
