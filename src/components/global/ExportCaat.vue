@@ -50,20 +50,28 @@ export default class ExportCaat extends Props {
       family = family.substr(0, 3) + "0" + family[3];
     }
 
+    let gid = control.wraps.tags.gid;
+    // If it's impact is not 0 and it's gid (if one is provided) hasn't been seen, build the row. Else return null
     if (
-      control.wraps.impact != 0 &&
-      !vulnList.includes(control.data.tags.gid)
+      control.wraps.impact === 0 ||
+      (gid !== undefined && vuln_list.includes(gid))
     ) {
+      return null;
+    } else {
       // Flag this as seen
-      vulnList.push(control.wraps.tags.gid);
+      vuln_list.push(control.wraps.tags.gid);
 
       // Designate a helper to deal with null/undefined
       let fix = (x: string | null | undefined) => x || "";
 
       // Build up the row
-      row.push(control.wraps.id); // Control Number
+      row.push(family); // Control Number
       row.push(fix(control.wraps.title)); // Finding Title
-      row.push(this.convertDate(new Date(control.start_time), "/")); // Date Identified
+      if (control.start_time) {
+        row.push(this.convertDate(new Date(control.start_time), "/")); // Date Identified
+      } else {
+        row.push("");
+      }
       row.push(fix(control.wraps.tags.stig_id)); // Finding ID
       row.push(""); // Information System or Program Name
       row.push(""); // Repeat Findings
@@ -76,7 +84,7 @@ export default class ExportCaat extends Props {
       row.push("Test"); // Test Method
       row.push(fix(control.wraps.tags.check)); // Test Objective
       if (control.segments && control.segments.length > 0) {
-        row.push(control.wraps.results[0].message); // Test Result Description
+        row.push(fix(control.segments[0].message)); // Test Result Description
       } else {
         row.push(""); // No result could be found
       }
@@ -85,10 +93,15 @@ export default class ExportCaat extends Props {
       } else {
         row.push("Other Than Satisfied");
       }
-      field.push(fix(control.wraps.tags.fix)); // Recommended Corrective Action(s)
-      field.push(""); // Effect on Business
-      field.push(""); // Likelihood
-      field.push(control.wraps.impact); // Impact
+      row.push(fix(control.wraps.tags.fix)); // Recommended Corrective Action(s)
+      row.push(""); // Effect on Business
+      row.push(""); // Likelihood
+      row.push(control.wraps.impact.toString()); // Impact
+
+      if (row.length !== this.header.length) {
+        throw new Error("Row of wrong size");
+      }
+      return row;
     }
   }
 
@@ -130,19 +143,30 @@ export default class ExportCaat extends Props {
     let caat: CAAT = [this.header()];
 
     // Eliminate controls with matching gids
-    let vuln_list = [];
+    let vuln_list: string[] = [];
     // controls.forEach(
 
     // Turn controls into rows
     let rows_unfiltered: Array<CAATRow | null> = controls.map(ctrl =>
-      this.to_row(ctrl, vuln_list)
+      this.to_row(hdfWrapControl(ctrl.data), vuln_list)
     );
 
     // Filter out nulls
     let rows: CAATRow[] = rows_unfiltered.filter(x => x !== null) as CAATRow[];
 
-    // Sort them
-    rows = rows.sort(this.Comparator);
+    // Sort them by id
+    rows = rows.sort((a, b) => {
+      // We sort by family (index 0), then by severity within
+      let a_fam = a[0];
+      let a_imp = a[19];
+      let b_fam = b[0];
+      let b_imp = b[19];
+      if (a_fam !== b_fam) {
+        return a_fam.localeCompare(b_fam);
+      } else {
+        return a_imp.localeCompare(b_imp);
+      }
+    });
 
     // Append to caat
     caat.push(...rows);
@@ -179,11 +203,10 @@ export default class ExportCaat extends Props {
     return s < 10 ? `0${s}` : `${s}`;
   }
 
-  convertDate(inputFormat: string, delimiter: string): string {
-    let d = new Date(inputFormat);
+  convertDate(d: Date, delimiter: string): string {
     return [
-      this.pad(d.getMonth() + 1),
-      this.pad(d.getDate()),
+      this.pad_two_digits(d.getMonth() + 1),
+      this.pad_two_digits(d.getDate()),
       d.getFullYear()
     ].join(delimiter);
   }
