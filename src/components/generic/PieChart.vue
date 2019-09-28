@@ -154,7 +154,9 @@ export default class PieChart extends Props {
           data: this._series,
           // rotation: 0.5 * Math.PI,
           borderWidth: 1,
-          hoverBorderWidth: 2
+          hoverBorderWidth: 2,
+          borderColor: "#888888",
+          hoverBorderColor: this.colors.lookupColor("fgtext")
         }
       ]
     };
@@ -165,6 +167,25 @@ export default class PieChart extends Props {
    * Changes to reflect colorscheme changes
    */
   get options(): Chart.ChartOptions {
+    // Define our callbacks
+    let on_series_click = (
+      event: MouseEvent | undefined,
+      activeElements: {}[] | undefined
+    ) => {
+      if (activeElements !== undefined && activeElements.length > 0) {
+        // This isn't properly typed in the output, but we know there will always be an index
+        let selected_index = (activeElements[0] as any)._index;
+        this.$emit("category-selected", this._categories[selected_index]);
+      }
+    };
+    let on_legend_click = (
+      event: MouseEvent,
+      legendItem: Chart.ChartLegendLabelItem
+    ) => {
+      let selected_index = legendItem.datasetIndex;
+      this.$emit("category-selected", this._categories[selected_index]);
+    };
+
     return {
       // Make the arc start from the left
       rotation: Math.PI,
@@ -185,18 +206,10 @@ export default class PieChart extends Props {
         labels: {
           boxWidth: 12, // Make it square
           fontColor: this.colors.lookupColor("fgtext") // use fg color
-        }
+        },
+        onClick: on_legend_click
       },
-      onClick: (
-        event: MouseEvent | undefined,
-        activeElements: {}[] | undefined
-      ) => {
-        if (activeElements !== undefined && activeElements.length > 0) {
-          // This isn't properly typed in the output, but we know there will always be an index
-          let selected_index = (activeElements[0] as any)._index;
-          this.$emit("category-selected", this._categories[selected_index]);
-        }
-      }
+      onClick: on_series_click
     };
   }
 

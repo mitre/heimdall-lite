@@ -1,4 +1,10 @@
-import { Module, VuexModule, getModule } from "vuex-module-decorators";
+import {
+  Module,
+  VuexModule,
+  getModule,
+  Action,
+  Mutation
+} from "vuex-module-decorators";
 import Store from "@/store/store";
 import { ControlStatus, nist, Severity } from "inspecjs";
 
@@ -40,19 +46,28 @@ function calculateColor(colorName: string): string {
 })
 class ColorHackModule extends VuexModule {
   /**
+   * Cache of colors. Cleared via clear method
+   */
+  localCache: { [key: string]: string } = {};
+
+  /**
+   * Clears the cache
+   */
+  @Mutation
+  clear() {
+    this.localCache = {};
+  }
+
+  /**
    * Get a color's (e.g. red, blue, info, error) hex code by name.
    * Tries a class color before a base/builtin color
    */
   get lookupColor(): (colorName: string) => string {
-    // Establish a cache
-    const localCache: { [key: string]: string } = {};
-
     // Establish to vue that we vary on any changes to the theme
-    // let _depends: any = this.
     return (colorName: string) => {
       // Check if we have this cached:
-      if (colorName in localCache) {
-        return localCache[colorName];
+      if (colorName in this.localCache) {
+        return this.localCache[colorName];
       } else {
         // If not calculate it
         // We first try class colors, assuming base.
@@ -68,7 +83,7 @@ class ColorHackModule extends VuexModule {
           color = calculateColor(colorName);
         }
 
-        localCache[colorName] = color;
+        this.localCache[colorName] = color;
         return color;
       }
     };

@@ -69,6 +69,7 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "@/store/data_store";
 import FileItem from "@/components/global/sidebaritems/SidebarFile.vue";
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
+import ColorHackModule from "../../store/color_hack";
 
 interface LinkProps {
   text: string; // To label the item
@@ -134,6 +135,8 @@ export default class Sidebar extends SidebarProps {
   /** Updates theme darkness */
   updateDark() {
     this.$vuetify.theme.dark = this.dark;
+    let color = getModule(ColorHackModule, this.$store);
+    color.clear();
   }
 }
 </script>

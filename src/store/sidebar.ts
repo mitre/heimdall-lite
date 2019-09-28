@@ -151,26 +151,6 @@ class SidebarModule extends VuexModule {
       submenu: [this.catt, this.print]
     };
   }
-
-  @Action
-  addFileItemOrSomething(): null {
-    /*
-    let fileCount = 2;
-
-    for (let results in Items[1].submenu) {
-      if (Items[1].submenu[results].name == fileName) {
-        if (fileCount < 3) {
-          fileName = fileName + " " + fileCount;
-          fileCount++;
-        } else {
-          fileName = fileName.substr(0, fileName.length - 2) + " " + fileCount;
-          fileCount++;
-        }
-      }
-    }
-    */
-    return null;
-  }
 }
 
 export default SidebarModule;
