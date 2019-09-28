@@ -1,5 +1,10 @@
 <template>
-  <PieChart :categories="categories" :series="series" :arc_span="180" />
+  <PieChart
+    :categories="categories"
+    :series="series"
+    :doughnut="true"
+    :arc_span="180"
+  />
 </template>
 
 <script lang="ts">
@@ -10,7 +15,6 @@ import { getModule } from "vuex-module-decorators";
 import ColorHackModule from "@/store/color_hack";
 import FilteredDataModule, { Filter } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
-import { ApexOptions } from "apexcharts";
 import InspecDataModule from "@/store/data_store";
 import StatusCountModule from "@/store/status_counts";
 

@@ -33,19 +33,29 @@ function isCategory(x: any): x is Category<string> {
   );
 }
 
-const PieChartProps = Vue.extend({
+const Props = Vue.extend({
   props: {
-    categories: Array, // Should be of type Category[]
-    series: Array, // Should be of type number[]
+    categories: {
+      type: Array, // Should be of type Category[]
+      required: true
+    },
+    series: {
+      type: Array, // Should be of type number[]
+      required: true
+    },
     arc_span: {
       type: Number,
       default: 360
+    },
+    doughnut: {
+      type: Boolean,
+      default: false
     }
   }
 });
 
 @Component({})
-export default class PieChart extends PieChartProps {
+export default class PieChart extends Props {
   /** The ID for the chart */
   uid: string = `piechart-${gen_uid()}`;
 
@@ -108,19 +118,22 @@ export default class PieChart extends PieChartProps {
    * Maybe look into the more advanced version...?
    */
   get _watch(): string {
+    // Declare our dependencies -- specifically, color and data
+    let deps: any = [this.$vuetify.theme.dark, this._series];
+
+    // Perform an update if chart exists
     if (this.chart !== undefined) {
       // Update the data
       this.chart.data.datasets![0].data = this._series;
 
       // Update the legend colors
-      let colors: ColorHackModule = getModule(ColorHackModule, this.$store);
-      this.chart.options.legend!.labels = {
-        fontColor: colors.lookupColor("fgtext")
-      };
+      this.chart.options = this.options;
+
+      // Update!
       this.chart.update();
     }
-    // Vary our output on this._series so this function will be reliably called
-    return this._series.join(";");
+    // Vary our output on dependencies so this function will be reliably called
+    return deps.join(";");
   }
 
   /** Provide quick access to our color lookup function */
@@ -129,8 +142,8 @@ export default class PieChart extends PieChartProps {
   }
 
   /** Generates our chart data */
-  get data(): Chart.ChartData {
-    return {
+  get chart_data(): Chart.ChartData {
+    let data: Chart.ChartData = {
       labels: this._categories.map(c => c.label),
       datasets: [
         {
@@ -140,11 +153,12 @@ export default class PieChart extends PieChartProps {
           ),
           data: this._series,
           // rotation: 0.5 * Math.PI,
-          borderWidth: 0,
+          borderWidth: 1,
           hoverBorderWidth: 2
         }
       ]
     };
+    return data;
   }
 
   /** Generates our chart options.
@@ -156,12 +170,21 @@ export default class PieChart extends PieChartProps {
       rotation: Math.PI,
       // Set the circumference, to allow half-donuts
       circumference: (this.arc_span / 180) * Math.PI,
+      layout: {
+        padding: {
+          left: 20,
+          right: 20,
+          top: 10,
+          bottom: 30
+        }
+      },
       // Enable the legend
       legend: {
         display: true, // Looks better false; investigate generating programatically
         // Tweak labels to look a bit nicer
         labels: {
-          boxWidth: 12 // Make it square
+          boxWidth: 12, // Make it square
+          fontColor: this.colors.lookupColor("fgtext") // use fg color
         }
       },
       onClick: (
@@ -177,21 +200,20 @@ export default class PieChart extends PieChartProps {
     };
   }
 
-  /** Generates our chart configuration */
-  get configuration(): Chart.ChartConfiguration {
-    return {
-      type: "doughnut",
-      data: this.data,
-      options: this.options
-    };
-  }
-
+  /** on mount, configure chart */
   mounted() {
     // Get the color module
     let colors: ColorHackModule = getModule(ColorHackModule, this.$store);
 
+    // Make our config
+    let configuration: Chart.ChartConfiguration = {
+      type: this.doughnut ? "doughnut" : "pie",
+      data: this.chart_data,
+      options: this.options
+    };
+
     // Instantiate our chart
-    this.chart = new Chart(this.uid, this.options);
+    this.chart = new Chart(this.uid, configuration);
   }
 }
 </script>
