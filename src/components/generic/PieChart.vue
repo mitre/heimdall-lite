@@ -8,6 +8,7 @@ import Component from "vue-class-component";
 import { Chart } from "chart.js";
 import ColorHackModule from "../../store/color_hack";
 import { getModule } from "vuex-module-decorators";
+import { Color } from "vuetify/lib/util/colors";
 
 // Chart UID generation
 let uid = 0;
@@ -108,11 +109,81 @@ export default class PieChart extends PieChartProps {
    */
   get _watch(): string {
     if (this.chart !== undefined) {
+      // Update the data
       this.chart.data.datasets![0].data = this._series;
+
+      // Update the legend colors
+      let colors: ColorHackModule = getModule(ColorHackModule, this.$store);
+      this.chart.options.legend!.labels = {
+        fontColor: colors.lookupColor("fgtext")
+      };
       this.chart.update();
     }
     // Vary our output on this._series so this function will be reliably called
     return this._series.join(";");
+  }
+
+  /** Provide quick access to our color lookup function */
+  get colors(): ColorHackModule {
+    return getModule(ColorHackModule, this.$store);
+  }
+
+  /** Generates our chart data */
+  get data(): Chart.ChartData {
+    return {
+      labels: this._categories.map(c => c.label),
+      datasets: [
+        {
+          label: "Number of controls",
+          backgroundColor: this._categories.map(c =>
+            this.colors.lookupColor(c.color)
+          ),
+          data: this._series,
+          // rotation: 0.5 * Math.PI,
+          borderWidth: 0,
+          hoverBorderWidth: 2
+        }
+      ]
+    };
+  }
+
+  /** Generates our chart options.
+   * Changes to reflect colorscheme changes
+   */
+  get options(): Chart.ChartOptions {
+    return {
+      // Make the arc start from the left
+      rotation: Math.PI,
+      // Set the circumference, to allow half-donuts
+      circumference: (this.arc_span / 180) * Math.PI,
+      // Enable the legend
+      legend: {
+        display: true, // Looks better false; investigate generating programatically
+        // Tweak labels to look a bit nicer
+        labels: {
+          boxWidth: 12 // Make it square
+        }
+      },
+      onClick: (
+        event: MouseEvent | undefined,
+        activeElements: {}[] | undefined
+      ) => {
+        if (activeElements !== undefined && activeElements.length > 0) {
+          // This isn't properly typed in the output, but we know there will always be an index
+          let selected_index = (activeElements[0] as any)._index;
+          this.$emit("category-selected", this._categories[selected_index]);
+        }
+      }
+    };
+  }
+
+  /** Generates our chart configuration */
+  get configuration(): Chart.ChartConfiguration {
+    return {
+      type: "doughnut",
+      data: this.data,
+      options: this.options
+    };
   }
 
   mounted() {
@@ -120,41 +191,7 @@ export default class PieChart extends PieChartProps {
     let colors: ColorHackModule = getModule(ColorHackModule, this.$store);
 
     // Instantiate our chart
-    this.chart = new Chart(this.uid, {
-      type: "doughnut",
-      data: {
-        labels: this._categories.map(c => c.label),
-        datasets: [
-          {
-            label: "Number of controls",
-            backgroundColor: this._categories.map(c =>
-              colors.lookupColor(c.color)
-            ),
-            data: this._series,
-            // rotation: 0.5 * Math.PI,
-            borderWidth: 0,
-            hoverBorderWidth: 2
-          }
-        ]
-      },
-      options: {
-        rotation: Math.PI,
-        circumference: (this.arc_span / 180) * Math.PI,
-        legend: {
-          display: true // Looks better false; investigate generating programatically
-        },
-        onClick: (
-          event: MouseEvent | undefined,
-          activeElements: {}[] | undefined
-        ) => {
-          if (activeElements !== undefined && activeElements.length > 0) {
-            // This isn't properly typed in the output, but we know there will always be an index
-            let selected_index = (activeElements[0] as any)._index;
-            this.$emit("category-selected", this._categories[selected_index]);
-          }
-        }
-      }
-    });
+    this.chart = new Chart(this.uid, this.options);
   }
 }
 </script>

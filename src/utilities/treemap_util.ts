@@ -2,16 +2,7 @@
  * Tools used for generating the treemaps consumed by, of course, the Treemap card and associated components.
  */
 
-import {
-  HDFControl,
-  NistHash,
-  NistFamily,
-  NistCategory,
-  hdfWrapControl,
-  ControlStatus,
-  generateNewNistHash,
-  populateNistHash
-} from "inspecjs";
+import { HDFControl, hdfWrapControl, ControlStatus, nist } from "inspecjs";
 import * as d3 from "d3";
 import { ContextualizedControl } from "@/store/data_store";
 
@@ -21,7 +12,7 @@ import { ContextualizedControl } from "@/store/data_store";
 export class CCWrapper {
   ctrl: ContextualizedControl;
   hdf: HDFControl;
-  category?: NistCategory<CCWrapper>;
+  category?: nist.NistCategory<CCWrapper>;
 
   constructor(ctrl: ContextualizedControl) {
     this.ctrl = ctrl;
@@ -40,9 +31,9 @@ export class CCWrapper {
 
 /** A simple wrapper type representing what any node's data might be in our treemap */
 export type TreemapDatumType =
-  | NistHash<CCWrapper>
-  | NistFamily<CCWrapper>
-  | NistCategory<CCWrapper>
+  | nist.NistHash<CCWrapper>
+  | nist.NistFamily<CCWrapper>
+  | nist.NistCategory<CCWrapper>
   | CCWrapper;
 
 /** The type of our treemap nodes, prior to rendering */
@@ -63,9 +54,9 @@ export function isCCWrapper(ctrl: TreemapDatumType): ctrl is CCWrapper {
 export function isNistGrouping(
   grp: TreemapDatumType
 ): grp is
-  | NistHash<CCWrapper>
-  | NistFamily<CCWrapper>
-  | NistCategory<CCWrapper> {
+  | nist.NistHash<CCWrapper>
+  | nist.NistFamily<CCWrapper>
+  | nist.NistCategory<CCWrapper> {
   return !isCCWrapper(grp);
 }
 
@@ -77,11 +68,11 @@ export function isNistGrouping(
  */
 export function nistHashForControls(
   controls: Readonly<ContextualizedControl[]>
-): NistHash<CCWrapper> {
+): nist.NistHash<CCWrapper> {
   // Generate the hash
   let wrapped_controls = controls.map(c => new CCWrapper(c));
-  let hash = generateNewNistHash<CCWrapper>();
-  populateNistHash(wrapped_controls, hash);
+  let hash = nist.generateNewNistHash<CCWrapper>();
+  nist.populateNistHash(wrapped_controls, hash);
 
   // Bind the categories
   hash.children.forEach(family => {
@@ -105,7 +96,7 @@ export function nistHashForControls(
  * @param hash The nist hash to turn into a tree map
  */
 export function nistHashToTreeMap(
-  hash: Readonly<NistHash<CCWrapper>>
+  hash: Readonly<nist.NistHash<CCWrapper>>
 ): TreemapNode {
   // Find the largest count category. We use this to set the weights in individual controls so they fill their parent
   let biggest = 1;

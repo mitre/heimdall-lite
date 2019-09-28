@@ -6,7 +6,7 @@
       </v-col>
       <v-col :cols="8">
         <v-btn @click="up" :disabled="!allow_up" block x-small>
-          <v-icon v-if="allow_up"> arrow_back </v-icon>
+          <v-icon v-if="allow_up"> mdi-arrow-left </v-icon>
           {{ selected_node.data.name }}
         </v-btn>
       </v-col>
@@ -38,15 +38,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
-import {
-  ControlStatus,
-  HDFControl,
-  NistHash,
-  hdfWrapControl,
-  NistFamily,
-  NistCategory,
-  ControlGroupStatus
-} from "inspecjs";
+import { ControlStatus, HDFControl, nist, hdfWrapControl } from "inspecjs";
 import * as d3 from "d3";
 import FilteredDataModule, { NistMapState } from "@/store/data_filters";
 import {
@@ -103,7 +95,7 @@ export default class Treemap extends TreemapProps {
     if (val.selectedFamily) {
       let new_curr = curr.children!.find(
         child =>
-          (child.data as NistFamily<CCWrapper>).name === val.selectedFamily
+          (child.data as nist.NistFamily<CCWrapper>).name === val.selectedFamily
       );
       if (new_curr !== undefined) {
         curr = new_curr;
@@ -123,7 +115,8 @@ export default class Treemap extends TreemapProps {
     if (val.selectedCategory) {
       let new_curr = curr.children!.find(
         child =>
-          (child.data as NistCategory<CCWrapper>).name === val.selectedCategory
+          (child.data as nist.NistCategory<CCWrapper>).name ===
+          val.selectedCategory
       );
       if (new_curr !== undefined) {
         curr = new_curr;
@@ -184,7 +177,7 @@ export default class Treemap extends TreemapProps {
    * Note that regardless of what filtering this treeview applies,
    * we want the treeview itself to remain unaffected.
    */
-  get nist_hash(): NistHash<CCWrapper> {
+  get nist_hash(): nist.NistHash<CCWrapper> {
     // Get our data module
     let data: FilteredDataModule = getModule(FilteredDataModule, this.$store);
 
@@ -217,10 +210,10 @@ export default class Treemap extends TreemapProps {
 
     // Depending on length of route, assign values
     if (route.length > 1) {
-      selected_family = (route[1].data as NistFamily<CCWrapper>).name;
+      selected_family = (route[1].data as nist.NistFamily<CCWrapper>).name;
     }
     if (route.length > 2) {
-      selected_category = (route[2].data as NistCategory<CCWrapper>).name;
+      selected_category = (route[2].data as nist.NistCategory<CCWrapper>).name;
     }
     if (route.length > 3) {
       selected_control_id = (route[3].data as CCWrapper).ctrl.data.id;
