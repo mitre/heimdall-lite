@@ -10,7 +10,7 @@
       <v-app-bar-nav-icon
         @click.stop="$emit('toggle-drawer')"
       ></v-app-bar-nav-icon>
-      <span class="hidden-sm-and-down">Heimdall Lite</span>
+      <span class="hidden-sm-and-down"> {{ title }} </span>
     </v-toolbar-title>
     <v-spacer />
 
@@ -32,7 +32,9 @@ import Component from "vue-class-component";
 
 // We declare the props separately to make props types inferable.
 const TopbarProps = Vue.extend({
-  props: {}
+  props: {
+    title: String
+  }
 });
 
 @Component({

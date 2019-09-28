@@ -1,5 +1,5 @@
 <template>
-  <BaseView>
+  <BaseView :title="curr_title">
     <!-- Topbar config - give it a search bar -->
     <template #topbar-content>
       <v-text-field
@@ -133,6 +133,8 @@ import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import { Filter, NistMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
 import { FileID } from "@/store/report_intake";
+import { getModule } from "vuex-module-decorators";
+import InspecDataModule from "../store/data_store";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -256,6 +258,20 @@ export default class Results extends ResultsProps {
       console.log("Cant clear");
       return false;
     }
+  }
+
+  /**
+   * The title to override with
+   */
+  get curr_title(): String | undefined {
+    if (this.file_filter !== null) {
+      let store = getModule(InspecDataModule, this.$store);
+      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+      if (file) {
+        return file.filename;
+      }
+    }
+    return undefined;
   }
 
   /**
