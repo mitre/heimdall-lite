@@ -1,12 +1,12 @@
 <template>
   <div class="text-center">
     <v-dialog v-model="dialog" width="500">
+      <!--<template v-slot:activator="{ on }">
+        <v-btn dark v-on="on">About</v-btn>
+      </template>-->
       <template v-slot:activator="{ on }">
-        <v-btn dark v-on="on">
-          About
-        </v-btn>
+        <LinkItem :key="about" :text="about" :icon="info" v-on="on" />
       </template>
-
       <v-card>
         <v-card-title class="headline grey" primary-title>
           About Heimdall-Vuetify
@@ -32,11 +32,18 @@
 </template>
 
 <script>
+import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
+
 export default {
   data() {
     return {
-      dialog: false
+      dialog: false,
+      about: "About",
+      info: "info"
     };
+  },
+  components: {
+    LinkItem
   }
 };
 </script>

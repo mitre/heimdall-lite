@@ -6,6 +6,8 @@
     app
   >
     <v-list dense>
+      <AboutModal></AboutModal>
+      <HelpModal></HelpModal>
       <template v-for="item in items">
         <!-- Link lists -->
         <v-list-group v-if="item.children" :key="item.text">
@@ -55,16 +57,16 @@
         />
       </template>
     </v-list>
-    <v-layout align-center>
-      <v-flex class="text-center">
+    <v-layout>
+      <v-flex class="center-switch">
         <v-switch
           label="Light/Dark"
           v-model="dark"
           v-on:change="updateDark"
-          align-center
         ></v-switch>
       </v-flex>
     </v-layout>
+    <ExportCaat></ExportCaat>
   </v-navigation-drawer>
 </template>
 
@@ -76,6 +78,9 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "@/store/data_store";
 import FileItem from "@/components/global/sidebaritems/SidebarFile.vue";
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
+import ExportCaat from "@/components/global/ExportCaat.vue";
+import AboutModal from "@/components/global/AboutModal.vue";
+import HelpModal from "@/components/global/HelpModal.vue";
 
 interface LinkProps {
   text: string; // To label the item
@@ -106,14 +111,16 @@ const SidebarProps = Vue.extend({
 @Component({
   components: {
     LinkItem,
-    FileItem
+    FileItem,
+    ExportCaat,
+    AboutModal,
+    HelpModal
   }
 })
 export default class Sidebar extends SidebarProps {
   // Dynamic list setup
   get items(): AnyProp[] {
     return [
-      { icon: "info", text: "Help", on_click: () => {} },
       {
         text: "Files",
         files: this.visible_files
@@ -125,8 +132,7 @@ export default class Sidebar extends SidebarProps {
           { text: "Export", icon: "printer", on_click: () => {} },
           { text: "Print", icon: "printer", on_click: () => {} }
         ]
-      },
-      { icon: "info", text: "About", on_click: () => {} }
+      }
     ];
   }
 
@@ -145,3 +151,9 @@ export default class Sidebar extends SidebarProps {
   }
 }
 </script>
+
+<style>
+.center-switch {
+  margin-left: 20px;
+}
+</style>
