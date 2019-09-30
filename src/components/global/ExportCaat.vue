@@ -98,7 +98,7 @@ export default class ExportCaat extends Props {
       row.push(""); // Likelihood
       row.push(control.wraps.impact.toString()); // Impact
 
-      if (row.length !== this.header.length) {
+      if (row.length !== this.header().length) {
         throw new Error("Row of wrong size");
       }
       return row;

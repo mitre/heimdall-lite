@@ -57,6 +57,7 @@
         />
       </template>
     </v-list>
+    <ExportCaat></ExportCaat>
     <v-layout>
       <v-flex class="center-switch">
         <v-switch
@@ -66,7 +67,6 @@
         ></v-switch>
       </v-flex>
     </v-layout>
-    <ExportCaat></ExportCaat>
   </v-navigation-drawer>
 </template>
 
