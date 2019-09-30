@@ -5,8 +5,9 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Chart } from "chart.js";
-import ColorHackModule from "../../store/color_hack";
+import Chart from "chart.js";
+import ChartDataLabels, { Context } from "chartjs-plugin-datalabels";
+import ColorHackModule from "@/store/color_hack";
 import { getModule } from "vuex-module-decorators";
 import { Color } from "vuetify/lib/util/colors";
 
@@ -163,6 +164,33 @@ export default class PieChart extends Props {
     return data;
   }
 
+  /**
+   * Generates annotation config options
+   * See: https://chartjs-plugin-datalabels.netlify.com/guide/options.html#option-context
+   */
+  get data_labels(): any {
+    let opts: any = {
+      datalabels: {
+        backgroundColor: function(context: Context) {
+          return context.dataset.backgroundColor;
+        },
+        borderColor: "white",
+        borderRadius: 25,
+        borderWidth: 2,
+        color: "white",
+        display: function(context: Context) {
+          let dataset = context.dataset!;
+          let value = dataset.data![context.dataIndex]!;
+          return value.valueOf() > 0;
+        },
+        font: {
+          weight: "bold"
+        }
+      }
+    };
+    return opts;
+  }
+
   /** Generates our chart options.
    * Changes to reflect colorscheme changes
    */
@@ -182,7 +210,7 @@ export default class PieChart extends Props {
       event: MouseEvent,
       legendItem: Chart.ChartLegendLabelItem
     ) => {
-      let selected_index = legendItem.datasetIndex;
+      let selected_index = (legendItem as any).index;
       this.$emit("category-selected", this._categories[selected_index]);
     };
 
@@ -196,7 +224,7 @@ export default class PieChart extends Props {
           left: 20,
           right: 20,
           top: 10,
-          bottom: 30
+          bottom: 10
         }
       },
       // Enable the legend
@@ -207,9 +235,13 @@ export default class PieChart extends Props {
           boxWidth: 12, // Make it square
           fontColor: this.colors.lookupColor("fgtext") // use fg color
         },
-        onClick: on_legend_click
+        onClick: on_legend_click,
+        position: "bottom"
       },
-      onClick: on_series_click
+      onClick: on_series_click, // Handle series clicks
+      plugins: {
+        datalabels: this.data_labels
+      }
     };
   }
 
@@ -220,9 +252,10 @@ export default class PieChart extends Props {
 
     // Make our config
     let configuration: Chart.ChartConfiguration = {
-      type: this.doughnut ? "doughnut" : "pie",
+      type: this.doughnut ? "doughnut" : "doughnut",
       data: this.chart_data,
-      options: this.options
+      options: this.options,
+      plugins: [ChartDataLabels]
     };
 
     // Instantiate our chart
