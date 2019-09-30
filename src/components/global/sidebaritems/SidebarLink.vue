@@ -26,8 +26,7 @@ const LinkItemProps = Vue.extend({
     },
     link: {
       type: String,
-      required: false,
-      default: "/"
+      required: false
     }
   }
 });

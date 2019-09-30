@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="dialog" width="500">
+    <v-dialog v-model="dialog" width="60%">
       <!--<template v-slot:activator="{ on }">
         <v-btn dark v-on="on">About</v-btn>
       </template>-->
@@ -13,9 +13,11 @@
         </v-card-title>
 
         <v-card-text>
-          <br />
-          Version: 1.0 <br />
-          Github Repository: <a>https://github.com/mitre/heimdall-vuetify</a>
+          <p class="about-text">
+            <br />
+            Version: 1.0 <br /><br />
+            Github Repository: <a>https://github.com/mitre/heimdall-vuetify</a>
+          </p>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -47,3 +49,9 @@ export default {
   }
 };
 </script>
+
+<style>
+.about-text {
+  font-size: 15pt;
+}
+</style>

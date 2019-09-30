@@ -66,13 +66,15 @@ export default class ExportCaat extends Props {
 
       // Build up the row
       row.push(family); // Control Number
-      row.push(fix(control.wraps.title)); // Finding Title
+      row.push(
+        "Test " + fix(control.wraps.id) + " - " + fix(control.wraps.title)
+      ); // Finding Title
       if (control.start_time) {
         row.push(this.convertDate(new Date(control.start_time), "/")); // Date Identified
       } else {
         row.push("");
       }
-      row.push(fix(control.wraps.tags.stig_id)); // Finding ID
+      row.push(""); //row.push(fix(control.wraps.tags.stig_id)); // Finding ID
       row.push(""); // Information System or Program Name
       row.push(""); // Repeat Findings
       row.push(""); // Repeat Finding CFACTS Weakness ID
@@ -80,14 +82,10 @@ export default class ExportCaat extends Props {
       row.push(fix(control.wraps.desc)); // Weakness Description
       row.push("Security"); // Control Weakness Type
       row.push("Self-Assessment "); // Source
-      row.push("InSpec"); // Assessment/Audit Company
+      row.push(""); //row.push("InSpec"); // Assessment/Audit Company
       row.push("Test"); // Test Method
       row.push(fix(control.wraps.tags.check)); // Test Objective
-      if (control.segments && control.segments.length > 0) {
-        row.push(fix(control.segments[0].message)); // Test Result Description
-      } else {
-        row.push(""); // No result could be found
-      }
+      row.push(fix(control.message)); // Test Result Description
       if (control.status === "Passed") {
         row.push("Satisfied");
       } else {
@@ -96,7 +94,7 @@ export default class ExportCaat extends Props {
       row.push(fix(control.wraps.tags.fix)); // Recommended Corrective Action(s)
       row.push(""); // Effect on Business
       row.push(""); // Likelihood
-      row.push(control.wraps.impact.toString()); // Impact
+      row.push(fix(control.severity)); // Impact
 
       if (row.length !== this.header().length) {
         throw new Error("Row of wrong size");
