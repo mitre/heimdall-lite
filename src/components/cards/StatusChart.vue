@@ -2,6 +2,7 @@
   <PieChart
     :categories="categories"
     :series="series"
+    :doughnut="true"
     @category-selected="onSelect"
   />
 </template>
