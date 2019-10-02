@@ -78,15 +78,8 @@ export default class ComplianceChart extends ComplianceChartProps {
   }
 
   /** The gradient we use for filling the bar */
-  get gradient(): CanvasGradient | undefined {
-    if (this.chart !== undefined) {
-      let gradientStroke = this.chart.ctx!.createLinearGradient(500, 0, 100, 0);
-      gradientStroke.addColorStop(0, this.colors.lookupColor("statusFailed"));
-      gradientStroke.addColorStop(1, this.colors.lookupColor("statusPassed"));
-      return gradientStroke;
-    } else {
-      return undefined;
-    }
+  get gradient(): Chart.ChartColor {
+    return this.colors.lookupColor("statusPassed");
   }
 
   /** Generates our chart data */

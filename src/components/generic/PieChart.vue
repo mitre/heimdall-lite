@@ -1,5 +1,5 @@
 <template>
-  <canvas :id="uid" ref="chart_canvas" :fake_prop="_watch" />
+  <canvas :id="uid" :fake_prop="_watch" />
 </template>
 
 <script lang="ts">
@@ -61,13 +61,6 @@ export default class PieChart extends Props {
   get _series(): number[] {
     // If we have any non-zero data, just returngive 0.01 of all
     return this.series as number[];
-  }
-
-  /**
-   * Typed access to our chart canvas ref
-   */
-  get chart_canvas(): Element {
-    return this.$refs.chart_canvas as Element;
   }
 
   /**
