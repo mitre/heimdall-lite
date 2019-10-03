@@ -44,15 +44,13 @@ export default new Vuetify({
         ...statuses,
         ...severities,
         ...compliances,
-        ...branding,
-        background: "#303030"
+        ...branding
       },
       light: {
         ...statuses,
         ...severities,
         ...compliances,
-        ...branding,
-        background: "#f8f8f8"
+        ...branding
       }
     },
     options: {
