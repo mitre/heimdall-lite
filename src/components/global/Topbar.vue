@@ -1,10 +1,5 @@
 <template>
-  <v-app-bar
-    :clipped-left="$vuetify.breakpoint.lgAndUp"
-    app
-    color="mitreBlue"
-    dark
-  >
+  <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app>
     <!-- The title and nav bar -->
     <v-toolbar-title class="ml-0 pl-4">
       <v-app-bar-nav-icon
@@ -50,3 +45,11 @@ export default class Topbar extends TopbarProps {
   }
 }
 </script>
+
+<style scoped>
+.v-toolbar__content,
+.v-toolbar,
+.v-appbar {
+  background-color: var(--v-primary-darken1);
+}
+</style>

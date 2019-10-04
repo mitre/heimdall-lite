@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire" style="background: var(--v-background-base)">
+  <v-app id="inspire" class="override">
     <!-- Router view. Typically a "subclass" of Base -->
     <router-view></router-view>
 
@@ -28,9 +28,39 @@ export default class App extends AppProps {}
 
 <!-- Style to fix dark mode to use our color scheme -->
 <style>
-.theme--light.v-card,
-.theme--light.v-sheet,
-.theme--light.v-navigation-drawer {
-  background: var(--v-background-lighten-1);
+/* Backgrounds (root) */
+.override.theme--dark.v-application {
+  background: var(--v-secondary-base);
+}
+
+.override.theme--light.v-application {
+  background: var(--v-secondary-base);
+}
+
+/** Backgrounds (middle) */
+.override .theme--dark.v-card,
+.override .theme--dark.v-navigation-drawer {
+  background: var(--v-secondary-lighten1);
+  background-color: var(--v-secondary-lighten1);
+}
+
+.override .theme--light.v-card,
+.override .theme--light.v-navigation-drawer {
+  background: var(--v-secondary-lighten1);
+  background-color: var(--v-secondary-lighten1);
+}
+
+/** Foreground */
+.foreground .v-card {
+  background: var(--v-secondary-lighten2) !important;
+  background-color: var(--v-secondary-lighten2) !important;
+}
+
+/** Bar */
+.v-app-bar,
+.v-toolbar,
+.v-footer {
+  background: var(--v-primary-base);
+  background-color: var(--v-primary-base);
 }
 </style>
