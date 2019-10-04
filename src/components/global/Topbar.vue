@@ -1,5 +1,10 @@
 <template>
-  <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" color="background" app>
+  <v-app-bar
+    :clipped-left="$vuetify.breakpoint.lgAndUp"
+    color="mitre"
+    class="font-weight-medium white--text"
+    app
+  >
     <!-- The title and nav bar -->
     <v-toolbar-title class="ml-0 pl-4">
       <v-app-bar-nav-icon
@@ -15,7 +20,10 @@
     <!-- Login information or whatever -->
     <v-btn icon large>
       <v-avatar size="32px" item>
-        <v-img :src="require('@/assets/logo.png')" alt="Heimdall"></v-img>
+        <v-img
+          :src="require('@/assets/logo-xs-orange-white.svg')"
+          alt="Heimdall Logo"
+        ></v-img>
       </v-avatar>
     </v-btn>
   </v-app-bar>
