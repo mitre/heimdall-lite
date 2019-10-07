@@ -55,12 +55,4 @@ export default class App extends AppProps {}
   background: var(--v-secondary-lighten2) !important;
   background-color: var(--v-secondary-lighten2) !important;
 }
-
-/** Bar */
-.v-app-bar,
-.v-toolbar,
-.v-footer {
-  background: var(--v-primary-base);
-  background-color: var(--v-primary-base);
-}
 </style>

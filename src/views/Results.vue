@@ -10,6 +10,7 @@
         prepend-inner-icon="mdi-magnify"
         label="Search"
         v-model="search_term"
+        clearable
       ></v-text-field>
       <v-spacer />
       <v-btn
@@ -252,10 +253,8 @@ export default class Results extends ResultsProps {
       this.search_term !== "" ||
       this.nist_filters.selectedFamily
     ) {
-      console.log("Can clear");
       return true;
     } else {
-      console.log("Cant clear");
       return false;
     }
   }

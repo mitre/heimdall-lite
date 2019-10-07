@@ -1,11 +1,13 @@
 <template>
-  <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app>
+  <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="primary">
     <!-- The title and nav bar -->
     <v-toolbar-title class="ml-0 pl-4">
       <v-app-bar-nav-icon
         @click.stop="$emit('toggle-drawer')"
       ></v-app-bar-nav-icon>
-      <span class="hidden-sm-and-down"> {{ title }} </span>
+      <span class="hidden-sm-and-down primary-visible--text">
+        {{ title }}
+      </span>
     </v-toolbar-title>
     <v-spacer />
 
@@ -45,11 +47,3 @@ export default class Topbar extends TopbarProps {
   }
 }
 </script>
-
-<style scoped>
-.v-toolbar__content,
-.v-toolbar,
-.v-appbar {
-  background-color: var(--v-primary-darken1);
-}
-</style>

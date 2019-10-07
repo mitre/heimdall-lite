@@ -20,6 +20,25 @@ const statuses = {
 
 type CustColor = VuetifyParsedThemeItem;
 
+/** Makes a color that is visible against the provided color */
+function visible_against(color_hex: string): string {
+  // Get the color
+  let color = Chroma.hex(color_hex);
+
+  // Rotate 50 degrees in hue (arbitrary # but seems nice)
+  color = color.set("hsl.h", "+50");
+
+  // Now set its luminance to the opposite extreme
+  let lum = color.luminance();
+  if (lum < 0.5) {
+    color = color.luminance(0.8);
+  } else {
+    color = color.luminance(0.2);
+  }
+  console.log(color.hex());
+  return color.hex();
+}
+
 /** Bounds luminance so it never quite reaches 0 or 1 */
 function lum_sigmoid(t: number, shift: number) {
   // The base sigmoid maps [-infinity, infinity] to [0, 1]
@@ -31,9 +50,6 @@ function lum_sigmoid(t: number, shift: number) {
   let shifted_logit = logit_t + shift;
   let shifted_sigmoid = 1 / (1 + Math.pow(Math.E, -shifted_logit));
 
-  console.log(
-    `Base: ${t};\nLogit: ${logit_t};\nShifted logit: ${shifted_logit};\nShifted sigmoid: ${shifted_sigmoid};`
-  );
   return shifted_sigmoid;
 }
 
@@ -43,7 +59,6 @@ function shift(base_color: string, amount: number): string {
   let base_l = c.luminance();
   let new_l = lum_sigmoid(base_l, amount);
   let new_c = c.luminance(new_l);
-  console.log(`Shifting ${base_color} by ${amount} yielded ${new_c.hex()}`);
   return new_c.hex();
 }
 
@@ -65,6 +80,17 @@ function gen_variants(
     lighten4: shift(base_color, 4 * spread),
     lighten5: shift(base_color, 5 * spread)
   };
+}
+
+/** Replaces all colors in a CustColor with
+ * a variant that will be visible against the original color.
+ */
+function gen_visibilities(colorset: CustColor): CustColor {
+  let c: CustColor = { ...colorset };
+  Object.keys(c).forEach(key => {
+    c[key] = visible_against(c[key]!);
+  });
+  return c;
 }
 
 // Get colors generated from base mitre using UtilColorGenerator.
@@ -116,7 +142,9 @@ const veautiful = new Vuetify({
         ...compliances,
         ...branding,
         primary: mitrePrimaryGrey,
-        secondary: darkBackground
+        "primary-visible": gen_visibilities(mitrePrimaryGrey),
+        secondary: darkBackground,
+        "secondary-visible": gen_visibilities(darkBackground)
       },
       light: {
         ...statuses,
@@ -124,7 +152,9 @@ const veautiful = new Vuetify({
         ...compliances,
         ...branding,
         primary: mitrePrimaryBlue,
-        secondary: lightBackground
+        "primary-visible": gen_visibilities(mitrePrimaryBlue),
+        secondary: lightBackground,
+        "secondary-visible": gen_visibilities(lightBackground)
       }
     },
     options: {

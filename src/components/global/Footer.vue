@@ -1,6 +1,6 @@
 <template>
-  <v-footer app title="footer" class="font-weight-light">
-    <span>The MITRE Corporation &copy; 2019</span>
+  <v-footer app title="footer" class="primary font-weight-light">
+    <span class="primary-visible--text">The MITRE Corporation &copy; 2019</span>
   </v-footer>
 </template>
 
@@ -18,9 +18,3 @@ const FooterProps = Vue.extend({
 })
 export default class Footer extends FooterProps {}
 </script>
-
-<style scoped>
-footer.v-footer {
-  background-color: var(--v-primary-darken1);
-}
-</style>
