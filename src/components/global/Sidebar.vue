@@ -6,8 +6,6 @@
     app
   >
     <v-list dense>
-      <AboutModal></AboutModal>
-      <HelpModal></HelpModal>
       <template v-for="item in items">
         <!-- Link lists -->
         <v-list-group v-if="item.children" :key="item.text">
@@ -67,6 +65,8 @@
         ></v-switch>
       </v-flex>
     </v-layout>
+    <AboutModal></AboutModal>
+    <HelpModal></HelpModal>
   </v-navigation-drawer>
 </template>
 
@@ -159,5 +159,8 @@ nav.v-navigation-drawer {
   max-height: 100vh !important;
   /* z-index hides behind footer and topbar */
   z-index: 1;
+}
+.center-switch {
+  margin-left: 15px;
 }
 </style>
