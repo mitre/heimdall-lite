@@ -65,6 +65,7 @@
         ></v-switch>
       </v-flex>
     </v-layout>
+    <hr />
     <AboutModal></AboutModal>
     <HelpModal></HelpModal>
   </v-navigation-drawer>
