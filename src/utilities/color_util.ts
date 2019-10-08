@@ -21,7 +21,6 @@ export function visible_against(color_hex: string): string {
   } else {
     color = color.luminance(0.2);
   }
-  console.log(color.hex());
   return color.hex();
 }
 
