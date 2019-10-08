@@ -1,9 +1,7 @@
 import "@mdi/font/css/materialdesignicons.css";
 import Vue from "vue";
 import Vuetify, { colors } from "vuetify/lib";
-import { VuetifyParsedThemeItem } from "vuetify/types/services/theme";
-import Chroma from "chroma-js";
-
+import { gen_variants, gen_visibilities } from "@/utilities/color_util";
 Vue.use(Vuetify);
 
 // "Not Applicable" | "Not Reviewed" | "Profile Error";
@@ -18,89 +16,14 @@ const statuses = {
   statusFromProfile: colors.teal.base
 };
 
-type CustColor = VuetifyParsedThemeItem;
-
-/** Makes a color that is visible against the provided color */
-function visible_against(color_hex: string): string {
-  // Get the color
-  let color = Chroma.hex(color_hex);
-
-  // Rotate 50 degrees in hue (arbitrary # but seems nice)
-  color = color.set("hsl.h", "+50");
-
-  // Now set its luminance to the opposite extreme
-  let lum = color.luminance();
-  if (lum < 0.5) {
-    color = color.luminance(0.8);
-  } else {
-    color = color.luminance(0.2);
-  }
-  console.log(color.hex());
-  return color.hex();
-}
-
-/** Bounds luminance so it never quite reaches 0 or 1 */
-function lum_sigmoid(t: number, shift: number) {
-  // The base sigmoid maps [-infinity, infinity] to [0, 1]
-  // return 1/(1+Math.pow(Math.E, -t));
-  // First compute inverse sigmoid to find our starting place
-  let logit_t = -Math.log(1 / t - 1);
-
-  // Then shift in domain and recompute using sigmoid
-  let shifted_logit = logit_t + shift;
-  let shifted_sigmoid = 1 / (1 + Math.pow(Math.E, -shifted_logit));
-
-  return shifted_sigmoid;
-}
-
-/** Shifts a colors luminance by the specified amount */
-function shift(base_color: string, amount: number): string {
-  let c = Chroma.hex(base_color);
-  let base_l = c.luminance();
-  let new_l = lum_sigmoid(base_l, amount);
-  let new_c = c.luminance(new_l);
-  return new_c.hex();
-}
-
-/** Gen variations on a color */
-const BASE_SPREAD = 0.5;
-function gen_variants(
-  base_color: string,
-  spread: number = BASE_SPREAD
-): CustColor {
-  return {
-    darken4: shift(base_color, -4 * spread),
-    darken3: shift(base_color, -3 * spread),
-    darken2: shift(base_color, -2 * spread),
-    darken1: shift(base_color, -1 * spread),
-    base: base_color,
-    lighten1: shift(base_color, 1 * spread),
-    lighten2: shift(base_color, 2 * spread),
-    lighten3: shift(base_color, 3 * spread),
-    lighten4: shift(base_color, 4 * spread),
-    lighten5: shift(base_color, 5 * spread)
-  };
-}
-
-/** Replaces all colors in a CustColor with
- * a variant that will be visible against the original color.
- */
-function gen_visibilities(colorset: CustColor): CustColor {
-  let c: CustColor = { ...colorset };
-  Object.keys(c).forEach(key => {
-    c[key] = visible_against(c[key]!);
-  });
-  return c;
-}
-
 // Get colors generated from base mitre using UtilColorGenerator.
 // These are identical to default vuetify shading, but now we can access them programatically!
 let mitrePrimaryBlue = gen_variants("#005b94");
 let mitrePrimaryGrey = gen_variants("#5f636a");
 let mitreSecondaryGrey = gen_variants("#cfdeea");
 let mitreSecondaryBlue = gen_variants("#00b3dc");
-let darkBackground = gen_variants("#303030", BASE_SPREAD);
-let lightBackground = gen_variants("#d6d6d6", BASE_SPREAD);
+let darkBackground = gen_variants("#303030");
+let lightBackground = gen_variants("#d6d6d6");
 
 const branding = {
   mitrePrimaryBlue,
@@ -141,8 +64,8 @@ const veautiful = new Vuetify({
         ...severities,
         ...compliances,
         ...branding,
-        primary: mitrePrimaryGrey,
-        "primary-visible": gen_visibilities(mitrePrimaryGrey),
+        primary: darkBackground,
+        "primary-visible": gen_visibilities(darkBackground),
         secondary: darkBackground,
         "secondary-visible": gen_visibilities(darkBackground)
       },
