@@ -8,7 +8,9 @@
         <v-treeview
           :items="items"
           :active.sync="active"
-          :open.sync="open"
+          hoverable
+          open-all
+          dense
           activatable
           color="info"
           selection-type="independent"
@@ -19,9 +21,6 @@
           </template>
         </v-treeview>
       </v-col>
-      <!--
-          open-on-click
-          <-->
 
       <v-divider vertical></v-divider>
 
@@ -106,8 +105,6 @@ const Props = Vue.extend({
 export default class ProfileData extends Props {
   /** Models selected item ids */
   active: string[] = [];
-  /** Models open tree item ids  */
-  open: string[] = [];
 
   /** Models all loaded profiles */
   get items(): TreeItem[] {
@@ -143,11 +140,9 @@ export default class ProfileData extends Props {
 
     // Otherwise take the most recent active
     const id = this.active[0];
-    console.log(`Active id: ${id}`);
     const selected_profile = this.visible_profiles.find(
       prof => profile_unique_key(prof) === id
     );
-    console.log(`Active profile: ${selected_profile}`);
     return selected_profile;
   }
 
@@ -161,6 +156,13 @@ export default class ProfileData extends Props {
       label: "Version",
       text: (this.selected.data as any).version //Todo: fix
     });
+
+    if (this.selected.data.sha256) {
+      output.push({
+        label: "Sha256 Hash",
+        text: this.selected.data.sha256
+      });
+    }
 
     if (this.selected.data.title) {
       output.push({
@@ -176,10 +178,17 @@ export default class ProfileData extends Props {
       });
     }
 
-    if (this.selected.data.sha256) {
+    if (this.selected.data.copyright) {
       output.push({
-        label: "Sha256 Hash",
-        text: this.selected.data.sha256
+        label: "Copyright",
+        text: this.selected.data.copyright
+      });
+    }
+
+    if (this.selected.data.copyright_email) {
+      output.push({
+        label: "Copyright Email",
+        text: this.selected.data.copyright_email
       });
     }
 
