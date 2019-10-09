@@ -17,7 +17,7 @@
           transition
         >
           <template v-slot:prepend="{ item, active }">
-            <v-icon>mdi-assessment</v-icon>
+            <v-icon>mdi-note</v-icon>
           </template>
         </v-treeview>
       </v-col>
