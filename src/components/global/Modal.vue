@@ -4,6 +4,7 @@
     :persistent="persistent"
     @click:outside="$emit('input', { target: false })"
     max-width="1000px"
+    content-class="v-card"
   >
     <slot> Default Modal </slot>
   </v-dialog>
