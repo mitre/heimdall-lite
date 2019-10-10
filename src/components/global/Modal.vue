@@ -3,6 +3,7 @@
     :value="value"
     :persistent="persistent"
     @click:outside="$emit('input', { target: false })"
+    width="80%"
     max-width="1000px"
     content-class="v-card"
   >
