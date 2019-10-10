@@ -2,7 +2,7 @@
   <div>
     <v-btn @click="show_selector">
       Upload
-      <v-icon>
+      <v-icon class="pl-2">
         mdi-file-upload
       </v-icon>
     </v-btn>
@@ -14,16 +14,6 @@
         @change="select_file"
         accept=".json, application/json"
       />
-
-      <!--
-          <v-file-input
-            ref="real-input"
-            hidden
-            v-model="curr_file"
-            multiple
-            @change="commitFile"
-          ></v-file-input>
-          -->
     </div>
   </div>
 </template>
@@ -66,7 +56,6 @@ export default class UploadButton extends Props {
   /** Programatically show real input selector */
   show_selector() {
     let file_input = this.$refs["real-input"];
-    console.log(file_input);
     (file_input as any).click();
   }
 }
