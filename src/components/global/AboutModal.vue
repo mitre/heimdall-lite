@@ -15,7 +15,7 @@
         <v-card-text>
           <p class="about-text">
             <br />
-            Version: 1.0 <br /><br />
+            Version: {{ version }} <br /><br />
             Github Repository:
             <a href="https://github.com/mitre/heimdall-vuetify"
               >https://github.com/mitre/heimdall-vuetify</a
@@ -40,15 +40,22 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
+
+declare var process: {
+  env: {
+    PACKAGE_VERSION: string;
+  };
+};
 
 export default {
   data() {
     return {
       dialog: false,
       about: "About",
-      info: "info"
+      info: "info",
+      version: process.env.PACKAGE_VERSION || "0"
     };
   },
   components: {
