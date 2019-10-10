@@ -71,10 +71,17 @@
           </v-col>
         </v-row>
 
+        <!-- Profile information -->
+        <v-row>
+          <v-col xs-12>
+            <ProfileData :filter="all_filter" />
+          </v-col>
+        </v-row>
+
         <!-- TreeMap and Partition Map -->
         <v-row>
           <v-col xs-12>
-            <v-card elevation="2" title="test">
+            <v-card elevation="2">
               <v-card-title>TreeMap</v-card-title>
               <v-card-text>
                 <Treemap
@@ -116,6 +123,7 @@ import Treemap from "@/components/cards/treemap/Treemap.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import SeverityChart from "@/components/cards/SeverityChart.vue";
 import ComplianceChart from "@/components/cards/ComplianceChart.vue";
+import ProfileData from "@/components/cards/ProfileData.vue";
 
 import { Filter, NistMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -138,7 +146,8 @@ const ResultsProps = Vue.extend({
     ControlTable,
     StatusChart,
     SeverityChart,
-    ComplianceChart
+    ComplianceChart,
+    ProfileData
   }
 })
 export default class Results extends ResultsProps {

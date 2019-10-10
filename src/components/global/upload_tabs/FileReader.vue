@@ -37,7 +37,6 @@ import InspecIntakeModule, {
 const Props = Vue.extend({
   props: {}
 });
-
 /**
  * File reader component for taking in inspec JSON data.
  * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
@@ -58,9 +57,21 @@ export default class FileReader extends Props {
       let unique_id = next_free_file_ID();
       unique_ids.push(unique_id);
 
-      // Submit it to be loaded
+      // The error toast is globally registered, and has no awareness of the
+      // theme setting, so this component passes it up
+      let toast = this.$toasted.global.error;
+      let isDark = this.$vuetify.theme.dark;
+
+      // Submit it to be loaded, and display an error if it fails
       let intake_module = getModule(InspecIntakeModule, this.$store);
-      intake_module.loadFile({ file, unique_id });
+      intake_module.loadFile({ file, unique_id }).then(err => {
+        if (err) {
+          toast({
+            message: String(err),
+            isDark: isDark
+          });
+        }
+      });
 
       // Todo: Set the uploaded files as "active" in some sort of file selection scheme
     });
@@ -75,5 +86,10 @@ export default class FileReader extends Props {
 div.v-file-input {
   margin-left: -36px;
   background-color: var(--v-primary-base);
+}
+</style>
+<style lang="scss">
+.invert {
+  filter: invert(90%);
 }
 </style>
