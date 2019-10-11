@@ -13,6 +13,9 @@ Vue.use(VueAnalytics, {
   router,
   autoTracking: {
     screenview: true
+  },
+  debug: {
+    sendHitTask: process.env.NODE_ENV === "production"
   }
 });
 
