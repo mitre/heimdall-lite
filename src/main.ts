@@ -15,7 +15,7 @@ Vue.use(VueAnalytics, {
     screenview: true
   },
   debug: {
-    sendHitTask: process.env.NODE_ENV === "production"
+    sendHitTask: true
   }
 });
 
