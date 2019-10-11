@@ -6,7 +6,7 @@
 
     <v-card>
       <v-card-title class="headline grey" primary-title>
-        How to use Heimdall Lite v{{ version }}
+        How to use Heimdall Lite v{{ "version" }}
       </v-card-title>
 
       <v-card-text>
@@ -91,6 +91,5 @@ const Props = Vue.extend({
 })
 export default class HelpModal extends Props {
   dialog: boolean = false;
-  version: string = process.env.PACKAGE_VERSION || "0";
 }
 </script>

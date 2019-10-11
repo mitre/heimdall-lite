@@ -14,6 +14,7 @@
           <div class="d-flex flex-column justify-center">
             <span :class="title_class">Heimdall</span>
             <span :class="title_class">Lite</span>
+            <span>Version</span>
           </div>
         </v-col>
       </v-row>
@@ -35,12 +36,6 @@ import InspecIntakeModule, {
   FileID,
   next_free_file_ID
 } from "@/store/report_intake";
-
-declare var process: {
-  env: {
-    PACKAGE_VERSION: string;
-  };
-};
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
