@@ -11,14 +11,14 @@
     </v-list>
 
     <v-list dense class="px-2" subheader>
-      <v-subheader>Info</v-subheader>
-      <AboutModal />
-      <HelpModal />
+      <v-subheader>Tools</v-subheader>
+      <ExportCaat></ExportCaat>
     </v-list>
 
     <v-list dense class="px-2" subheader>
-      <v-subheader>Tools</v-subheader>
-      <ExportCaat></ExportCaat>
+      <v-subheader>Info</v-subheader>
+      <AboutModal />
+      <HelpModal />
       <v-list-item>
         <div class="d-flex center-switch">
           <v-switch label="Light/Dark" v-model="dark" v-on:change="updateDark">
