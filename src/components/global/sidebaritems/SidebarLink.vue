@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="link" @click="$emit('click', $event)">
+  <v-list-item :to="link" @click="try_callback">
     <v-list-item-avatar>
       <v-icon v-text="icon" small />
     </v-list-item-avatar>
@@ -28,12 +28,28 @@ const LinkItemProps = Vue.extend({
     link: {
       type: String,
       required: false
+    },
+    action: {
+      type: Object, // Of type linkaction
+      required: false
     }
   }
 });
 
+/** If provided, will be called whenever clicked. */
+export interface LinkAction {
+  callback: () => void;
+}
+
 @Component({
   components: {}
 })
-export default class LinkItem extends LinkItemProps {}
+export default class LinkItem extends LinkItemProps {
+  try_callback() {
+    if (this.action) {
+      let _action = this.action as LinkAction;
+      _action.callback();
+    }
+  }
+}
 </script>
