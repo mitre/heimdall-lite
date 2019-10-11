@@ -8,9 +8,10 @@
       </v-row>
       <v-row>
         <v-col cols="12" align="center">
-          <div class="d-flex flex-wrap justify-center">
-            <span class="display-4 px-0">Heimdall-</span>
-            <span class="display-4 px-0">Lite</span>
+          <div class="d-flex flex-column justify-center">
+            <span :class="title_class">Heimdall</span>
+            <span :class="title_class">Lite</span>
+            <!--<span :class="title_class">Lite</span>-->
           </div>
         </v-col>
       </v-row>
@@ -78,6 +79,14 @@ export default class FileReader extends Props {
 
     // Notify we got files
     this.$emit("got-files", unique_ids);
+  }
+
+  get title_class(): string[] {
+    if (this.$vuetify.breakpoint.mdAndUp) {
+      return ["display-4", "px-0"];
+    } else {
+      return ["display-2", "px-0"];
+    }
   }
 }
 </script>
