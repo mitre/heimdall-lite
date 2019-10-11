@@ -3,7 +3,7 @@
     <template v-slot:activator="{ on }">
       <LinkItem
         key="export_caat"
-        text="CAAT Spreadsheet Data"
+        text="CAAT Spreadsheet"
         icon="mdi-download"
         v-on="on"
       />
