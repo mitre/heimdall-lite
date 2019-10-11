@@ -74,18 +74,23 @@
   </v-dialog>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 
-export default {
-  data() {
-    return {
-      dialog: false,
-      version: process.env.PACKAGE_VERSION || "0"
-    };
-  },
+// We declare the props separately to make props types inferable.
+const Props = Vue.extend({
+  props: {}
+});
+@Component({
   components: {
     LinkItem
   }
-};
+})
+export default class HelpModal extends Props {
+  dialog: boolean = false;
+  version: string = process.env.PACKAGE_VERSION || "0";
+}
 </script>
