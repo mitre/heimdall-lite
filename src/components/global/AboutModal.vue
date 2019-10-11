@@ -13,7 +13,7 @@
           <br />
           <span class="title">
             <strong>Version:</strong>
-            {{ version }}
+            {{ "version" }}
           </span>
           <br />
           <br />
@@ -60,6 +60,9 @@ const Props = Vue.extend({
 })
 export default class HelpModal extends Props {
   dialog: boolean = false;
-  version: string = process.env.PACKAGE_VERSION || "0";
+  tmp: null = (() => {
+    console.log(this.$store);
+    return null;
+  })();
 }
 </script>
