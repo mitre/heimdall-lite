@@ -5,7 +5,7 @@
         <v-col cols="12" align="center">
           <v-img
             :src="require('@/assets/logo-orange-tsp.svg')"
-            max-width="204"
+            max-width="196"
           />
         </v-col>
       </v-row>
@@ -13,6 +13,8 @@
         <v-col cols="12" align="center">
           <div class="d-flex flex-wrap justify-center">
             <span class="display-4 px-0">&nbsp;Heimdall&nbsp;</span>
+          </div>
+          <div class="d-flex flex-wrap justify-center">
             <span class="display-4 px-0">&nbsp;Lite&nbsp;</span>
           </div>
           <div class="d-flex flex-wrap justify-center">
