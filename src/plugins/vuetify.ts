@@ -50,7 +50,7 @@ const statuses = {
   statusNotApplicable: colors.lightBlue.base,
   statusNoData: colors.orange.lighten1,
   statusNotReviewed: colors.orange.base,
-  statusProfileError: colors.indigo.base,
+  statusProfileError: colors.indigo.lighten2,
   statusNotRun: colors.teal.darken2,
   statusFromProfile: colors.teal.base
 };
