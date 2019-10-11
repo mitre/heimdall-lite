@@ -15,6 +15,9 @@ Vue.use(VueAnalytics, {
     enabled: true,
     trace: false,
     sendHitTask: true
+  },
+  autoTracking: {
+    screenview: true
   }
 });
 
