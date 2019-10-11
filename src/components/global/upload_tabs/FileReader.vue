@@ -12,7 +12,7 @@
       <v-row>
         <v-col cols="12" align="center">
           <div class="d-flex flex-wrap justify-center">
-            <span class="display-4 px-0">Heimdall&nbsp;</span>
+            <span class="display-4 px-0">&nbsp;Heimdall&nbsp;</span>
             <span class="display-4 px-0">Lite</span>
           </div>
           <div class="d-flex flex-wrap justify-center">
