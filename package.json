@@ -39,6 +39,7 @@
     "prismjs": "^1.17.1",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
+    "vue-analytics": "^5.17.2",
     "vue-apexcharts": "^1.5.0",
     "vue-c3": "^1.2.11",
     "vue-class-component": "^7.0.2",
