@@ -4,19 +4,23 @@
       <LinkItem key="about" text="About" icon="info" v-on="on" />
     </template>
     <v-card>
-      <v-card-title class="headline grey" primary-title>
-        About Heimdall-Vuetify
-      </v-card-title>
+      <v-card-title class="headline grey" primary-title
+        >About Heimdall-Vuetify</v-card-title
+      >
 
       <v-card-text>
         <p>
           <br />
-          Version: {{ version }} <br /><br />
-          Github Repository:
+          Version: {{ version }}
+          <br />
+          <br />Github Repository:
           <a href="https://github.com/mitre/heimdall-vuetify"
             >https://github.com/mitre/heimdall-vuetify</a
-          ><br /><br /><br /><br />
-          If you would like to report an issue or suggest features,
+          >
+          <br />
+          <br />
+          <br />
+          <br />If you would like to report an issue or suggest features,
           <a href="https://github.com/mitre/heimdall-vuetify/issues/new"
             >let us know on github.</a
           >
@@ -27,9 +31,7 @@
 
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="primary" text @click="dialog = false">
-          Close Window
-        </v-btn>
+        <v-btn color="primary" text @click="dialog = false">Close Window</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
