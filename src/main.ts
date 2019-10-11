@@ -47,6 +47,9 @@ Vue.use(VueAnalytics, {
   }
 });
 
+// in components
+this.$ga.event("category", "action", "label", 123);
+
 Vue.config.productionTip = false;
 
 new Vue({
