@@ -1,9 +1,9 @@
 <template>
   <v-row>
     <v-col
+      cols="12"
       sm="6"
-      md="6"
-      lg="3"
+      md="3"
       v-for="card in standardCardProps"
       :key="card.title"
     >
