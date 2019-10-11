@@ -5,7 +5,7 @@
         key="export_caat"
         text="CAAT Spreadsheet"
         icon="mdi-download"
-        :action="action"
+        @click="export_caat()"
         v-on="on"
       />
     </template>
@@ -135,7 +135,7 @@ export default class ExportCaat extends Props {
     ];
   }
 
-  exportCaat() {
+  export_caat() {
     // Get our data
     let filter: Filter = {};
     let filter_module = getModule(FilteredDataModule, this.$store);
@@ -217,12 +217,5 @@ export default class ExportCaat extends Props {
     }
     return buf;
   }
-
-  /** Action to give the button */
-  action: LinkAction = {
-    callback: () => {
-      this.exportCaat();
-    }
-  };
 }
 </script>
