@@ -3,7 +3,10 @@
     <v-container>
       <v-row>
         <v-col cols="12" align="center">
-          <img :src="require('@/assets/logo.png')" />
+          <v-img
+            :src="require('@/assets/logo-orange-tsp.svg')"
+            max-width="164"
+          />
         </v-col>
       </v-row>
       <v-row>
@@ -11,7 +14,6 @@
           <div class="d-flex flex-column justify-center">
             <span :class="title_class">Heimdall</span>
             <span :class="title_class">Lite</span>
-            <!--<span :class="title_class">Lite</span>-->
           </div>
         </v-col>
       </v-row>
@@ -34,6 +36,12 @@ import InspecIntakeModule, {
   next_free_file_ID
 } from "@/store/report_intake";
 
+declare var process: {
+  env: {
+    PACKAGE_VERSION: string;
+  };
+};
+
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {}
@@ -49,6 +57,9 @@ const Props = Vue.extend({
   }
 })
 export default class FileReader extends Props {
+  get version() {
+    return process.env.PACKAGE_VERSION || "0";
+  }
   /** Callback for our file reader */
   commit_files(files: File[]) {
     // Coerce into a more ergonomic type
@@ -90,15 +101,3 @@ export default class FileReader extends Props {
   }
 }
 </script>
-
-<style scoped>
-div.v-file-input {
-  margin-left: -36px;
-  background-color: var(--v-primary-base);
-}
-</style>
-<style lang="scss">
-.invert {
-  filter: invert(90%);
-}
-</style>
