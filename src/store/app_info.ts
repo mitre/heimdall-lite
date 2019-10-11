@@ -11,19 +11,11 @@ declare const process: {
   namespaced: true,
   dynamic: true,
   store: Store,
-  name: "appInfo"
+  name: "info"
 })
 class AppInfoModule extends VuexModule {
   /** The app version */
-  version: string = process.env.PACKAGE_VERSION || "0";
-
-  /** Idk lol */
-  get foo(): string {
-    return "bar";
-  }
+  version: string = `Ver.${process.env.PACKAGE_VERSION}`;
 }
-
-console.log("Hello?");
-console.log("Is anyone... there???");
 
 export default AppInfoModule;

@@ -23,9 +23,9 @@
       >
         <div>
           <v-card-title>
-            <v-icon large>mdi-{{ errorProps.icon }}</v-icon>
+            <v-icon class="pr-3" large>mdi-{{ errorProps.icon }}</v-icon>
             <span class="title">
-              {{ `ALERT: ${errorProps.number} ${errorProps.title}!` }}
+              {{ `ALERT: ${errorProps.number} ${errorProps.title}` }}
             </span>
           </v-card-title>
           <v-card-text v-text="errorProps.subtitle" />
@@ -114,7 +114,7 @@ export default class StatusCardRow extends StatusCardRowProps {
       status: undefined
     };
     return {
-      icon: "ying-yang",
+      icon: "alert-circle",
       title: "Profile Errors",
       subtitle:
         "Errors running test - check profile run privileges or check with the author of profile",
