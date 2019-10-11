@@ -13,7 +13,7 @@
         <v-col cols="12" align="center">
           <div class="d-flex flex-wrap justify-center">
             <span class="display-4 px-0">&nbsp;Heimdall&nbsp;</span>
-            <span class="display-4 px-0">Lite</span>
+            <span class="display-4 px-0">&nbsp;Lite&nbsp;</span>
           </div>
           <div class="d-flex flex-wrap justify-center">
             <span class="subtitle-2 px-0">v{{ version }}</span>
