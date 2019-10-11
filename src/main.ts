@@ -7,41 +7,10 @@ import "roboto-fontface/css/roboto/roboto-fontface.css";
 //import "@mdi/font/css/materialdesignicons.css";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import VueAnalytics from "vue-analytics";
-import VueRouter from "vue-router";
-
-const routes = new VueRouter({
-  routes: [
-    {
-      path: "/results/:id",
-      name: "results"
-    },
-    {
-      path: "/compare",
-      name: "compare"
-    },
-    {
-      path: "/about",
-      name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "about" */ "@/views/About.vue")
-    },
-    {
-      path: "/",
-      name: "home"
-    },
-    {
-      path: "*",
-      redirect: "/results/all"
-    }
-  ]
-});
 
 Vue.use(VueAnalytics, {
   id: "UA-149784359-1",
-  routes,
+  router,
   autoTracking: {
     screenview: true
   }
