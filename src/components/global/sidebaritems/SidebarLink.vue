@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="link" @click="try_callback">
+  <v-list-item :to="link" @click="$emit('click', $event)">
     <v-list-item-avatar>
       <v-icon v-text="icon" small />
     </v-list-item-avatar>
@@ -44,12 +44,5 @@ export interface LinkAction {
 @Component({
   components: {}
 })
-export default class LinkItem extends LinkItemProps {
-  try_callback() {
-    if (this.action) {
-      let _action = this.action as LinkAction;
-      _action.callback();
-    }
-  }
-}
+export default class LinkItem extends LinkItemProps {}
 </script>
