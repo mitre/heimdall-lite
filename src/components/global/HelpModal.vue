@@ -6,7 +6,7 @@
 
     <v-card>
       <v-card-title class="headline grey" primary-title>
-        How to use Heimdall Lite v{{ "version" }}
+        How to use Heimdall Lite {{ version }}
       </v-card-title>
 
       <v-card-text>
@@ -80,6 +80,9 @@ import Component from "vue-class-component";
 
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 
+import { getModule } from "vuex-module-decorators";
+import AppInfoModule from "@/store/app_info";
+
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {}
@@ -91,5 +94,8 @@ const Props = Vue.extend({
 })
 export default class HelpModal extends Props {
   dialog: boolean = false;
+  get version(): string {
+    return getModule(AppInfoModule, this.$store).version;
+  }
 }
 </script>

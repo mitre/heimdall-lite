@@ -13,7 +13,7 @@
           <br />
           <span class="title">
             <strong>Version:</strong>
-            {{ "version" }}
+            {{ version }}
           </span>
           <br />
           <br />
@@ -49,6 +49,9 @@ import Component from "vue-class-component";
 
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 
+import { getModule } from "vuex-module-decorators";
+import AppInfoModule from "@/store/app_info";
+
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {}
@@ -60,9 +63,8 @@ const Props = Vue.extend({
 })
 export default class HelpModal extends Props {
   dialog: boolean = false;
-  tmp: null = (() => {
-    console.log(this.$store);
-    return null;
-  })();
+  get version(): string {
+    return getModule(AppInfoModule, this.$store).version;
+  }
 }
 </script>

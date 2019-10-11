@@ -14,7 +14,7 @@
           <div class="d-flex flex-column justify-center">
             <span :class="title_class">Heimdall</span>
             <span :class="title_class">Lite</span>
-            <span>Version</span>
+            <span class="subtitle-2 px-0">{{ version }}</span>
           </div>
         </v-col>
       </v-row>
@@ -36,6 +36,7 @@ import InspecIntakeModule, {
   FileID,
   next_free_file_ID
 } from "@/store/report_intake";
+import AppInfoModule from "@/store/app_info";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -52,9 +53,6 @@ const Props = Vue.extend({
   }
 })
 export default class FileReader extends Props {
-  get version() {
-    return process.env.PACKAGE_VERSION || "0";
-  }
   /** Callback for our file reader */
   commit_files(files: File[]) {
     // Coerce into a more ergonomic type
@@ -93,6 +91,10 @@ export default class FileReader extends Props {
     } else {
       return ["display-2", "px-0"];
     }
+  }
+
+  get version(): string {
+    return getModule(AppInfoModule, this.$store).version;
   }
 }
 </script>
