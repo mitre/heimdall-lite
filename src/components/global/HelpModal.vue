@@ -6,18 +6,17 @@
 
     <v-card>
       <v-card-title class="headline grey" primary-title>
-        How to use Heimdall-Vuetify
+        How to use Heimdall Lite v{{ version }}
       </v-card-title>
 
       <v-card-text>
         <br />
-        <h1>
-          View the results of an InSpec execution json
-        </h1>
+        <h1>View the results of an InSpec execution json</h1>
         <br />
         <p>
-          Easily see how many controls passed and failed.<br /><br />
-          Click on the donut charts to filter the controls by status and
+          Easily see how many controls passed and failed.
+          <br />
+          <br />Click on the donut charts to filter the controls by status and
           severity.
         </p>
         <v-img src="../../assets/data_cards.png" />
@@ -25,11 +24,18 @@
         <hr />
         <br />
         <h1>
-          Use the treemap or datatable to navigate through your controls.
+          Use the treemap to navigate through your controls by NIST family
+          classification.
         </h1>
         <br />
         <v-img src="../../assets/treemap.png" />
-        <br /><br /><br />
+        <br />
+        <hr />
+        <br />
+        <h1>
+          Use the data table to sort your controls and see more details.
+        </h1>
+        <br />
         <v-img src="../../assets/data_table.png" />
         <br />
         <hr />
@@ -47,14 +53,14 @@
           View the profile before you execute it on a system.
         </h1>
         <br />
-        <p class="help-text">
-          The profile must be loaded into Heimdall-lite as a json value.<br />To
-          create a json of a profile use the following steps:
+        <p>
+          The profile must be loaded into Heimdall Lite as a json value.
+          <br />To create a json of a profile use the following steps:
         </p>
-        <li class="help-text">
+        <li>
           Open a terminal to the directory of the profile.
         </li>
-        <li class="help-text">
+        <li>
           Run the command: `inspec json [path to profile] -o [name]`
         </li>
       </v-card-text>
@@ -62,10 +68,7 @@
       <v-divider></v-divider>
 
       <v-card-actions>
-        <div class="flex-grow-1"></div>
-        <v-btn color="primary" text @click="dialog = false">
-          Close Window
-        </v-btn>
+        <v-btn color="primary" text @click="dialog = false">Close Window</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -77,7 +80,8 @@ import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 export default {
   data() {
     return {
-      dialog: false
+      dialog: false,
+      version: process.env.PACKAGE_VERSION || "0"
     };
   },
   components: {

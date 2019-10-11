@@ -5,31 +5,39 @@
     </template>
     <v-card>
       <v-card-title class="headline grey" primary-title>
-        About Heimdall-Vuetify
+        About Heimdall Lite
       </v-card-title>
 
       <v-card-text>
         <p>
           <br />
-          Version: {{ version }} <br /><br />
-          Github Repository:
-          <a href="https://github.com/mitre/heimdall-vuetify"
-            >https://github.com/mitre/heimdall-vuetify</a
-          ><br /><br /><br /><br />
-          If you would like to report an issue or suggest features,
-          <a href="https://github.com/mitre/heimdall-vuetify/issues/new"
-            >let us know on github.</a
-          >
+          <span class="title">
+            <strong>Version:</strong>
+            {{ version }}
+          </span>
+          <br />
+          <br />
+          <span class="subtitle-2">
+            <strong>Github:</strong>
+            <a href="https://github.com/mitre/heimdall-vuetify">
+              https://github.com/mitre/heimdall-vuetify
+            </a>
+          </span>
+          <br />
+          <span class="subtitle-2">
+            <br />
+            If you would like to report an Issue or Feature Request,
+            <a href="https://github.com/mitre/heimdall-vuetify/issues/new">
+              let us know on github.
+            </a>
+          </span>
         </p>
       </v-card-text>
 
       <v-divider></v-divider>
 
       <v-card-actions>
-        <div class="flex-grow-1"></div>
-        <v-btn color="primary" text @click="dialog = false">
-          Close Window
-        </v-btn>
+        <v-btn color="primary" text @click="dialog = false">Close Window</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
