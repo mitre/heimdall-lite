@@ -11,11 +11,9 @@ import VueAnalytics from "vue-analytics";
 Vue.use(VueAnalytics, {
   id: "UA-149784359-1",
   router,
-  autoTracking: {
-    screenview: true
-  },
   debug: {
     enabled: true,
+    trace: false,
     sendHitTask: true
   }
 });
