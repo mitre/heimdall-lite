@@ -3,14 +3,20 @@
     <v-container>
       <v-row>
         <v-col cols="12" align="center">
-          <img :src="require('@/assets/logo.png')" />
+          <v-img
+            :src="require('@/assets/logo-orange-tsp.svg')"
+            max-width="204"
+          />
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" align="center">
           <div class="d-flex flex-wrap justify-center">
-            <span class="display-4 px-0">Heimdall-</span>
+            <span class="display-4 px-0">Heimdall&nbsp;</span>
             <span class="display-4 px-0">Lite</span>
+          </div>
+          <div class="d-flex flex-wrap justify-center">
+            <span class="subtitle-2 px-0">v{{ version }}</span>
           </div>
         </v-col>
       </v-row>
@@ -33,6 +39,12 @@ import InspecIntakeModule, {
   next_free_file_ID
 } from "@/store/report_intake";
 
+declare var process: {
+  env: {
+    PACKAGE_VERSION: string;
+  };
+};
+
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {}
@@ -48,6 +60,9 @@ const Props = Vue.extend({
   }
 })
 export default class FileReader extends Props {
+  get version() {
+    return process.env.PACKAGE_VERSION || "0";
+  }
   /** Callback for our file reader */
   commit_files(files: File[]) {
     // Coerce into a more ergonomic type
