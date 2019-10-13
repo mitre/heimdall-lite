@@ -19,7 +19,7 @@
             <v-container fluid>
               <v-row>
                 <v-col cols="12">
-                  <span>{{ control.finding_details.split(":")[0] }}:</span>
+                  <span>{{ header }}</span>
                   <br />
                   <br />
                   <span>{{ control.wraps.desc }}</span>
@@ -128,6 +128,16 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
   get status_color(): string {
     // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
     return `status${this.control.status.replace(" ", "")}`;
+  }
+
+  /** Shown above the description */
+  get header(): string {
+    let msg_split = (this.control as HDFControl).finding_details.split(":");
+    if (msg_split.length === 1) {
+      return msg_split[0] + ".";
+    } else {
+      return msg_split[0] + ":";
+    }
   }
 
   get details(): Detail[] {
