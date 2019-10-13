@@ -12,7 +12,6 @@
         <p>
           <br />
           <span class="title">
-            <strong>Version:</strong>
             {{ version }}
           </span>
           <br />
