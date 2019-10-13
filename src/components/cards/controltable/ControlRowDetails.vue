@@ -187,8 +187,11 @@ pre {
   white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
-.zebra-table {
-  background-color: rgba(0, 0, 0, 0.3);
+.theme--dark .zebra-table {
+  background-color: var(--v-secondary-lighten2);
+}
+.theme--light .zebra-table {
+  background-color: var(--v-secondary-lighten1);
 }
 /*
 .v-application code {
