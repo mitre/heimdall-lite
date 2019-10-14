@@ -1,6 +1,7 @@
 import { Module, VuexModule } from "vuex-module-decorators";
 import Store from "@/store/store";
 
+/** Configure this to match data set in vue.config.ts */
 declare const process: {
   env: {
     PACKAGE_VERSION: string;
@@ -9,7 +10,6 @@ declare const process: {
     LICENSE: string;
   };
 };
-const process_immut = Object.freeze(Object.assign({}, process.env));
 
 @Module({
   namespaced: true,
@@ -19,16 +19,24 @@ const process_immut = Object.freeze(Object.assign({}, process.env));
 })
 class AppInfoModule extends VuexModule {
   /** The app version */
-  version: Readonly<string> = `Ver.${process_immut.PACKAGE_VERSION}`;
+  get version(): string {
+    return `Ver.${process.env.PACKAGE_VERSION}`;
+  }
 
   /** The app description */
-  description: Readonly<string> = process_immut.DESCRIPTION;
+  get description(): string {
+    return process.env.DESCRIPTION;
+  }
 
   /** The app repository */
-  repository: Readonly<string> = process_immut.REPOSITORY;
+  get repository(): string {
+    return process.env.REPOSITORY;
+  }
 
   /** The app license */
-  license: Readonly<string> = process_immut.LICENSE;
+  get license(): string {
+    return process.env.LICENSE;
+  }
 }
 
 export default AppInfoModule;
