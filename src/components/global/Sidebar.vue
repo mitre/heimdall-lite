@@ -8,6 +8,15 @@
     <v-list dense class="px-2" subheader>
       <v-subheader>Files</v-subheader>
       <FileItem v-for="(file, i) in visible_files" :key="i" :file="file" />
+      <v-list-item to="/results/all" title="Show all files' controls">
+        <v-list-item-avatar>
+          <v-icon small>list</v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title>All reports</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
 
     <v-list dense class="px-2" subheader>
