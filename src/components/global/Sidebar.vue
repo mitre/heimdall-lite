@@ -12,7 +12,7 @@
 
     <v-list dense class="px-2" subheader>
       <v-subheader>Tools</v-subheader>
-      <ExportCaat></ExportCaat>
+      <slot></slot>
     </v-list>
 
     <v-list dense class="px-2" subheader>
@@ -37,7 +37,6 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "@/store/data_store";
 import FileItem from "@/components/global/sidebaritems/SidebarFile.vue";
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
-import ExportCaat from "@/components/global/ExportCaat.vue";
 import AboutModal from "@/components/global/AboutModal.vue";
 import HelpModal from "@/components/global/HelpModal.vue";
 
@@ -52,7 +51,6 @@ const SidebarProps = Vue.extend({
   components: {
     LinkItem,
     FileItem,
-    ExportCaat,
     AboutModal,
     HelpModal
   }
