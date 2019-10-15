@@ -20,6 +20,7 @@
               <v-row>
                 <v-col cols="12">
                   <span>{{ header }}</span>
+                  <v-divider></v-divider>
                   <br />
                   <pre>{{ control.wraps.desc }}</pre>
                 </v-col>
@@ -104,23 +105,6 @@ const ControlRowDetailsProps = Vue.extend({
   }
 })
 export default class ControlRowDetails extends ControlRowDetailsProps {
-  getLineClamp(ix: number) {
-    console.log(ix);
-    console.log(this.$refs);
-    console.log(this.$refs["test0"]);
-    // if(this.clamped(this.$refs["test" + ix]) || this.clamped(this.$refs["code" + ix])) {
-    //
-    // }
-  }
-  //
-  //  clamped(tag:  Element | Element[]): boolean{
-  //    console.log(tag);
-  //    if((tag.offsetHeight < tag.scrollHeight) || (tag.offsetWidth < tag.scrollWidth)) {
-  //      return true;
-  //    }
-  //    return false;
-  //  }
-
   /** Shown above the description */
   get header(): string {
     let msg_split = (this.control as HDFControl).finding_details.split(":");
