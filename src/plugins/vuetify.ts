@@ -14,13 +14,19 @@ let options: ToastOptions = {
   fullWidth: true,
   containerClass: "background v-application",
   className: "white--text",
-  action: {
-    text: "Report Issue",
-    href:
-      "https://github.com/mitre/heimdall-vuetify/issues/new?assignees=&labels=bug&template=bug_report.md&title="
-  },
+  action: [
+    {
+      text: "Report Issue",
+      href:
+        "https://github.com/mitre/heimdall-vuetify/issues/new?assignees=&labels=bug&template=bug_report.md&title="
+    },
+    {
+      text: "Dismiss",
+      onClick: (_, toast_object) => toast_object.goAway(0)
+    }
+  ],
   // icon: 'mdi-alert-octagram',
-  duration: 5000
+  duration: 1e12 // effectively infinite.
 };
 
 // register the toast with the custom message
