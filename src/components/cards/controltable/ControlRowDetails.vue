@@ -19,44 +19,20 @@
             <v-container fluid>
               <v-row>
                 <v-col cols="12">
-                  <span>{{ control.finding_details.split(":")[0] }}:</span>
+                  <pre>{{ control.finding_details.split(":")[0] }}:</pre>
+                  <v-divider></v-divider>
                   <br />
-                  <br />
-                  <span>{{ control.wraps.desc }}</span>
+                  <pre>{{ control.wraps.desc }}</pre>
                 </v-col>
               </v-row>
-              <v-row
-                cols="12"
+              <ControlRowCol
                 v-for="(result, index) in control.wraps.results"
                 :key="index"
                 :class="zebra(index)"
+                :result="result"
+                :statusCode="control.status"
               >
-                <v-col sm="12" md="12" lg="1" xl="1"
-                  ><v-card
-                    :color="status_color"
-                    height="100%"
-                    width="100%"
-                    tile
-                  >
-                    <h3>{{ result.status.toUpperCase() }}</h3>
-                  </v-card>
-                </v-col>
-                <v-col v-if="!result.message" cols="11" class="right">
-                  <h3>Test</h3>
-                  <v-divider> </v-divider>
-                  <pre>{{ result.code_desc }}</pre>
-                </v-col>
-                <v-col v-if="result.message" cols="5" class="right">
-                  <h3>Test</h3>
-                  <v-divider> </v-divider>
-                  <pre>{{ result.code_desc }}</pre>
-                </v-col>
-                <v-col v-if="result.message" cols="6" class="right">
-                  <h3>Result</h3>
-                  <v-divider> </v-divider>
-                  <pre>{{ result.message }}</pre>
-                </v-col>
-              </v-row>
+              </ControlRowCol>
             </v-container>
           </v-tab-item>
 
@@ -93,6 +69,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import ControlRowCol from "@/components/cards/controltable/ControlRowCol.vue";
 import { HDFControl, ControlStatus } from "inspecjs";
 
 //TODO: add line numbers
@@ -122,13 +99,28 @@ const ControlRowDetailsProps = Vue.extend({
 });
 
 @Component({
-  components: { Prism }
+  components: {
+    ControlRowCol,
+    Prism
+  }
 })
 export default class ControlRowDetails extends ControlRowDetailsProps {
-  get status_color(): string {
-    // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
-    return `status${this.control.status.replace(" ", "")}`;
+  getLineClamp(ix: number) {
+    console.log(ix);
+    console.log(this.$refs);
+    console.log(this.$refs["test0"]);
+    // if(this.clamped(this.$refs["test" + ix]) || this.clamped(this.$refs["code" + ix])) {
+    //
+    // }
   }
+  //
+  //  clamped(tag:  Element | Element[]): boolean{
+  //    console.log(tag);
+  //    if((tag.offsetHeight < tag.scrollHeight) || (tag.offsetWidth < tag.scrollWidth)) {
+  //      return true;
+  //    }
+  //    return false;
+  //  }
 
   get details(): Detail[] {
     return [
