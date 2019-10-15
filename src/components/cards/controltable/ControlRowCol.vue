@@ -1,13 +1,13 @@
 <template>
   <v-row>
-    <v-col sm="12" md="12" lg="1" xl="1">
+    <v-col sm="12" md="12" lg="2" xl="2">
       <v-layout fill-height :class="status_color" justify-center align-center>
-        <v-card :color="status_color" tile>
+        <v-card :color="status_color" tile flat>
           <h3>{{ result.status.toUpperCase() }}</h3>
         </v-card>
       </v-layout>
     </v-col>
-    <v-col v-if="!result.message" cols="10" class="right">
+    <v-col v-if="!result.message" lg="8" xl="8" sm="10" md="10" class="right">
       <h3>Test</h3>
       <v-divider></v-divider>
       <pre v-show="expanded">{{ result.code_desc }}</pre>
@@ -15,7 +15,7 @@
         result.code_desc
       }}</pre>
     </v-col>
-    <v-col v-else cols="5" class="right">
+    <v-col v-else lg="4" xl="4" sm="6" md="6" xs="6" class="right">
       <h3>Test</h3>
       <v-divider></v-divider>
       <pre v-show="expanded">{{ result.code_desc }}</pre>
@@ -23,7 +23,15 @@
         result.code_desc
       }}</pre>
     </v-col>
-    <v-col v-if="result.message" cols="5" class="right">
+    <v-col
+      v-if="result.message"
+      lg="4"
+      xl="4"
+      xs="6"
+      sm="6"
+      md="6"
+      class="right"
+    >
       <h3>Result</h3>
       <v-divider></v-divider>
       <pre v-show="expanded">{{ result.message.trim() }}</pre>
@@ -31,7 +39,15 @@
         result.message.trim()
       }}</pre>
     </v-col>
-    <v-col v-if="clamp" cols="1" @click="expanded = !expanded">
+    <v-col
+      v-if="clamp"
+      xs="12"
+      lg="2"
+      xl="2"
+      sm="12"
+      md="12"
+      @click="expanded = !expanded"
+    >
       <div v-if="!expanded">
         <h3>Expand</h3>
         <v-divider></v-divider>
