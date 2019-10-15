@@ -1,8 +1,9 @@
 <template>
-  <v-list-item :to="link">
-    <v-list-item-action>
-      <v-icon>{{ icon }}</v-icon>
-    </v-list-item-action>
+  <v-list-item :to="link" @click="$emit('click', $event)">
+    <v-list-item-avatar>
+      <v-icon v-text="icon" small />
+    </v-list-item-avatar>
+
     <v-list-item-content>
       <v-list-item-title>{{ text }}</v-list-item-title>
     </v-list-item-content>
@@ -26,11 +27,19 @@ const LinkItemProps = Vue.extend({
     },
     link: {
       type: String,
-      required: false,
-      default: "/"
+      required: false
+    },
+    action: {
+      type: Object, // Of type linkaction
+      required: false
     }
   }
 });
+
+/** If provided, will be called whenever clicked. */
+export interface LinkAction {
+  callback: () => void;
+}
 
 @Component({
   components: {}

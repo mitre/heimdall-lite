@@ -19,8 +19,7 @@
             <v-container fluid>
               <v-row>
                 <v-col cols="12">
-                  <pre>{{ control.finding_details.split(":")[0] }}:</pre>
-                  <v-divider></v-divider>
+                  <span>{{ header }}</span>
                   <br />
                   <pre>{{ control.wraps.desc }}</pre>
                 </v-col>
@@ -122,6 +121,16 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
   //    return false;
   //  }
 
+  /** Shown above the description */
+  get header(): string {
+    let msg_split = (this.control as HDFControl).finding_details.split(":");
+    if (msg_split.length === 1) {
+      return msg_split[0] + ".";
+    } else {
+      return msg_split[0] + ":";
+    }
+  }
+
   get details(): Detail[] {
     return [
       {
@@ -179,8 +188,11 @@ pre {
   white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
-.zebra-table {
-  background-color: rgba(0, 0, 0, 0.3);
+.theme--dark .zebra-table {
+  background-color: var(--v-secondary-lighten2);
+}
+.theme--light .zebra-table {
+  background-color: var(--v-secondary-lighten1);
 }
 /*
 .v-application code {

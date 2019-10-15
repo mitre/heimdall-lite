@@ -13,7 +13,14 @@
         clearable
       ></v-text-field>
       <v-spacer />
+      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
+        Upload
+        <v-icon class="pl-2">
+          cloud_upload
+        </v-icon>
+      </v-btn>
       <v-btn
+        class="mx-2"
         @click="clear"
         title="Clear all set filters"
         :disabled="!can_clear"
@@ -22,15 +29,23 @@
       </v-btn>
     </template>
 
+    <!-- Custom sidebar content -->
+    <template #sidebar-content-tools>
+      <ExportCaat :filter="all_filter"></ExportCaat>
+    </template>
+
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
         <!-- Count Cards -->
-        <StatusCardRow :filter="all_filter" />
+        <StatusCardRow
+          :filter="all_filter"
+          @show-errors="status_filter = 'Profile Error'"
+        />
 
         <!-- Compliance Cards -->
         <v-row justify="space-around">
-          <v-col xs-4>
+          <v-col xs="4">
             <v-card class="fill-height">
               <v-card-title class="justify-center">Status Counts</v-card-title>
               <v-card-actions class="justify-center">
@@ -38,7 +53,7 @@
               </v-card-actions>
             </v-card>
           </v-col>
-          <v-col xs-4>
+          <v-col xs="4">
             <v-card class="fill-height">
               <v-card-title class="justify-center"
                 >Severity Counts</v-card-title
@@ -48,7 +63,7 @@
               </v-card-actions>
             </v-card>
           </v-col>
-          <v-col xs-4>
+          <v-col xs="4">
             <v-card class="fill-height">
               <v-card-title class="justify-center"
                 >Compliance Level</v-card-title
@@ -99,21 +114,6 @@
       </v-container>
     </template>
 
-    <!-- File select modal toggle -->
-
-    <v-btn
-      bottom
-      color="teal"
-      dark
-      fab
-      fixed
-      right
-      @click="dialog = true"
-      :hidden="dialog"
-    >
-      <v-icon large>mdi-plus-circle</v-icon>
-    </v-btn>
-
     <!-- File select modal -->
     <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
@@ -132,6 +132,7 @@ import StatusChart from "@/components/cards/StatusChart.vue";
 import SeverityChart from "@/components/cards/SeverityChart.vue";
 import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
+import ExportCaat from "@/components/global/ExportCaat.vue";
 
 import { Filter, NistMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -155,7 +156,8 @@ const ResultsProps = Vue.extend({
     StatusChart,
     SeverityChart,
     ComplianceChart,
-    ProfileData
+    ProfileData,
+    ExportCaat
   }
 })
 export default class Results extends ResultsProps {
