@@ -14,8 +14,7 @@
     "baseUrl": ".",
     "types": ["webpack-env", "mocha", "chai", "vuetify", "node"],
     "paths": {
-      "@/*": ["src/*"],
-      "vue-analytics": ["src/types/vue-analytics"]
+      "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
