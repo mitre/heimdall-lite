@@ -16,24 +16,47 @@
           </v-tab>
 
           <v-tab-item value="tab-test">
-            <v-container fluid>
-              <v-row>
-                <v-col cols="12">
-                  <span>{{ header }}</span>
-                  <v-divider></v-divider>
+            <v-container>
+              <v-col justify="center">
+                <v-card
+                  class="text-center"
+                  :color="status_color"
+                  @click="expanded = !expanded"
+                >
+                  <v-card-text class="pa-2">
+                    {{ header }}
+                    <v-icon class="float-right">{{
+                      expanded ? "mdi-chevron-up" : "mdi-chevron-down"
+                    }}</v-icon>
+                  </v-card-text>
+                </v-card>
+                <v-spacer></v-spacer>
+                <v-divider></v-divider>
+                <v-row>
                   <br />
-                  <pre>{{ control.wraps.desc }}</pre>
-                </v-col>
-              </v-row>
-              <ControlRowCol
-                v-for="(result, index) in control.wraps.results"
-                :key="index"
-                :class="zebra(index)"
-                :result="result"
-                :statusCode="control.status"
-              >
-              </ControlRowCol>
+                  <v-col cols="12">
+                    <pre v-show="expanded" class="text-center">{{
+                      control.wraps.desc
+                    }}</pre>
+                    <pre
+                      v-show="!expanded"
+                      class="text-center"
+                      ref="desc"
+                      v-line-clamp="2"
+                      >{{ control.wraps.desc }}</pre
+                    >
+                  </v-col>
+                </v-row>
+              </v-col>
             </v-container>
+            <ControlRowCol
+              v-for="(result, index) in control.wraps.results"
+              :key="index"
+              :class="zebra(index)"
+              :result="result"
+              :statusCode="control.status"
+            >
+            </ControlRowCol>
           </v-tab-item>
 
           <v-tab-item value="tab-details">
@@ -98,6 +121,11 @@ const ControlRowDetailsProps = Vue.extend({
   }
 });
 
+interface CollapsableElement extends Element {
+  offsetHeight: Number;
+  offsetWidth: Number;
+}
+
 @Component({
   components: {
     ControlRowCol,
@@ -105,6 +133,26 @@ const ControlRowDetailsProps = Vue.extend({
   }
 })
 export default class ControlRowDetails extends ControlRowDetailsProps {
+  clamped: boolean = false;
+  expanded: boolean = false;
+
+  // Checks if an element has been clamped
+  isClamped(el: CollapsableElement | undefined | null) {
+    if (!el) {
+      return false;
+    }
+    return el.offsetHeight < el.scrollHeight || el.offsetWidth < el.scrollWidth;
+  }
+
+  mounted() {
+    // Wait until nextTick to ensure that element has been rendered and clamping
+    // applied, otherwise it may show up as null or 0.
+    var that = this;
+    this.$nextTick(function() {
+      that.clamped = this.isClamped(this.$refs.desc as CollapsableElement);
+    });
+  }
+
   /** Shown above the description */
   get header(): string {
     let msg_split = (this.control as HDFControl).finding_details.split(":");
@@ -158,6 +206,10 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
 </script>
 
 <style lang="scss" scoped>
+.clickable {
+  cursor: pointer;
+}
+
 .v-application {
   code.language-ruby {
     border: none;
