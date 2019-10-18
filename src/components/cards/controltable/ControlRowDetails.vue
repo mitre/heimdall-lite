@@ -18,11 +18,7 @@
           <v-tab-item value="tab-test">
             <v-container>
               <v-col justify="center">
-                <v-card
-                  class="text-center"
-                  :color="status_color"
-                  @click="expanded = !expanded"
-                >
+                <v-card class="text-center" @click="expanded = !expanded">
                   <v-card-text class="pa-2">
                     {{ header }}
                     <v-icon class="float-right">{{
