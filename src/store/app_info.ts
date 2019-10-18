@@ -8,6 +8,9 @@ declare const process: {
     DESCRIPTION: string;
     REPOSITORY: string;
     LICENSE: string;
+    CHANGELOG: string;
+    BRANCH: string;
+    ISSUES: string;
   };
 };
 
@@ -36,6 +39,21 @@ class AppInfoModule extends VuexModule {
   /** The app license */
   get license(): string {
     return process.env.LICENSE;
+  }
+
+  /** The app changelog */
+  get changelog(): string {
+    return process.env.CHANGELOG;
+  }
+
+  /** The app branch/build */
+  get branch(): string {
+    return process.env.BRANCH;
+  }
+
+  /** The app open new issues */
+  get issues(): string {
+    return process.env.ISSUES;
   }
 }
 

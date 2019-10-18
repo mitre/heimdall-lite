@@ -10,6 +10,9 @@ const version = parsed.version || 0;
 const description = parsed.description || "";
 const repository = parsed.repository.url || "";
 const license = parsed.license || "";
+const changelog = parsed.changelog || "";
+const branch = parsed.branch || "";
+const issues = parsed.issues || "";
 
 module.exports = {
   publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
@@ -20,7 +23,10 @@ module.exports = {
           PACKAGE_VERSION: '"' + version + '"',
           DESCRIPTION: '"' + description + '"',
           REPOSITORY: '"' + repository + '"',
-          LICENSE: '"' + license + '"'
+          LICENSE: '"' + license + '"',
+          CHANGELOG: '"' + changelog + '"',
+          BRANCH: '"' + branch + '"',
+          ISSUES: '"' + issues + '"'
         }
       }),
       new HtmlWebpackPlugin({
