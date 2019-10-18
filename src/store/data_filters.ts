@@ -209,12 +209,12 @@ class FilteredDataModule extends VuexModule {
           if (f.selectedControlID !== null) {
             return as_hdf.wraps.id.includes(f.selectedControlID);
           } else if (f.selectedCategory !== null) {
-            return as_hdf.nist_tags.some((tag: string) =>
-              tag.includes(f.selectedCategory!)
+            return as_hdf.fixed_nist_tags.some(
+              tag => tag.sub_specs[0] === f.selectedCategory
             );
           } else if (f.selectedFamily !== null) {
-            return as_hdf.nist_tags.some((tag: string) =>
-              tag.includes(f.selectedFamily!)
+            return as_hdf.fixed_nist_tags.some(
+              tag => tag.family === f.selectedFamily
             );
           } else {
             // No filters - so we don't!

@@ -55,10 +55,13 @@ export default class ExportCaat extends Props {
     let row: CAATRow = [];
 
     // Figure out the nist tags to make a family
-    let family = control.fixed_nist_tags[0];
-    // If its length is 4, then we want to pad the 0. E.g. AB-1 -> AB-01
-    if (family.length === 4) {
-      family = family.substr(0, 3) + "0" + family[3];
+    let root_control = control.fixed_nist_tags[0];
+    let family = root_control.family;
+    // If # is too small, then we want to pad the 0. E.g. AB-1 -> AB-01
+    if (root_control.sub_specs[0].length < 2) {
+      family = `${family}-0${root_control.sub_specs[0]}`;
+    } else {
+      family = `${family}-${root_control.sub_specs[0]}`;
     }
 
     let gid = control.wraps.tags.gid;
