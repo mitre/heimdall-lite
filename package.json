@@ -8,7 +8,10 @@
     "url": "https://github.com/mitre/heimdall-vuetify"
   },
   "license": "Apache-2.0",
+  "branch": "/blob/master/",
   "readme": "README.md",
+  "changelog": "CHANGELOG.md",
+  "issues": "/issues/new/choose",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
