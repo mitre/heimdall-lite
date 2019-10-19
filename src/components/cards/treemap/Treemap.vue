@@ -21,7 +21,7 @@
             <!-- The body -->
             <Cell
               :selected_node="selected_node"
-              :selected_control_id="value.selectedControlID"
+              :selected_control_id="NONEFORNOW"
               :node="treemap_layout"
               :scales="scales"
               @select-node="select_node"
@@ -40,13 +40,11 @@ import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
 import { ControlStatus, HDFControl, nist, hdfWrapControl } from "inspecjs";
 import * as d3 from "d3";
-import FilteredDataModule, { NistMapState } from "@/store/data_filters";
+import FilteredDataModule, { TreeMapState } from "@/store/data_filters";
 import {
-  nistHashToTreeMap,
   TreemapNode,
-  TreemapDatumType,
-  nistHashForControls,
-  CCWrapper
+  build_nist_tree_map,
+  is_leaf
 } from "@/utilities/treemap_util";
 import { HierarchyRectangularNode, tree } from "d3";
 import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
@@ -57,9 +55,19 @@ import resize from "vue-resize-directive";
 const TreemapProps = Vue.extend({
   props: {
     value: {
-      type: Object, // Of type NistMapState
+      type: Array, // Of type TreeMapState, representing current descent path
       required: true
     },
+    /*
+    path: {
+      type: Array, // Of type TreeMapState, representing current descent path
+      required: true
+    },
+    selected_control: {
+      type: string, // Represents control id
+      required: false
+    },
+    */
     filter: {
       type: Object, // Of type Filter
       required: true
@@ -85,68 +93,28 @@ export default class Treemap extends TreemapProps {
   height: number = 530;
 
   /** The currently selected treemap node. Wrapped to avoid initialization woes */
-  get selected_node(): d3.HierarchyRectangularNode<TreemapDatumType> {
+  get selected_node(): d3.HierarchyRectangularNode<TreemapNode> {
     // Get typed versions of the curr state
-    let val: NistMapState = this.value;
+    let val = this.value as TreeMapState;
     let curr = this.treemap_layout;
+    let depth = 0;
 
-    // Try to go to the selected family
-    // If we cannot go, fail out and update the state
-    if (val.selectedFamily) {
-      let new_curr = curr.children!.find(
-        child =>
-          (child.data as nist.NistFamily<CCWrapper>).name === val.selectedFamily
-      );
-      if (new_curr !== undefined) {
-        curr = new_curr;
-      } else {
-        // Unable to go to the specified family
-        let revised: NistMapState = {
-          selectedFamily: null, // This one failed
-          selectedCategory: null,
-          selectedControlID: null
-        };
-        this.$emit("input", revised);
-        return curr;
+    try {
+      for (; depth < val.length; depth++) {
+        let next_incursion = val[depth];
+        // We use "as any" here because, honestly, I'm lazy. Makes the try catch handle all of the tough work
+        let new_curr = curr.children!.find(
+          child => (child as any).name === next_incursion
+        );
+        if (new_curr) {
+          curr = new_curr;
+        } else {
+          throw "truncate";
+        }
       }
-    }
-    // Try to go to the selected category
-    // If we cannot go, fail out and update the state
-    if (val.selectedCategory) {
-      let new_curr = curr.children!.find(
-        child =>
-          (child.data as nist.NistCategory<CCWrapper>).name ===
-          val.selectedCategory
-      );
-      if (new_curr !== undefined) {
-        curr = new_curr;
-      } else {
-        // Unable to go to the specified category
-        let revised: NistMapState = {
-          selectedFamily: val.selectedFamily, // This one went off ok
-          selectedCategory: null, // This one failed
-          selectedControlID: null
-        };
-        this.$emit("input", revised);
-        return curr;
-      }
-    }
-
-    // Check the selected category. We don't actually go to it, just validate that it exists
-    if (val.selectedControlID) {
-      let test_curr = curr.children!.find(
-        child =>
-          (child.data as CCWrapper).ctrl.data.id === val.selectedControlID
-      );
-      if (test_curr == undefined) {
-        // Unable to go to the specified control
-        let revised: NistMapState = {
-          selectedFamily: val.selectedFamily, // This one went off ok
-          selectedCategory: val.selectedCategory, // This one as well
-          selectedControlID: null // This one failed
-        };
-        this.$emit("input", revised);
-      }
+    } catch (some_traversal_error) {
+      // Slice to last successful depth. Slice is non inclusive so this works
+      this.$emit("input", val.slice(0, depth));
     }
 
     // Return as deep as we travelled
@@ -172,26 +140,19 @@ export default class Treemap extends TreemapProps {
     };
   }
 
-  /**
-   * Fetches the controls we want to display in this tree, and turns them into a hash
-   * Note that regardless of what filtering this treeview applies,
-   * we want the treeview itself to remain unaffected.
-   */
-  get nist_hash(): nist.NistHash<CCWrapper> {
+  /** Generates a d3 heirarchy structure, with appropriate bounds to our width
+   *  detailing all of the controls in the nist hash */
+  get treemap_layout(): d3.HierarchyRectangularNode<TreemapNode> {
     // Get our data module
     let data: FilteredDataModule = getModule(FilteredDataModule, this.$store);
 
-    // Get the current filtered data
+    // Get the currejnt filtered data
     let controls = data.controls(this.filter);
-    return nistHashForControls(controls);
-  }
 
-  /** Generates a d3 heirarchy structure, with appropriate bounds to our width
-   *  detailing all of the controls in the nist hash */
-  get treemap_layout(): d3.HierarchyRectangularNode<TreemapDatumType> {
-    let hierarchy = nistHashToTreeMap(this.nist_hash);
+    // Build the map
+    let hierarchy = build_nist_tree_map(controls);
     let treemap = d3
-      .treemap<TreemapDatumType>()
+      .treemap<TreemapNode>()
       .size([this.width, this.height])
       .round(false)
       .paddingInner(0)(hierarchy);
@@ -199,43 +160,32 @@ export default class Treemap extends TreemapProps {
   }
 
   // Callbacks for our tree
-  select_node(n: d3.HierarchyRectangularNode<TreemapDatumType>): void {
-    // Get our path to the selected node
-    let route = n.ancestors().reverse();
-
-    // Initialize all as null
-    let selected_family: string | null = null;
-    let selected_category: string | null = null;
-    let selected_control_id: string | null = null;
-
-    // Depending on length of route, assign values
-    if (route.length > 1) {
-      selected_family = (route[1].data as nist.NistFamily<CCWrapper>).name;
-    }
-    if (route.length > 2) {
-      selected_category = (route[2].data as nist.NistCategory<CCWrapper>).name;
-    }
-    if (route.length > 3) {
-      selected_control_id = (route[3].data as CCWrapper).ctrl.data.id;
-      // If they click the same one, clear
-      if (selected_control_id === this.value.selectedControlID) {
-        selected_control_id = null;
+  // NOTE: SHOULD ONLY EVER BE CALLED ON CURRENT DESCENDANTS. LOGIC BREAKS OTHERWISE
+  select_node(n: d3.HierarchyRectangularNode<TreemapNode>): void {
+    // If it is a leaf, then select it
+    let new_state: TreeMapState;
+    if (is_leaf(n.data)) {
+      console.error("We don't yet support this");
+      return;
+      //let id = n.data.control.data.id;
+    } else {
+      // Otherwise, dive away. Set our directive to the last directive in the given control
+      let cntrl = n.data.nist_control!;
+      let l = cntrl.sub_specs.length;
+      new_state = [...(this.value as TreeMapState)];
+      if (l) {
+        new_state.push(cntrl.sub_specs[l - 1]);
+      } else {
+        new_state.push(cntrl.family);
       }
     }
-
-    // Construct the state and emit
-    let new_state: NistMapState = {
-      selectedFamily: selected_family,
-      selectedCategory: selected_category,
-      selectedControlID: selected_control_id
-    };
     this.$emit("input", new_state);
   }
 
   /** Submits an event to go up one node */
   up(): void {
-    if (this.selected_node.parent !== null) {
-      this.select_node(this.selected_node.parent);
+    if (this.value.length) {
+      this.value.pop();
     }
   }
 

@@ -16,6 +16,7 @@ import {
 import { FileID, isInspecFile } from "@/store/report_intake";
 import Store from "@/store/store";
 import LRUCache from "lru-cache";
+import { nist } from "inspecjs";
 
 const MAX_CACHE_ENTRIES = 20;
 
@@ -47,14 +48,10 @@ export interface Filter {
   search_term?: string;
 
   /** The current state of the Nist Treemap. Used to further filter by nist categories etc. */
-  nist_filters?: NistMapState;
+  tree_filters?: TreeMapState;
 }
 
-export interface NistMapState {
-  selectedFamily: string | null;
-  selectedCategory: string | null;
-  selectedControlID: string | null;
-}
+export type TreeMapState = string[]; // Representing the current path spec, from root
 
 /**
  * Facillitates the search functionality
@@ -197,29 +194,21 @@ class FilteredDataModule extends VuexModule {
       }
 
       // Filter by nist stuff
-      if (filter.nist_filters !== undefined) {
+      if (filter.tree_filters && filter.tree_filters.length > 0) {
         // Shorthand the nist filters
-        let f = filter.nist_filters;
+        let f = filter.tree_filters;
+
+        // Construct a nist control to represent the filter
+        let control = new nist.NistControl(
+          filter.tree_filters[0],
+          filter.tree_filters.slice(1)
+        );
 
         controls = controls.filter(c => {
-          // Get an hdf version so we have
+          // Get an hdf version so we have the fixed nist tags
           let as_hdf = hdfWrapControl(c.data);
 
-          // Short circuit in order controlID > Category >  Family, see if any sat
-          if (f.selectedControlID !== null) {
-            return as_hdf.wraps.id.includes(f.selectedControlID);
-          } else if (f.selectedCategory !== null) {
-            return as_hdf.fixed_nist_tags.some(
-              tag => tag.sub_specs[0] === f.selectedCategory
-            );
-          } else if (f.selectedFamily !== null) {
-            return as_hdf.fixed_nist_tags.some(
-              tag => tag.family === f.selectedFamily
-            );
-          } else {
-            // No filters - so we don't!
-            return true;
-          }
+          return as_hdf.fixed_nist_tags.some(t => control.contains(t));
         });
       }
 

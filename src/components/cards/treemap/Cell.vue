@@ -4,7 +4,7 @@
     <!-- Generate our children here -->
     <Cell
       v-for="child in node.children"
-      :key="key_for(child.data)"
+      :key="child.data.key"
       :selected_node="selected_node"
       :selected_control_id="selected_control_id"
       :depth="child_depth"
@@ -13,10 +13,10 @@
       @select-node="select_node"
     />
 
+    <!-- The actual body of this square. -->
     <!-- The actual body of this square.  width add selectedNode.x0-->
     <rect
       v-if="_depth >= 0"
-      :key="label"
       :style="cell_style"
       :x="x"
       :y="y"
@@ -33,7 +33,7 @@
       text-anchor="middle"
       :x="x + width / 2"
       :y="y + height / 2"
-      >{{ label }}</text
+      >{{ node.data.title }}</text
     >
   </g>
 </template>

@@ -93,8 +93,8 @@
               <v-card-title>TreeMap</v-card-title>
               <v-card-text>
                 <Treemap
-                  :filter="treemap_filter"
-                  v-model="nist_filters"
+                  :filter="treemap_full_filter"
+                  v-model="tree_filters"
                   @clear="clear"
                 />
               </v-card-text>
@@ -134,7 +134,7 @@ import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 
-import { Filter, NistMapState } from "@/store/data_filters";
+import { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
 import { FileID } from "@/store/report_intake";
 import { getModule } from "vuex-module-decorators";
@@ -178,11 +178,7 @@ export default class Results extends ResultsProps {
    * The current state of the treemap as modeled by the treemap (duh).
    * Once can reliably expect that if a "deep" selection is not null, then its parent should also be not-null.
    */
-  nist_filters: NistMapState = {
-    selectedFamily: null,
-    selectedCategory: null,
-    selectedControlID: null
-  };
+  tree_filters: TreeMapState = [];
 
   /**
    * The current search term, as modeled by the search bar
@@ -219,7 +215,7 @@ export default class Results extends ResultsProps {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
       fromFile: this.file_filter || undefined,
-      nist_filters: this.nist_filters,
+      tree_filters: this.tree_filters,
       search_term: this.search_term,
       omit_overlayed_controls: true
     };
@@ -228,7 +224,7 @@ export default class Results extends ResultsProps {
   /**
    * The filter for treemap. Omits its own stuff
    */
-  get treemap_filter(): Filter {
+  get treemap_full_filter(): Filter {
     return {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
@@ -245,11 +241,7 @@ export default class Results extends ResultsProps {
     this.severity_filter = null;
     this.status_filter = null;
     this.search_term = "";
-    this.nist_filters = {
-      selectedFamily: null,
-      selectedCategory: null,
-      selectedControlID: null
-    };
+    this.tree_filters = [];
   }
 
   /**
@@ -262,7 +254,7 @@ export default class Results extends ResultsProps {
       this.severity_filter ||
       this.status_filter ||
       this.search_term !== "" ||
-      this.nist_filters.selectedFamily
+      this.tree_filters.length
     ) {
       return true;
     } else {
