@@ -6,7 +6,8 @@ import { HDFControl, hdfWrapControl, ControlStatus, nist } from "inspecjs";
 import * as d3 from "d3";
 import { ContextualizedControl } from "@/store/data_store";
 import { control_unique_key } from "./format_util";
-import { NistControl } from "inspecjs/dist/nist";
+import ColorHackModule from "@/store/color_hack";
+import { Color } from "chroma-js";
 
 /**
  * A simple wrapping class needed to facilitate inspecjs nist function usage
@@ -34,20 +35,19 @@ export class CCWrapper {
 */
 
 /** A simple wrapper type representing what any node's data might be in our treemap */
-export interface TreemapNodeParent {
+interface AbsTreemapNode {
   title: string;
   subtitle?: string;
   hovertext?: string;
   key: string;
-  nist_control?: NistControl;
+  color: string;
+}
+export interface TreemapNodeParent extends AbsTreemapNode {
+  nist_control?: nist.NistControl;
   children: Array<TreemapNodeParent> | Array<TreemapNodeLeaf>;
 }
 
-export interface TreemapNodeLeaf {
-  title: string;
-  subtitle?: string;
-  hovertext?: string;
-  key: string;
+export interface TreemapNodeLeaf extends AbsTreemapNode {
   control: ContextualizedControl;
 }
 
@@ -68,7 +68,8 @@ export type D3TreemapNode = d3.HierarchyNode<TreemapNode>;
  * @param controls The controls to build into a nist node map
  */
 function controls_to_nist_node_data(
-  controls: Readonly<ContextualizedControl[]>
+  controls: Readonly<ContextualizedControl[]>,
+  colors: ColorHackModule
 ): TreemapNodeLeaf[] {
   return controls.map(c => {
     let c_data: TreemapNodeLeaf = {
@@ -76,7 +77,8 @@ function controls_to_nist_node_data(
       subtitle: c.data.title || undefined,
       hovertext: c.data.desc || undefined,
       key: control_unique_key(c),
-      control: c
+      control: c,
+      color: colors.colorForStatus(hdfWrapControl(c.data).status)
     };
     return c_data;
   });
@@ -86,15 +88,25 @@ function controls_to_nist_node_data(
  * Also constructs a lookup table of leaf controls
  */
 function recursive_nist_map(
-  node: Readonly<nist.NistHeirarchyNode>,
-  leaf_lookup: { [key: string]: TreemapNodeParent }
+  node: Readonly<nist.NistHierarchyNode>,
+  leaf_lookup: { [key: string]: TreemapNodeParent },
+  colors: ColorHackModule
 ): TreemapNodeParent {
+  // Build our children
+  let children = node.children.map(c =>
+    recursive_nist_map(c, leaf_lookup, colors)
+  );
+
+  // We decide this node's color as a composite of all underlying node colors
+  let color = "red";
+
   // Make our final value
-  let ret = {
+  let ret: TreemapNodeParent = {
     key: node.control.raw_text!,
     title: node.control.raw_text!, // TODO: Make this like, suck less. IE give more descriptive stuff
-    children: node.children.map(c => recursive_nist_map(c, leaf_lookup)),
-    nist_control: node.control
+    children: children,
+    nist_control: node.control,
+    color
   };
 
   // Save to lookup if it's a leaf
@@ -107,16 +119,20 @@ function recursive_nist_map(
 /**
  * Assembles the provided leaves into a nist map.
  */
-function build_populated_nist_map(data: TreemapNodeLeaf[]): TreemapNodeParent {
+function build_populated_nist_map(
+  data: TreemapNodeLeaf[],
+  colors: ColorHackModule
+): TreemapNodeParent {
   // Build our scaffold
   let lookup: { [key: string]: TreemapNodeParent } = {};
-  let root_children = nist.FULL_NIST_HEIRARCHY.map(n =>
-    recursive_nist_map(n, lookup)
+  let root_children = nist.FULL_NIST_HIERARCHY.map(n =>
+    recursive_nist_map(n, lookup, colors)
   );
   let root: TreemapNodeParent = {
     key: "tree_root",
     title: "NIST-853 Controls",
-    children: root_children
+    children: root_children,
+    color: "grey" // Doesn't really matter. We never actually see this
   };
 
   // Populate it
@@ -221,10 +237,11 @@ function node_data_to_tree_map(
   */
 
 export function build_nist_tree_map(
-  data: Readonly<ContextualizedControl[]>
+  data: Readonly<ContextualizedControl[]>,
+  colors: ColorHackModule
 ): D3TreemapNode {
-  let a = controls_to_nist_node_data(data);
-  let b = build_populated_nist_map(a);
+  let a = controls_to_nist_node_data(data, colors);
+  let b = build_populated_nist_map(a, colors);
   let c = node_data_to_tree_map(b);
   return c;
 }

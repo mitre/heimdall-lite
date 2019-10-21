@@ -21,9 +21,10 @@
             <!-- The body -->
             <Cell
               :selected_node="selected_node"
-              :selected_control_id="NONEFORNOW"
+              :selected_control_id="'NONEFORNOW'"
               :node="treemap_layout"
               :scales="scales"
+              :depth="0"
               @select-node="select_node"
             />
           </g>
@@ -50,6 +51,7 @@ import { HierarchyRectangularNode, tree } from "d3";
 import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
 //@ts-ignore
 import resize from "vue-resize-directive";
+import ColorHackModule from "../../../store/color_hack";
 
 // We declare the props separately to make props types inferable.
 const TreemapProps = Vue.extend({
@@ -150,7 +152,12 @@ export default class Treemap extends TreemapProps {
     let controls = data.controls(this.filter);
 
     // Build the map
-    let hierarchy = build_nist_tree_map(controls);
+    console.log("building");
+    let hierarchy = build_nist_tree_map(
+      controls,
+      getModule(ColorHackModule, this.$store)
+    );
+    console.log("built");
     let treemap = d3
       .treemap<TreemapNode>()
       .size([this.width, this.height])
