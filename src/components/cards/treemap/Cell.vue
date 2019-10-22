@@ -5,7 +5,7 @@
     <g v-if="is_parent && depth <= 1">
       <Cell
         v-for="child in node.children"
-        :key="pass(child.data.key)"
+        :key="child.data.key"
         :selected_node="selected_node"
         :selected_control_id="selected_control_id"
         :depth="depth + 1"
@@ -97,8 +97,8 @@ const CellProps = Vue.extend({
 export default class Cell extends CellProps {
   scale: number = 1.0;
 
-  pass(x: string): string {
-    // console.log(x);
+  pass<T>(x: T): T {
+    console.log(x);
     return x;
   }
 

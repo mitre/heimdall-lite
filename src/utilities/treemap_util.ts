@@ -7,32 +7,7 @@ import * as d3 from "d3";
 import { ContextualizedControl } from "@/store/data_store";
 import { control_unique_key } from "./format_util";
 import ColorHackModule from "@/store/color_hack";
-import { Color } from "chroma-js";
-
-/**
- * A simple wrapping class needed to facilitate inspecjs nist function usage
- */
-/*
-export class CCWrapper {
-  ctrl: ContextualizedControl;
-  hdf: HDFControl;
-  category?: nist.NistCategory<CCWrapper>;
-
-  constructor(ctrl: ContextualizedControl) {
-    this.ctrl = ctrl;
-    this.hdf = hdfWrapControl(ctrl.data);
-    this.category = undefined;
-  }
-
-  get fixed_nist_tags(): string[] {
-    return this.hdf.fixed_nist_tags;
-  }
-
-  get status(): ControlStatus {
-    return this.hdf.status;
-  }
-}
-*/
+import Chroma from "chroma-js";
 
 /** A simple wrapper type representing what any node's data might be in our treemap */
 interface AbsTreemapNode {
@@ -44,7 +19,7 @@ interface AbsTreemapNode {
 }
 export interface TreemapNodeParent extends AbsTreemapNode {
   nist_control?: nist.NistControl;
-  children: Array<TreemapNodeParent> | Array<TreemapNodeLeaf>;
+  children: Array<TreemapNodeParent | TreemapNodeLeaf>;
 }
 
 export interface TreemapNodeLeaf extends AbsTreemapNode {
@@ -89,16 +64,16 @@ function controls_to_nist_node_data(
  */
 function recursive_nist_map(
   node: Readonly<nist.NistHierarchyNode>,
-  leaf_lookup: { [key: string]: TreemapNodeParent },
+  control_lookup: { [key: string]: TreemapNodeParent },
   colors: ColorHackModule
 ): TreemapNodeParent {
   // Build our children
   let children = node.children.map(c =>
-    recursive_nist_map(c, leaf_lookup, colors)
+    recursive_nist_map(c, control_lookup, colors)
   );
 
   // We decide this node's color as a composite of all underlying node colors
-  let color = "red";
+  let color = Chroma.average(children.map(c => c.color));
 
   // Make our final value
   let ret: TreemapNodeParent = {
@@ -106,13 +81,11 @@ function recursive_nist_map(
     title: node.control.raw_text!, // TODO: Make this like, suck less. IE give more descriptive stuff
     children: children,
     nist_control: node.control,
-    color
+    color: color.hex()
   };
 
-  // Save to lookup if it's a leaf
-  if (node.children.length === 0) {
-    leaf_lookup[node.control.raw_text!] = ret;
-  }
+  // Save to lookup
+  control_lookup[node.control.raw_text!] = ret;
   return ret;
 }
 
@@ -142,7 +115,7 @@ function build_populated_nist_map(
       let parent = lookup[control.raw_text!];
       if (parent) {
         // We can do this as because we know we constructed these to only have empty children
-        (parent.children as TreemapNodeLeaf[]).push(leaf);
+        parent.children.push(leaf);
       } else {
         console.warn(
           `Warning: unable to assign control ${control.raw_text} to valid treemap leaf`

@@ -57,7 +57,7 @@ import ColorHackModule from "../../../store/color_hack";
 const TreemapProps = Vue.extend({
   props: {
     value: {
-      type: Array, // Of type TreeMapState, representing current descent path
+      type: Array, // Of type Array<TreeMapNode>, representing current descent path
       required: true
     },
     /*
@@ -104,9 +104,13 @@ export default class Treemap extends TreemapProps {
     try {
       for (; depth < val.length; depth++) {
         let next_incursion = val[depth];
+        console.log(`next incursion: ${next_incursion}`);
         // We use "as any" here because, honestly, I'm lazy. Makes the try catch handle all of the tough work
-        let new_curr = curr.children!.find(
-          child => (child as any).name === next_incursion
+        if (curr.children === undefined) {
+          throw "no children to incur";
+        }
+        let new_curr = curr.children.find(
+          child => child.data.title === next_incursion
         );
         if (new_curr) {
           curr = new_curr;
@@ -116,6 +120,7 @@ export default class Treemap extends TreemapProps {
       }
     } catch (some_traversal_error) {
       // Slice to last successful depth. Slice is non inclusive so this works
+      console.log("Traversal error - rebounding");
       this.$emit("input", val.slice(0, depth));
     }
 
@@ -176,29 +181,32 @@ export default class Treemap extends TreemapProps {
       return;
       //let id = n.data.control.data.id;
     } else {
-      // Otherwise, dive away. Set our directive to the last directive in the given control
-      let cntrl = n.data.nist_control!;
-      let l = cntrl.sub_specs.length;
-      new_state = [...(this.value as TreeMapState)];
-      if (l) {
-        new_state.push(cntrl.sub_specs[l - 1]);
-      } else {
-        new_state.push(cntrl.family);
-      }
+      console.log("Going deep");
+      console.log(this.value);
+      // Otherwise, dive away. Set course for the leading title
+      let cntrl = n.data;
+      new_state.push(cntrl);
     }
+    console.log(new_state);
     this.$emit("input", new_state);
+    console.log(this.value);
   }
 
   /** Submits an event to go up one node */
   up(): void {
     if (this.value.length) {
-      this.value.pop();
+      // Slice and dice, baybee
+      console.log("Going up");
+      this.$emit("input", this.value.slice(0, this.value.length - 1));
     }
   }
 
+  /** Typed method to wrap changes in the depth */
+  set_path(path_spec: TreeMapState) {}
+
   /** Controls whether we should allow up */
   get allow_up(): boolean {
-    return this.selected_node.parent !== null;
+    return this.value.length > 0;
   }
 
   /** Called on resize */

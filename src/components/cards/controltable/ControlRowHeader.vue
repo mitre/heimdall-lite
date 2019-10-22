@@ -38,7 +38,7 @@
       <v-chip-group column active-class="NONE">
         <v-chip
           v-for="tag in control.fixed_nist_tags"
-          :key="tag"
+          :key="tag.raw_text"
           active-class="NONE"
         >
           {{ tag }}
