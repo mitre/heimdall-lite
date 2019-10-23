@@ -101,6 +101,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { HDFControl, ControlStatus } from "inspecjs";
+//@ts-ignore
 import VClamp from "vue-clamp";
 
 interface CollapsableElement extends Element {
@@ -130,7 +131,6 @@ const ControlRowColProps = Vue.extend({
 export default class ControlRowCol extends ControlRowColProps {
   expanded: boolean = false;
   clamp: boolean = false;
-  expanded: boolean = false;
 
   get status_color(): string {
     // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
