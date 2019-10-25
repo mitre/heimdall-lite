@@ -10,10 +10,12 @@
       </v-card-title>
 
       <v-card-text>
+      <br/>
+     
         <h2>
-          View the results of a <a href="htps://www.inspec.io">InSpec</a> profile execution or the ressults from 
-          <a href="https://github.com/mitre/heimdall_tools">Heimdall Tools</a> which can convert many Static and 
-          Dynamic scanning tools.
+          View the results of an <a href="htps://www.inspec.io">InSpec</a> profile execution (JSON reporter) or the ressults 
+          from <a href="https://github.com/mitre/heimdall_tools">Heimdall Tools</a> whcih converts many Static and 
+          Dynamic scanning tools Results files to a Heimdall Data Fromat JSON file.
         </h2>
         <br />
         <p>
