@@ -37,11 +37,11 @@
     <template #tags>
       <v-chip-group column active-class="NONE">
         <v-chip
-          v-for="tag in control.fixed_nist_tags"
+          v-for="tag in control.parsed_nist_tags"
           :key="tag.raw_text"
           active-class="NONE"
         >
-          {{ tag }}
+          {{ tag.raw_text }}
         </v-chip>
       </v-chip-group>
     </template>

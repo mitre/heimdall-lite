@@ -7,7 +7,7 @@
       <v-col :cols="8">
         <v-btn @click="up" :disabled="!allow_up" block x-small>
           <v-icon v-if="allow_up"> mdi-arrow-left </v-icon>
-          {{ selected_node.data.name }}
+          {{ "NIST-853 -> " + value.join(" -> ") }}
         </v-btn>
       </v-col>
     </v-row>
@@ -45,13 +45,16 @@ import FilteredDataModule, { TreeMapState } from "@/store/data_filters";
 import {
   TreemapNode,
   build_nist_tree_map,
-  is_leaf
+  is_leaf,
+  is_parent
 } from "@/utilities/treemap_util";
 import { HierarchyRectangularNode, tree } from "d3";
 import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
 //@ts-ignore
 import resize from "vue-resize-directive";
 import ColorHackModule from "../../../store/color_hack";
+import { NistControl } from "inspecjs/dist/nist";
+import { compare_arrays } from "@/utilities/helper_util";
 
 // We declare the props separately to make props types inferable.
 const TreemapProps = Vue.extend({
@@ -77,10 +80,7 @@ const TreemapProps = Vue.extend({
   }
 });
 
-/**
- * Categories property must be of type Category
- * Emits "filter-status" with payload of type ControlStatus
- */
+// Respects a v-model of type TreeMapState
 @Component({
   components: {
     Cell
@@ -94,24 +94,43 @@ export default class Treemap extends TreemapProps {
   width: number = 1600;
   height: number = 530;
 
+  /** Typed getter on current spec path */
+  get _state(): TreeMapState {
+    return this.value as TreeMapState;
+  }
+
   /** The currently selected treemap node. Wrapped to avoid initialization woes */
   get selected_node(): d3.HierarchyRectangularNode<TreemapNode> {
     // Get typed versions of the curr state
-    let val = this.value as TreeMapState;
+    // Set curr to root
     let curr = this.treemap_layout;
     let depth = 0;
 
     try {
-      for (; depth < val.length; depth++) {
-        let next_incursion = val[depth];
-        console.log(`next incursion: ${next_incursion}`);
-        // We use "as any" here because, honestly, I'm lazy. Makes the try catch handle all of the tough work
+      for (; depth < this._state.length; depth++) {
+        // If the current has no children, then just bail here
         if (curr.children === undefined) {
-          throw "no children to incur";
+          throw "no children to go into";
         }
-        let new_curr = curr.children.find(
-          child => child.data.title === next_incursion
-        );
+
+        // Fetch the next path spec
+        let next_incursion = this._state[depth];
+
+        // Make a control matching the next step we go to
+        let next_control = new NistControl(this._state);
+        console.log(`next incursion: ${next_incursion}`);
+
+        let new_curr = curr.children.find(child => {
+          if (is_parent(child.data) && child.data.nist_control !== undefined) {
+            let ss_a = child.data.nist_control.sub_specifiers;
+            let ss_b = next_control.sub_specifiers;
+            return (
+              compare_arrays(ss_a, ss_b, (a, b) => a.localeCompare(b)) === 0
+            );
+          } else {
+            return false; // We cannot go into a leaf (OR CAN WE? MUST DECIDE, AT SOME POINT)
+          }
+        });
         if (new_curr) {
           curr = new_curr;
         } else {
@@ -120,8 +139,8 @@ export default class Treemap extends TreemapProps {
       }
     } catch (some_traversal_error) {
       // Slice to last successful depth. Slice is non inclusive so this works
-      console.log("Traversal error - rebounding");
-      this.$emit("input", val.slice(0, depth));
+      console.log(`Traversal error ${some_traversal_error} - rebounding`);
+      this.set_path(this._state.slice(0, depth));
     }
 
     // Return as deep as we travelled
@@ -172,41 +191,39 @@ export default class Treemap extends TreemapProps {
   }
 
   // Callbacks for our tree
-  // NOTE: SHOULD ONLY EVER BE CALLED ON CURRENT DESCENDANTS. LOGIC BREAKS OTHERWISE
   select_node(n: d3.HierarchyRectangularNode<TreemapNode>): void {
     // If it is a leaf, then select it
-    let new_state: TreeMapState;
+    let new_state = [...this._state];
     if (is_leaf(n.data)) {
-      console.error("We don't yet support this");
       return;
       //let id = n.data.control.data.id;
     } else {
-      console.log("Going deep");
-      console.log(this.value);
       // Otherwise, dive away. Set course for the leading title
-      let cntrl = n.data;
-      new_state.push(cntrl);
+      let cntrl = n.data.nist_control;
+      if (cntrl) {
+        console.log(`Setting new state: ${cntrl.sub_specifiers}`);
+        this.set_path(cntrl.sub_specifiers);
+      }
     }
-    console.log(new_state);
-    this.$emit("input", new_state);
-    console.log(this.value);
   }
 
   /** Submits an event to go up one node */
   up(): void {
-    if (this.value.length) {
+    if (this._state.length) {
       // Slice and dice, baybee
       console.log("Going up");
-      this.$emit("input", this.value.slice(0, this.value.length - 1));
+      this.set_path(this._state.slice(0, this._state.length - 1));
     }
   }
 
   /** Typed method to wrap changes in the depth */
-  set_path(path_spec: TreeMapState) {}
+  set_path(path_spec: TreeMapState) {
+    this.$emit("input", path_spec);
+  }
 
   /** Controls whether we should allow up */
   get allow_up(): boolean {
-    return this.value.length > 0;
+    return this._state.length > 0;
   }
 
   /** Called on resize */

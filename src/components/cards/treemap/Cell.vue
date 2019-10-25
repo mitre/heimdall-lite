@@ -29,7 +29,7 @@
     />
 
     <text
-      v-if="depth === 1"
+      v-if="_depth === 1"
       dominant-baseline="middle"
       text-anchor="middle"
       :x="x + width / 2"
@@ -123,6 +123,10 @@ export default class Cell extends CellProps {
    * To be clear, "appropriate" is when this is the selected node, using Object.is
    */
   get _depth(): number {
+    console.log(`I Have depth ${this.depth}`);
+    if (this.depth === 0) {
+      console.log(`I Have depth 0 and node ${this._node.data.title}`);
+    }
     return this.depth;
   }
 

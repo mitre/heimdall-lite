@@ -55,13 +55,15 @@ export default class ExportCaat extends Props {
     let row: CAATRow = [];
 
     // Figure out the nist tags to make a family
-    let root_control = control.fixed_nist_tags[0];
-    let family = root_control.family;
-    // If # is too small, then we want to pad the 0. E.g. AB-1 -> AB-01
-    if (root_control.sub_specs[0].length < 2) {
-      family = `${family}-0${root_control.sub_specs[0]}`;
-    } else {
-      family = `${family}-${root_control.sub_specs[0]}`;
+    let root_control = control.parsed_nist_tags[0];
+    let family = root_control.family || "UM";
+    let nist_control = root_control.sub_specifiers[1] || "01";
+    nist_control = ("00" + nist_control).slice(-2); // Pad to be 2 digits, always
+    nist_control = family + "-" + nist_control;
+    // If there's a second sub-spec, add it too
+    if (root_control.sub_specifiers[2]) {
+      let sub_spec = "00" + root_control.sub_specifiers[2];
+      nist_control += `(${sub_spec.slice(-2)})`;
     }
 
     let gid = control.wraps.tags.gid;
@@ -79,7 +81,7 @@ export default class ExportCaat extends Props {
       let fix = (x: string | null | undefined) => x || "";
 
       // Build up the row
-      row.push(family); // Control Number
+      row.push(nist_control); // Control Number
       row.push(
         "Test " + fix(control.wraps.id) + " - " + fix(control.wraps.title)
       ); // Finding Title

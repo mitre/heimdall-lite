@@ -199,16 +199,13 @@ class FilteredDataModule extends VuexModule {
         let f = filter.tree_filters;
 
         // Construct a nist control to represent the filter
-        let control = new nist.NistControl(
-          filter.tree_filters[0],
-          filter.tree_filters.slice(1)
-        );
+        let control = new nist.NistControl(filter.tree_filters);
 
         controls = controls.filter(c => {
           // Get an hdf version so we have the fixed nist tags
           let as_hdf = hdfWrapControl(c.data);
 
-          return as_hdf.fixed_nist_tags.some(t => control.contains(t));
+          return as_hdf.parsed_nist_tags.some(t => control.contains(t));
         });
       }
 
