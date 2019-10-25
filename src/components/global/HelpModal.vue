@@ -11,7 +11,10 @@
 
       <v-card-text>
         <br />
-        <h1>View the results of an InSpec execution json</h1>
+        <h1>
+          View the results of an execution json file output from InSpec or
+          <a href="https://github.com/mitre/heimdall_tools">heimdall_tools</a>
+        </h1>
         <br />
         <p>
           Easily see how many controls passed and failed.
