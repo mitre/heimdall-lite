@@ -10,11 +10,11 @@
       </v-card-title>
 
       <v-card-text>
-        <br />
-        <h1>
-          View the results of an execution json file output from InSpec or
-          <a href="https://github.com/mitre/heimdall_tools">heimdall_tools</a>
-        </h1>
+        <h2>
+          View the results of a <a href="htps://www.inspec.io">InSpec</a> profile execution or the ressults from 
+          <a href="https://github.com/mitre/heimdall_tools">Heimdall Tools</a> which can convert many Static and 
+          Dynamic scanning tools.
+        </h2>
         <br />
         <p>
           Easily see how many controls passed and failed.
@@ -26,35 +26,35 @@
         <br />
         <hr />
         <br />
-        <h1>
+        <h2>
           Use the treemap to navigate through your controls by NIST family
           classification.
-        </h1>
+        </h2>
         <br />
         <v-img src="../../assets/treemap.png" />
         <br />
         <hr />
         <br />
-        <h1>
+        <h2>
           Use the data table to sort your controls and see more details.
-        </h1>
+        </h2>
         <br />
         <v-img src="../../assets/data_table.png" />
         <br />
         <hr />
         <br />
-        <h1>
+        <h2>
           Click on a control to detect which tests passed or failed, or see its
           details and code.
-        </h1>
+        </h2>
         <br />
         <v-img src="../../assets/control_data.png" />
         <br />
         <hr />
         <br />
-        <h1 class="text-center">
+        <h2>
           View the profile before you execute it on a system.
-        </h1>
+        </h2>
         <br />
         <p>
           The profile must be loaded into Heimdall Lite as a json value.
