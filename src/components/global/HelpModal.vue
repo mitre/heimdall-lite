@@ -5,17 +5,20 @@
     </template>
 
     <v-card>
-      <v-card-title class="headline grey" primary-title>
-        How to use Heimdall Lite {{ version }}
-      </v-card-title>
+      <v-card-title class="headline grey" primary-title
+        >How to use Heimdall Lite {{ version }}</v-card-title
+      >
 
       <v-card-text>
-      <br/>
-     
+        <br />
+
         <h2>
-          View the results of an <a href="htps://www.inspec.io">InSpec</a> profile execution (JSON reporter) or the ressults 
-          from <a href="https://github.com/mitre/heimdall_tools">Heimdall Tools</a> whcih converts many Static and 
-          Dynamic scanning tools Results files to a Heimdall Data Fromat JSON file.
+          View the results of an
+          <a href="htps://www.inspec.io">InSpec</a> profile execution (using
+          InSpec's JSON reporter) or the results from
+          <a href="https://github.com/mitre/heimdall_tools">Heimdall Tools</a>
+          which converts many Static and Dynamic scanning tools Results to a
+          Heimdall Data Format JSON file.
         </h2>
         <br />
         <p>
@@ -37,9 +40,7 @@
         <br />
         <hr />
         <br />
-        <h2>
-          Use the data table to sort your controls and see more details.
-        </h2>
+        <h2>Use the data table to sort your controls and see more details.</h2>
         <br />
         <v-img src="../../assets/data_table.png" />
         <br />
@@ -54,20 +55,14 @@
         <br />
         <hr />
         <br />
-        <h2>
-          View the profile before you execute it on a system.
-        </h2>
+        <h2>View the profile before you execute it on a system.</h2>
         <br />
         <p>
           The profile must be loaded into Heimdall Lite as a json value.
           <br />To create a json of a profile use the following steps:
         </p>
-        <li>
-          Open a terminal to the directory of the profile.
-        </li>
-        <li>
-          Run the command: `inspec json [path to profile] -o [name]`
-        </li>
+        <li>Open a terminal to the directory of the profile.</li>
+        <li>Run the command: `inspec json [path to profile] -o [name]`</li>
       </v-card-text>
 
       <v-divider></v-divider>
