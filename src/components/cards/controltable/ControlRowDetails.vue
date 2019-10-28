@@ -26,10 +26,10 @@
                   medium
                   @click="toggle"
                 >
-                  add_box
+                  mdi-plus-box
                 </v-icon>
                 <v-icon fab v-if="expanded" right medium @click="toggle">
-                  indeterminate_check_box
+                  mdi-minus-box
                 </v-icon>
               </template>
             </v-clamp>
@@ -48,10 +48,10 @@
                   medium
                   @click="toggle"
                 >
-                  add_box
+                  mdi-plus-box
                 </v-icon>
                 <v-icon fab v-if="expanded" right medium @click="toggle">
-                  indeterminate_check_box
+                  mdi-minus-box
                 </v-icon>
               </template>
             </v-clamp>

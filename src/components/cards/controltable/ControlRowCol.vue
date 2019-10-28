@@ -27,10 +27,10 @@
         <template slot="default">{{ result.code_desc.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
-            >add_box</v-icon
+            >mdi-plus-box</v-icon
           >
           <v-icon fab v-if="expanded" right medium @click="toggle"
-            >indeterminate_check_box</v-icon
+            >mdi-minus-box</v-icon
           >
         </template>
       </v-clamp>
@@ -47,10 +47,10 @@
         <template slot="default">{{ result.code_desc.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
-            >add_box</v-icon
+            >mdi-plus-box</v-icon
           >
           <v-icon fab v-if="expanded" right medium @click="toggle"
-            >indeterminate_check_box</v-icon
+            >mdi-minus-box</v-icon
           >
         </template>
       </v-clamp>
@@ -75,10 +75,10 @@
         <template slot="default">{{ result.message.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
-            >add_box</v-icon
+            >mdi-plus-box</v-icon
           >
           <v-icon fab v-if="expanded" right medium @click="toggle"
-            >indeterminate_check_box</v-icon
+            >mdi-minus-box</v-icon
           >
         </template>
       </v-clamp>
