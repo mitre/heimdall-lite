@@ -20,9 +20,8 @@
           >
             <!-- The body -->
             <Cell
-              :selected_node="selected_node"
               :selected_control_id="'NONEFORNOW'"
-              :node="treemap_layout"
+              :node="selected_node"
               :scales="scales"
               :depth="0"
               @select-node="select_node"
@@ -114,25 +113,26 @@ export default class Treemap extends TreemapProps {
         }
 
         // Fetch the next path spec
-        let next_incursion = this._state[depth];
-
-        // Make a control matching the next step we go to
-        let next_control = new NistControl(this._state);
-        console.log(`next incursion: ${next_incursion}`);
+        let next_specifiers = this._state.slice(0, depth + 1);
 
         let new_curr = curr.children.find(child => {
-          if (is_parent(child.data) && child.data.nist_control !== undefined) {
+          if (is_parent(child.data)) {
             let ss_a = child.data.nist_control.sub_specifiers;
-            let ss_b = next_control.sub_specifiers;
             return (
-              compare_arrays(ss_a, ss_b, (a, b) => a.localeCompare(b)) === 0
+              compare_arrays(ss_a, next_specifiers, (a, b) =>
+                a.localeCompare(b)
+              ) === 0
             );
           } else {
             return false; // We cannot go into a leaf (OR CAN WE? MUST DECIDE, AT SOME POINT)
           }
         });
         if (new_curr) {
-          curr = new_curr;
+          if (new_curr.children && new_curr.children.length) {
+            curr = new_curr;
+          } else {
+            throw "empty";
+          }
         } else {
           throw "truncate";
         }
@@ -201,7 +201,6 @@ export default class Treemap extends TreemapProps {
       // Otherwise, dive away. Set course for the leading title
       let cntrl = n.data.nist_control;
       if (cntrl) {
-        console.log(`Setting new state: ${cntrl.sub_specifiers}`);
         this.set_path(cntrl.sub_specifiers);
       }
     }
@@ -211,13 +210,13 @@ export default class Treemap extends TreemapProps {
   up(): void {
     if (this._state.length) {
       // Slice and dice, baybee
-      console.log("Going up");
       this.set_path(this._state.slice(0, this._state.length - 1));
     }
   }
 
   /** Typed method to wrap changes in the depth */
   set_path(path_spec: TreeMapState) {
+    console.log(`Setting new state: ${path_spec}`);
     this.$emit("input", path_spec);
   }
 

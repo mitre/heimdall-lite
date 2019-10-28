@@ -9,7 +9,9 @@ import { control_unique_key } from "./format_util";
 import ColorHackModule from "@/store/color_hack";
 import Chroma from "chroma-js";
 import { NistControl } from "inspecjs/dist/nist";
+import { max } from "d3";
 
+// How deep into nist trees we allow
 const MAX_DEPTH = 2;
 
 /** A simple wrapper type representing what any node's data might be in our treemap */
@@ -18,12 +20,13 @@ interface AbsTreemapNode {
   subtitle?: string;
   hovertext?: string;
   key: string;
-  color: string;
+  color?: string;
   parent: TreemapNodeParent | null; // The parent of this node.
+  nist_control: nist.NistControl; // The nist control which this node is associated with. Not necessarily unique (e.g. leaves)
+  weight?: number; // Treemap weight
 }
 export interface TreemapNodeParent extends AbsTreemapNode {
-  nist_control?: nist.NistControl;
-  children: Array<TreemapNodeParent | TreemapNodeLeaf>;
+  children: TreemapNode[]; // Maps the next sub-specifier to children
 }
 
 export interface TreemapNodeLeaf extends AbsTreemapNode {
@@ -43,25 +46,33 @@ export type TreemapNode = TreemapNodeLeaf | TreemapNodeParent;
 export type D3TreemapNode = d3.HierarchyNode<TreemapNode>;
 
 /**
- * Converts a nist hash to node data.
+ * Converts a list of controls to treemap leaves.
+ * Actually a one-to-many mapping since we must make a unique leaf for each nist control on each control!
  * @param controls The controls to build into a nist node map
  */
 function controls_to_nist_node_data(
-  controls: Readonly<ContextualizedControl[]>,
+  contextualized_controls: Readonly<ContextualizedControl[]>,
   colors: ColorHackModule
 ): TreemapNodeLeaf[] {
-  return controls.map(c => {
-    let color = colors.colorForStatus(hdfWrapControl(c.data).status);
-    let c_data: TreemapNodeLeaf = {
-      title: c.data.id,
-      subtitle: c.data.title || undefined,
-      hovertext: c.data.desc || undefined,
-      key: control_unique_key(c),
-      control: c,
-      color,
-      parent: null
-    };
-    return c_data;
+  return contextualized_controls.flatMap(cc => {
+    // Get the status color
+    let color = colors.colorForStatus(hdfWrapControl(cc.data).status);
+    // Now make leaves for each nist control
+    let hdf = hdfWrapControl(cc.data);
+    return hdf.parsed_nist_tags.map(nc => {
+      let leaf: TreemapNodeLeaf = {
+        title: cc.data.id,
+        subtitle: cc.data.title || undefined,
+        hovertext: cc.data.desc || undefined,
+        key: control_unique_key(cc) + nc.raw_text,
+        control: cc,
+        nist_control: nc,
+        color,
+        parent: null, // We set this later
+        weight: Number.NaN
+      };
+      return leaf;
+    });
   });
 }
 
@@ -73,33 +84,34 @@ function recursive_nist_map(
   parent: TreemapNodeParent | null,
   node: Readonly<nist.NistHierarchyNode>,
   control_lookup: { [key: string]: TreemapNodeParent },
-  colors: ColorHackModule,
   max_depth: number
 ): TreemapNodeParent {
   // Init child list
-  let children: TreemapNodeParent[] = [];
+  let children: TreemapNode[] = [];
 
   // Make our final value
   let ret: TreemapNodeParent = {
     key: node.control.raw_text!,
     title: node.control.raw_text!, // TODO: Make this like, suck less. IE give more descriptive stuff
     nist_control: node.control,
-    color: colors.colorForStatus("Empty"),
     parent,
     children
   };
 
   // Fill our children
   if (node.control.sub_specifiers.length < max_depth) {
-    children.push(
-      ...node.children.map(c =>
-        recursive_nist_map(ret, c, control_lookup, colors, max_depth)
-      )
-    );
+    node.children.forEach(child => {
+      // Get the last subspec.
+      let final_subspec =
+        child.control.sub_specifiers[child.control.sub_specifiers.length - 1];
+
+      // Assign it, recursively computing the rest
+      children.push(recursive_nist_map(ret, child, control_lookup, max_depth));
+    });
   }
 
   // Save to lookup
-  control_lookup[lookup_key_for(node.control)] = ret;
+  control_lookup[lookup_key_for(node.control, max_depth)] = ret;
   return ret;
 }
 
@@ -114,7 +126,10 @@ function colorize_tree_map(root: TreemapNodeParent) {
 
   // Now all children should have valid colors
   // We decide this node's color as a composite of all underlying node colors
-  let child_colors = root.children.map(c => c.color);
+  let child_colors = root.children
+    .map(c => c.color)
+    .filter(c => c !== undefined) as string[];
+  // If we have any, then set our color
   if (child_colors.length) {
     // Set the color
     let avg_color = Chroma.average(child_colors);
@@ -122,8 +137,27 @@ function colorize_tree_map(root: TreemapNodeParent) {
   }
 }
 
+/** Computes weights for treemap. Used later in d3 sum() */
+function weight_tree_map(root: TreemapNode) {
+  if (is_parent(root)) {
+    if (root.children.length === 0) {
+      root.weight = 1;
+    } else {
+      // Children will make up the weight
+      root.weight = 0;
+      root.children.forEach(weight_tree_map);
+    }
+  } else {
+    if (root.parent) {
+      root.weight = 1.0 / root.parent.children.length;
+    } else {
+      console.log(root);
+    }
+  }
+}
+
 /** Generates a lookup key for the given control */
-function lookup_key_for(x: NistControl, max_depth?: number): string {
+function lookup_key_for(x: NistControl, max_depth: number): string {
   if (max_depth) {
     return x.sub_specifiers.slice(0, max_depth).join("-");
   } else {
@@ -134,23 +168,22 @@ function lookup_key_for(x: NistControl, max_depth?: number): string {
 /** Populates a treemap using the given lookup table */
 function populate_tree_map(
   lookup: { [key: string]: TreemapNodeParent },
-  leaves: TreemapNodeLeaf[]
+  leaves: TreemapNodeLeaf[],
+  max_depth: number
 ) {
   // Populate it
   leaves.forEach(leaf => {
-    let nist_controls = hdfWrapControl(leaf.control.data).parsed_nist_tags;
-    nist_controls.forEach(control => {
-      let parent = lookup[lookup_key_for(control)];
-      if (parent) {
-        // We found a node that will accept it
-        // We can do this as because we know we constructed these to only have empty children
-        parent.children.push(leaf);
-      } else {
-        console.warn(
-          `Warning: unable to assign control ${control.raw_text} to valid treemap leaf`
-        );
-      }
-    });
+    let parent = lookup[lookup_key_for(leaf.nist_control, max_depth)];
+    if (parent) {
+      // We found a node that will accept it (matches its control)
+      // We can do this as because we know we constructed these to only have empty children
+      parent.children.push(leaf);
+      leaf.parent = parent;
+    } else {
+      console.warn(
+        `Warning: unable to assign control ${leaf.nist_control.raw_text} to valid treemap leaf`
+      );
+    }
   });
 }
 
@@ -170,20 +203,25 @@ function build_populated_nist_map(
     title: "NIST-853 Controls",
     children: root_children,
     color: "TMP", // Doesn't really matter. We never actually see this
-    parent: null
+    parent: null,
+    nist_control: new NistControl([], "NIST-853")
   };
 
   // Fill out children, recursively
-  nist.FULL_NIST_HIERARCHY.map(n => {
-    let child = recursive_nist_map(root, n, lookup, colors, MAX_DEPTH);
+  nist.FULL_NIST_HIERARCHY.forEach(n => {
+    let child = recursive_nist_map(root, n, lookup, MAX_DEPTH);
+    let tag = child.nist_control.sub_specifiers[0];
     root_children.push(child);
   });
 
   // Populate them with leaves
-  populate_tree_map(lookup, data);
+  populate_tree_map(lookup, data, MAX_DEPTH);
 
   // Colorize it
   colorize_tree_map(root);
+
+  // Weight it
+  weight_tree_map(root);
 
   // Done
   return root;
@@ -206,21 +244,19 @@ function node_data_to_tree_map(
       }
     })
     .sort((a, b) => a.data.title.localeCompare(b.data.title))
-    .sum(n => {
-      // This value splits the value of this node amidst its siblings
-      let split_weight = 1;
-      if (n.parent) {
-        split_weight = 1 / n.parent.children.length;
-      }
-
-      if (is_parent(n)) {
-        // Give a minimum weight if has children. Otherwise, give split_weight
-        return n.children.length ? 0 : split_weight;
+    .sum(root => {
+      if (is_parent(root)) {
+        if (root.children.length === 0) {
+          return 1;
+        } else {
+          // Children will make up the weight
+          return 0;
+        }
       } else {
-        // Evenly split weight between siblings
-        return split_weight;
+        return 1.0 / root.parent!.children.length;
       }
     });
+  console.log(ret.value);
   return ret;
 }
 

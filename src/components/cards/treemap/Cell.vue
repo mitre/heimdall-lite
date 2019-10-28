@@ -6,7 +6,6 @@
       <Cell
         v-for="child in node.children"
         :key="child.data.key"
-        :selected_node="selected_node"
         :selected_control_id="selected_control_id"
         :depth="depth + 1"
         :node="child"
@@ -62,10 +61,6 @@ export interface XYScale {
 // We declare the props separately to make props types inferable.
 const CellProps = Vue.extend({
   props: {
-    selected_node: {
-      type: Object, // Of type d3.HierarchyRectangularNode<TreemapDatumType>,
-      required: true
-    },
     selected_control_id: {
       type: String, // Of type string
       required: false
@@ -110,22 +105,12 @@ export default class Cell extends CellProps {
   }
 
   /**
-   * Typed getter for the selected node, which defines which node we are "zoomed into".
-   * Note that the selected control will NEVER be the selected node, since we do not zoom into that level.
-   * Use selected_node_id for that purpose!
-   */
-  get _selected_node(): d3.HierarchyRectangularNode<TreemapNode> {
-    return this.selected_node;
-  }
-
-  /**
    * Typed getter for depth that also automatically substitutes "undefined" for 0 where appropriate
    * To be clear, "appropriate" is when this is the selected node, using Object.is
    */
   get _depth(): number {
-    console.log(`I Have depth ${this.depth}`);
     if (this.depth === 0) {
-      console.log(`I Have depth 0 and node ${this._node.data.title}`);
+      console.log(this.node.data);
     }
     return this.depth;
   }
@@ -249,6 +234,7 @@ text {
   font-size: large;
 }
 
+/* Basic settings for our chart. Things invis, unclickable by default */
 rect {
   stroke: #000000;
   fill-opacity: 0;
@@ -256,33 +242,23 @@ rect {
   pointer-events: none;
 }
 
+/* We want top to be clickable. */
 rect.top {
   pointer-events: auto;
 }
 
-rect.control {
+/* We want nested cells, or leaves that are on top, to be color-filled */
+rect.nested,
+rect.leaf rect.top {
   fill-opacity: 1;
   stroke-width: 0;
-}
-
-rect.control.top {
-  stroke-width: 1;
-}
-
-rect.empty {
-  fill-opacity: 0.1;
-  fill: black;
-}
-rect.hover,
-rect.category:hover {
-  fill: #222;
 }
 
 rect.top:hover {
   fill-opacity: 0.1;
 }
 
-rect.family {
+rect.root {
   stroke-width: 3;
 }
 </style>
