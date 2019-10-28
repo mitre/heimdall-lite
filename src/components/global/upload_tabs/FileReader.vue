@@ -78,13 +78,12 @@ export default class FileReader extends Props {
       });
     });
 
-    // When they're all done (succeed or fail), submit successes
-    let when_done = (_: any) => {
-      console.log("Done!");
-      console.log(valid_ids);
-      this.$emit("got-files", valid_ids);
-    };
-    Promise.all(upload_promises).then(when_done, when_done);
+    // When they're all done, emit event.
+    // To use promise.all we must make each promise explicitly allow rejection without breaking promise.all failfast
+    let guaranteed_promises = upload_promises.map(p => p.catch(err => err));
+    Promise.all(guaranteed_promises).then(_ =>
+      this.$emit("got-files", valid_ids)
+    );
   }
 
   get title_class(): string[] {
