@@ -24,9 +24,7 @@
         :max-lines="2"
         :expanded.sync="expanded"
       >
-        <template slot="default">
-          {{ result.code_desc.replace(/^\t+|^\s+|\t+$|\s+$/g, "") }}
-        </template>
+        <template slot="default">{{ result.code_desc.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
             >add_box</v-icon
@@ -37,19 +35,16 @@
         </template>
       </v-clamp>
     </v-col>
-    <v-col v-else lg="6" xl="6" sm="6" md="6" xs="6" class="left">
+    <v-col v-else lg="6" xl="6" sm="6" md="6" cols="12" class="left">
       <h3 class="pa-2">Test</h3>
       <v-divider></v-divider>
       <v-clamp
-        class="pa-2 mono text-justify"
+        class="pa-2 mono preserve-whitespace text-justify"
         autoresize
         :max-lines="2"
         :expanded.sync="expanded"
       >
-        <template slot="default">
-          {{ result.code_desc.replace(/^\t+|^\s+|\t+$|\s+$/g, "") }}
-          console.log(result.code_desc.replace(/^\t+|^\s+|\t+$|\s+$/g, ''));
-        </template>
+        <template slot="default">{{ result.code_desc.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
             >add_box</v-icon
@@ -62,7 +57,7 @@
     </v-col>
     <v-col
       v-if="result.message"
-      cols="6"
+      cols="12"
       sm="6"
       md="6"
       lg="5"
@@ -72,14 +67,12 @@
       <h3 class="pa-2">Result</h3>
       <v-divider></v-divider>
       <v-clamp
-        class="pa-2 mono text-justify"
+        class="pa-2 mono preserve-whitespace text-justify"
         autoresize
         :max-lines="2"
         :expanded.sync="expanded"
       >
-        <template slot="default">
-          {{ result.message.replace(/^\t+|^\s+|\t+$|\s+$/g, "") }}
-        </template>
+        <template slot="default">{{ result.message.trim() }}</template>
         <template slot="after" slot-scope="{ toggle, expanded, clamped }">
           <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
             >add_box</v-icon
@@ -137,16 +130,19 @@ export default class ControlRowCol extends ControlRowColProps {
 
 <style lang="scss" scoped>
 .mono {
-  white-space: pre-wrap; /* Since CSS 2.1 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono,
     DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
   text-align: left;
   text-justify: inter-word;
 }
+.preserve-whitespace {
+  white-space: pre-wrap; /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+}
+
 .right {
   margin-left: -1px;
 }

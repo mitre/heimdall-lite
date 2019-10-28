@@ -16,7 +16,7 @@
           </v-tab>
 
           <v-tab-item value="tab-test">
-            <v-clamp autoresize :max-lines="2">
+            <v-clamp class="pa-1" autoresize :max-lines="2">
               <template slot="default">{{ header }}</template>
               <template slot="after" slot-scope="{ toggle, expanded, clamped }">
                 <v-icon
@@ -36,7 +36,7 @@
             <v-spacer></v-spacer>
             <v-divider></v-divider>
             <br />
-            <v-clamp autoresize :max-lines="2">
+            <v-clamp class="pb-2" autoresize :max-lines="2">
               <template slot="default">{{
                 control.wraps.desc.trim()
               }}</template>
