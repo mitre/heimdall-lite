@@ -139,7 +139,6 @@ export default class Treemap extends TreemapProps {
       }
     } catch (some_traversal_error) {
       // Slice to last successful depth. Slice is non inclusive so this works
-      console.log(`Traversal error ${some_traversal_error} - rebounding`);
       this.set_path(this._state.slice(0, depth));
     }
 
@@ -176,12 +175,10 @@ export default class Treemap extends TreemapProps {
     let controls = data.controls(this.filter);
 
     // Build the map
-    console.log("building");
     let hierarchy = build_nist_tree_map(
       controls,
       getModule(ColorHackModule, this.$store)
     );
-    console.log("built");
     let treemap = d3
       .treemap<TreemapNode>()
       .size([this.width, this.height])
@@ -216,7 +213,6 @@ export default class Treemap extends TreemapProps {
 
   /** Typed method to wrap changes in the depth */
   set_path(path_spec: TreeMapState) {
-    console.log(`Setting new state: ${path_spec}`);
     this.$emit("input", path_spec);
   }
 

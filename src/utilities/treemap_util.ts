@@ -20,10 +20,9 @@ interface AbsTreemapNode {
   subtitle?: string;
   hovertext?: string;
   key: string;
-  color?: string;
+  color?: Chroma.Color;
   parent: TreemapNodeParent | null; // The parent of this node.
   nist_control: nist.NistControl; // The nist control which this node is associated with. Not necessarily unique (e.g. leaves)
-  weight?: number; // Treemap weight
 }
 export interface TreemapNodeParent extends AbsTreemapNode {
   children: TreemapNode[]; // Maps the next sub-specifier to children
@@ -56,7 +55,9 @@ function controls_to_nist_node_data(
 ): TreemapNodeLeaf[] {
   return contextualized_controls.flatMap(cc => {
     // Get the status color
-    let color = colors.colorForStatus(hdfWrapControl(cc.data).status);
+    let color = Chroma.hex(
+      colors.colorForStatus(hdfWrapControl(cc.data).status)
+    );
     // Now make leaves for each nist control
     let hdf = hdfWrapControl(cc.data);
     return hdf.parsed_nist_tags.map(nc => {
@@ -68,8 +69,7 @@ function controls_to_nist_node_data(
         control: cc,
         nist_control: nc,
         color,
-        parent: null, // We set this later
-        weight: Number.NaN
+        parent: null // We set this later
       };
       return leaf;
     });
@@ -128,31 +128,12 @@ function colorize_tree_map(root: TreemapNodeParent) {
   // We decide this node's color as a composite of all underlying node colors
   let child_colors = root.children
     .map(c => c.color)
-    .filter(c => c !== undefined) as string[];
+    .filter(c => c !== undefined) as Chroma.Color[];
   // If we have any, then set our color
   if (child_colors.length) {
     // Set the color
     let avg_color = Chroma.average(child_colors);
-    root.color = avg_color.hex();
-  }
-}
-
-/** Computes weights for treemap. Used later in d3 sum() */
-function weight_tree_map(root: TreemapNode) {
-  if (is_parent(root)) {
-    if (root.children.length === 0) {
-      root.weight = 1;
-    } else {
-      // Children will make up the weight
-      root.weight = 0;
-      root.children.forEach(weight_tree_map);
-    }
-  } else {
-    if (root.parent) {
-      root.weight = 1.0 / root.parent.children.length;
-    } else {
-      console.log(root);
-    }
+    root.color = avg_color;
   }
 }
 
@@ -202,7 +183,6 @@ function build_populated_nist_map(
     key: "tree_root",
     title: "NIST-853 Controls",
     children: root_children,
-    color: "TMP", // Doesn't really matter. We never actually see this
     parent: null,
     nist_control: new NistControl([], "NIST-853")
   };
@@ -219,9 +199,6 @@ function build_populated_nist_map(
 
   // Colorize it
   colorize_tree_map(root);
-
-  // Weight it
-  weight_tree_map(root);
 
   // Done
   return root;
@@ -256,7 +233,6 @@ function node_data_to_tree_map(
         return 1.0 / root.parent!.children.length;
       }
     });
-  console.log(ret.value);
   return ret;
 }
 

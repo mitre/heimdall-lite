@@ -2,7 +2,7 @@
   <!-- We can use Vue transitions too! -->
   <g>
     <!-- Generate our children here. Only do so for parents, and if they aren't too deep -->
-    <g v-if="is_parent && depth <= 1">
+    <g v-if="is_parent">
       <Cell
         v-for="child in node.children"
         :key="child.data.key"
@@ -16,7 +16,7 @@
 
     <!-- The actual body of this square. Visible only if depth === 1 (ie a direct child of parent) or depth === 2 (one level deeper) -->
     <rect
-      v-if="depth === 1 || depth === 2"
+      v-if="depth >= 1"
       :style="cell_style"
       :x="x"
       :y="y"
@@ -92,11 +92,6 @@ const CellProps = Vue.extend({
 export default class Cell extends CellProps {
   scale: number = 1.0;
 
-  pass<T>(x: T): T {
-    console.log(x);
-    return x;
-  }
-
   /**
    * Typed getter for this Cell's node, IE the rectangle that it is in charge of drawing.
    */
@@ -109,9 +104,6 @@ export default class Cell extends CellProps {
    * To be clear, "appropriate" is when this is the selected node, using Object.is
    */
   get _depth(): number {
-    if (this.depth === 0) {
-      console.log(this.node.data);
-    }
     return this.depth;
   }
 
@@ -205,8 +197,10 @@ export default class Cell extends CellProps {
   }
 
   get cell_style(): string {
-    let style = `fill: ${this._node.data.color};`;
-    return style;
+    if (this._node.data.color) {
+      return `fill: ${this._node.data.color.css()};`;
+    }
+    return "fill-opacity: 0";
   }
 
   /**
@@ -234,31 +228,31 @@ text {
   font-size: large;
 }
 
-/* Basic settings for our chart. Things invis, unclickable by default */
+/* Basic settings for our chart. Things unclickable by default */
 rect {
   stroke: #000000;
-  fill-opacity: 0;
-  stroke-width: 1;
   pointer-events: none;
+  fill-opacity: 0;
 }
 
 /* We want top to be clickable. */
 rect.top {
   pointer-events: auto;
-}
-
-/* We want nested cells, or leaves that are on top, to be color-filled */
-rect.nested,
-rect.leaf rect.top {
-  fill-opacity: 1;
-  stroke-width: 0;
-}
-
-rect.top:hover {
-  fill-opacity: 0.1;
-}
-
-rect.root {
   stroke-width: 3;
+}
+
+/* We want leaves */
+rect.leaf {
+  fill-opacity: 1;
+}
+
+/* Otherwise, don't want nested to draw strokes */
+rect.nested {
+  stroke-width: 1;
+}
+
+/* Make tops transparent but also more thickly drawn when hovered */
+rect.top:hover {
+  stroke-width: 5;
 }
 </style>
