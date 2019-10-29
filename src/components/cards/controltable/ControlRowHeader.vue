@@ -37,11 +37,11 @@
     <template #tags>
       <v-chip-group column active-class="NONE">
         <v-chip
-          v-for="tag in control.parsed_nist_tags"
-          :key="tag.raw_text"
+          v-for="(tag, i) in control.raw_nist_tags"
+          :key="i"
           active-class="NONE"
         >
-          {{ tag.raw_text }}
+          {{ tag }}
         </v-chip>
       </v-chip-group>
     </template>
@@ -74,21 +74,30 @@ const ControlRowHeaderProps = Vue.extend({
   }
 })
 export default class ControlRowHeader extends ControlRowHeaderProps {
+  /** Typed getter for control */
+  get _control(): HDFControl {
+    return this.control;
+  }
+
   get truncated_title(): string {
-    if (this.control.wraps.title.length > 80) {
-      return this.control.wraps.title.substr(0, 80) + "...";
+    if (this._control.wraps.id === "V-73165") {
+      console.log(this._control);
+    }
+
+    if (this._control.wraps.title && this._control.wraps.title.length > 80) {
+      return this._control.wraps.title.substr(0, 80) + "...";
     } else {
-      return this.control.wraps.title;
+      return this._control.wraps.title || "Untitled";
     }
   }
 
   get status_color(): string {
     // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
-    return `status${this.control.status.replace(" ", "")}`;
+    return `status${this._control.status.replace(" ", "")}`;
   }
 
   get severity_arrow_count(): number {
-    switch (this.control.severity) {
+    switch (this._control.severity) {
       default:
       case "none":
         return 0;

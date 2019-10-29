@@ -52,7 +52,6 @@ import Cell, { XYScale } from "@/components/cards/treemap/Cell.vue";
 //@ts-ignore
 import resize from "vue-resize-directive";
 import ColorHackModule from "../../../store/color_hack";
-import { NistControl } from "inspecjs/dist/nist";
 import { compare_arrays } from "@/utilities/helper_util";
 
 // We declare the props separately to make props types inferable.
@@ -192,8 +191,8 @@ export default class Treemap extends TreemapProps {
     // If it is a leaf, then select it
     let new_state = [...this._state];
     if (is_leaf(n.data)) {
-      return;
-      //let id = n.data.control.data.id;
+      let id = n.data.control.data.id;
+      console.log(`Selected id ${id}. We need to handle this somehow`);
     } else {
       // Otherwise, dive away. Set course for the leading title
       let cntrl = n.data.nist_control;

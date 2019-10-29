@@ -8,7 +8,6 @@ import { ContextualizedControl } from "@/store/data_store";
 import { control_unique_key } from "./format_util";
 import ColorHackModule from "@/store/color_hack";
 import Chroma from "chroma-js";
-import { NistControl } from "inspecjs/dist/nist";
 import { max } from "d3";
 
 // How deep into nist trees we allow
@@ -138,7 +137,7 @@ function colorize_tree_map(root: TreemapNodeParent) {
 }
 
 /** Generates a lookup key for the given control */
-function lookup_key_for(x: NistControl, max_depth: number): string {
+function lookup_key_for(x: nist.NistControl, max_depth: number): string {
   if (max_depth) {
     return x.sub_specifiers.slice(0, max_depth).join("-");
   } else {
@@ -184,7 +183,7 @@ function build_populated_nist_map(
     title: "NIST-853 Controls",
     children: root_children,
     parent: null,
-    nist_control: new NistControl([], "NIST-853")
+    nist_control: new nist.NistControl([], "NIST-853")
   };
 
   // Fill out children, recursively

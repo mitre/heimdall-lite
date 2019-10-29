@@ -57,13 +57,14 @@ export default class ExportCaat extends Props {
     // Figure out the nist tags to make a family
     let root_control = control.parsed_nist_tags[0];
     let family = root_control.family || "UM";
-    let nist_control = root_control.sub_specifiers[1] || "01";
-    nist_control = ("00" + nist_control).slice(-2); // Pad to be 2 digits, always
-    nist_control = family + "-" + nist_control;
-    // If there's a second sub-spec, add it too
-    if (root_control.sub_specifiers[2]) {
-      let sub_spec = "00" + root_control.sub_specifiers[2];
-      nist_control += `(${sub_spec.slice(-2)})`;
+    let pad = (x: string) => ("00" + x).slice(-2); // Pads a string to two digits
+    let nist_control_number = pad(root_control.sub_specifiers[1] || "01");
+    let nist_control: string;
+    if (!Number.isNaN(Number.parseInt(root_control.sub_specifiers[2] || ""))) {
+      let sub_number = pad(root_control.sub_specifiers[2]);
+      nist_control = `${family}-${nist_control_number}(${sub_number})`;
+    } else {
+      nist_control = `${family}-${nist_control_number}`;
     }
 
     let gid = control.wraps.tags.gid;
@@ -78,7 +79,7 @@ export default class ExportCaat extends Props {
       vuln_list.push(control.wraps.tags.gid);
 
       // Designate a helper to deal with null/undefined
-      let fix = (x: string | null | undefined) => x || "";
+      let fix = (x: string | null | undefined) => (x || "").replace("\n", " ");
 
       // Build up the row
       row.push(nist_control); // Control Number

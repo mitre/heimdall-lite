@@ -251,6 +251,10 @@ rect.nested {
   stroke-width: 1;
 }
 
+rect.nested.leaf {
+  stroke-width: 0;
+}
+
 /* Make tops transparent but also more thickly drawn when hovered */
 rect.top:hover {
   stroke-width: 5;
