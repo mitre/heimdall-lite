@@ -72,7 +72,7 @@
                 <v-row :key="index" :class="zebra(index)">
                   <v-col cols="12" :class="detail.class">
                     <h3>{{ detail.name }}:</h3>
-                    <pre>{{ detail.value }}</pre>
+                    <h4 class="mono preserve-whitespace">{{ detail.value }}</h4>
                   </v-col>
                   <v-divider> </v-divider>
                 </v-row>

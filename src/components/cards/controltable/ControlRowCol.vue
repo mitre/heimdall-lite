@@ -129,20 +129,6 @@ export default class ControlRowCol extends ControlRowColProps {
 </script>
 
 <style lang="scss" scoped>
-.mono {
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-  font-family: Consolas, Monaco, Lucida Console, Liberation Mono,
-    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-  text-align: left;
-  text-justify: inter-word;
-}
-.preserve-whitespace {
-  white-space: pre-wrap; /* Since CSS 2.1 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-}
-
 .right {
   margin-left: -1px;
 }
