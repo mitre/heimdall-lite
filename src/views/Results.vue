@@ -17,7 +17,7 @@
           Upload
         </span>
         <v-icon>
-          cloud_upload
+          mdi-cloud-upload
         </v-icon>
       </v-btn>
       <v-btn
