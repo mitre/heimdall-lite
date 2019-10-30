@@ -4,6 +4,11 @@
     @input="$emit('input', $event)"
     :clipped="$vuetify.breakpoint.lgAndUp"
     app
+    style="margin-top: 56px;"
+    disable-resize-watcher
+    fixed
+    temporary
+    width="375px"
   >
     <v-list dense class="px-2" subheader>
       <v-subheader>Files</v-subheader>
