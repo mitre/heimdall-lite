@@ -85,10 +85,6 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   }
 
   get truncated_title(): string {
-    if (this._control.wraps.id === "V-73165") {
-      console.log(this._control);
-    }
-
     if (this._control.wraps.title && this._control.wraps.title.length > 80) {
       return this._control.wraps.title.substr(0, 80) + "...";
     } else {

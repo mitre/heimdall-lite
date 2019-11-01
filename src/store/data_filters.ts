@@ -49,6 +49,9 @@ export interface Filter {
 
   /** The current state of the Nist Treemap. Used to further filter by nist categories etc. */
   tree_filters?: TreeMapState;
+
+  /** A specific control id */
+  control_id?: string;
 }
 
 export type TreeMapState = string[]; // Representing the current path spec, from root
@@ -164,6 +167,11 @@ class FilteredDataModule extends VuexModule {
       } else {
         // No file filter => we don't care about profile. Jump directly to the full control list
         controls = this.dataStore.contextualControls;
+      }
+
+      // Filter by control id
+      if (filter.control_id !== undefined) {
+        controls = controls.filter(c => c.data.id === filter.control_id);
       }
 
       // Filter by status, if necessary

@@ -101,6 +101,7 @@
                 <Treemap
                   :filter="treemap_full_filter"
                   v-model="tree_filters"
+                  v-bind:selected_control.sync="control_selection"
                   @clear="clear"
                 />
               </v-card-text>
@@ -185,6 +186,7 @@ export default class Results extends ResultsProps {
    * Once can reliably expect that if a "deep" selection is not null, then its parent should also be not-null.
    */
   tree_filters: TreeMapState = [];
+  control_selection: string | null = null;
 
   /**
    * The current search term, as modeled by the search bar
@@ -223,7 +225,8 @@ export default class Results extends ResultsProps {
       fromFile: this.file_filter || undefined,
       tree_filters: this.tree_filters,
       search_term: this.search_term,
-      omit_overlayed_controls: true
+      omit_overlayed_controls: true,
+      control_id: this.control_selection || undefined
     };
   }
 

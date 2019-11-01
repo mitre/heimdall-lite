@@ -20,7 +20,7 @@
           >
             <!-- The body -->
             <Cell
-              :selected_control_id="'NONEFORNOW'"
+              :selected_control_id="selected_control"
               :node="selected_node"
               :scales="scales"
               :depth="0"
@@ -66,11 +66,11 @@ const TreemapProps = Vue.extend({
       type: Array, // Of type TreeMapState, representing current descent path
       required: true
     },
+    */
     selected_control: {
-      type: string, // Represents control id
+      // Represents control id
       required: false
     },
-    */
     filter: {
       type: Object, // Of type Filter
       required: true
@@ -192,7 +192,11 @@ export default class Treemap extends TreemapProps {
     let new_state = [...this._state];
     if (is_leaf(n.data)) {
       let id = n.data.control.data.id;
-      console.log(`Selected id ${id}. We need to handle this somehow`);
+      if (id !== this.selected_control) {
+        this.$emit("update:selected_control", id);
+      } else {
+        this.$emit("update:selected_control", null);
+      }
     } else {
       // Otherwise, dive away. Set course for the leading title
       let cntrl = n.data.nist_control;
@@ -207,6 +211,9 @@ export default class Treemap extends TreemapProps {
     if (this._state.length) {
       // Slice and dice, baybee
       this.set_path(this._state.slice(0, this._state.length - 1));
+
+      // Also clear selected
+      this.$emit("update:selected_control", null);
     }
   }
 
