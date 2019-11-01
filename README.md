@@ -1,6 +1,15 @@
+# heimdall-vuetify
+![](https://github.com/mitre/heimdall-vuetify/workflows/heimdall-vuetify/badge.svg)
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/2b914cc2-27b8-4469-86bb-32bfad03aaa1/deploy-status)](https://app.netlify.com/sites/heimdall-vuetify/deploys)
 
-# heimdall-vuetify
+Heimdall-Vuetify is an InSpec results viewer based on Vuetify.js. It is hosted on the following platforms.
+
+##### Netlify
+https://heimdall-vuetify.netlify.com/
+
+##### GitHub Pages
+https://mitre.github.io/heimdall-vuetify/#/
 
 ## Project setup
 ```
@@ -31,6 +40,20 @@ npm run lint
 ```
 npm run test:unit
 ```
+
+## Versioning and State of Development
+
+This project uses the [Semantic Versioning Policy](https://semver.org/)
+
+# Contributing, Issues and Support
+
+## Contributing
+
+Please feel free to look through our issues, make a fork and submit _PRs_ and improvements. We love hearing from our end-users and the community and will be happy to engage with you on suggestions, updates, fixes or new capabilities.
+
+## Issues and Support
+
+Please feel free to contact us by **opening an issue** on the issue board, or, at [inspec@mitre.org](mailto:inspec@mitre.org) should you have any suggestions, questions or issues. If you have more general questions about the use of our software or other concerns, please contact us at [opensource@mitre.org](mailto:opensource@mitre.org).
 
 ### NOTICE
 
