@@ -249,6 +249,7 @@ export default class Results extends ResultsProps {
   clear() {
     this.severity_filter = null;
     this.status_filter = null;
+    this.control_selection = null;
     this.search_term = "";
     this.tree_filters = [];
   }

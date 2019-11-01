@@ -238,7 +238,7 @@ rect {
 /* We want top to be clickable. */
 rect.top {
   pointer-events: auto;
-  stroke-width: 3;
+  stroke-width: 2;
 }
 
 /* We want leaves */
@@ -257,6 +257,6 @@ rect.nested.leaf {
 
 /* Make tops transparent but also more thickly drawn when hovered */
 rect.top:hover {
-  stroke-width: 5;
+  stroke-width: 3;
 }
 </style>
