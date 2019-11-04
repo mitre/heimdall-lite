@@ -205,16 +205,17 @@ class InspecDataModule extends VuexModule {
 
       // Next step: Extract controls and connect them
       // Extract.
+      let all_file_controls: ContextualizedControl[] = [];
       exec_file_context.contains.forEach(p => {
         let p_controls = p.data.controls as schemas_1_0.ExecJSON.Control[];
         p.contains = p_controls.map(c => {
           return new ContextualizedControlImp(c, p, [], []);
         });
-        controls.push(...p.contains);
+        all_file_controls.push(...p.contains);
       });
 
       // Link.
-      controls.forEach(cc => {
+      all_file_controls.forEach(cc => {
         // First, we scan for a matching control id in the parent profile
         let extended_profile: ContextualizedProfile | undefined =
           cc.sourced_from.extends_from[0]; // Only ever going to have 1 element, max
@@ -235,23 +236,19 @@ class InspecDataModule extends VuexModule {
         // and we aren't the "base" control that gets filled with results, we go hunting for said base control
         // Unfortunately, if theres more than 2 profiles there's ultimately no way to figure out which one was applied "last".
         // This method leaves them as siblings. However, as a fallback method that is perhaps the best we can hope for
-        let same_id = controls.filter(c => c.data.id === cc.data.id);
-        let same_id_populated = same_id.find(
-          c => c.hdf.segments && c.hdf.segments.length
+        if (cc.hdf.segments && cc.hdf.segments.length) {
+          // Note: this is necessary so we don't accidentally say the base extends itself
+          return;
+        }
+        let base = all_file_controls.find(
+          c =>
+            c.data.id === cc.data.id && c.hdf.segments && c.hdf.segments.length
         );
 
-        // If found a populated base, use that. If not, we substitute in the first found element in same_id
-        if (!same_id_populated) {
-          same_id_populated = same_id[0];
-        }
-
-        // If the object we end up with is "us", then just ignore
-        if (Object.is(cc, same_id_populated)) {
-          return;
-        } else {
-          // Otherwise, bind
-          same_id_populated.extended_by.push(cc);
-          cc.extends_from.push(same_id_populated);
+        // If found, setup
+        if (base) {
+          base.extended_by.push(cc);
+          cc.extends_from.push(base);
         }
       });
     });
@@ -286,6 +283,7 @@ class InspecDataModule extends VuexModule {
     });
 
     // Freeze them all (could we? should we? what does it matter? it shouldn't)
+
     return [executions, profiles, controls];
   }
 
