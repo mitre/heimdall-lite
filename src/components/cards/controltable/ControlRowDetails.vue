@@ -168,7 +168,7 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
 
   /** Shown above the description */
   get header(): string {
-    let msg_split = this._control.hdf.finding_details.split(":");
+    let msg_split = this._control.root.hdf.finding_details.split(":");
     if (msg_split.length === 1) {
       return msg_split[0] + ".";
     } else {
