@@ -56,6 +56,7 @@ describe("Parsing", () => {
       let counts: any = JSON.parse(count_file_content);
 
       // Get the expected counts
+      console.log(file.filename);
       let expected: StatusHash = {
         Failed: counts.failed.total,
         Passed: counts.passed.total,
