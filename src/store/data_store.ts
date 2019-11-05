@@ -193,8 +193,8 @@ class InspecDataModule extends VuexModule {
 
           // Link it up
           if (parent) {
-            parent.extended_by.push(exec_files_profile);
-            exec_files_profile.extends_from.push(parent);
+            parent.extends_from.push(exec_files_profile);
+            exec_files_profile.extended_by.push(parent);
           } else {
             console.warn(
               `Warning: Unable to find parent profile for profile ${as_exec.name} in spite of its attribute parent_profile: ${as_exec.parent_profile}. Verify data is properly structured`
@@ -217,12 +217,21 @@ class InspecDataModule extends VuexModule {
 
       // Link.
       this_files_controls.forEach(cc => {
-        // First, we scan for a matching control id in the parent profile
-        let extended_profile: ContextualizedProfile | undefined =
-          cc.sourced_from.extends_from[0]; // Only ever going to have 1 element, max
-        if (extended_profile) {
-          // Ok so our current controls containing profile is extending another profile.
-          // This means we can extend the control the "normal" way: hunt for its ancestor in the extended profile
+        // Behaviour changes based on if we have well-formed or malformed profile dependency
+        if (
+          cc.sourced_from.extends_from.length ||
+          cc.sourced_from.extended_by.length
+        ) {
+          // Our profile knows its relatives! We only need to check extends-from in this case
+          // If we aren't extended from something we just drop. Our children will make connections for us
+          if (cc.sourced_from.extends_from.length === 0) {
+            return;
+          }
+
+          // Get the profile that this control's owning profile is extending
+          let extended_profile = cc.sourced_from.extends_from[0]; // Only ever going to have 1 element, max
+
+          // Hunt for its ancestor in the extended profile
           let ancestor = extended_profile.contains.find(
             c => c.data.id === cc.data.id
           );
@@ -231,29 +240,33 @@ class InspecDataModule extends VuexModule {
             cc.extends_from.push(ancestor);
             return;
           }
-        }
-
-        // If the above condition fails or we don't find our ancestor as expected,
-        // and we aren't the "base" control that gets filled with results, we go hunting for said base control
-        // Unfortunately, if theres more than 2 profiles there's ultimately no way to figure out which one was applied "last".
-        // This method leaves them as siblings. However, as a fallback method that is perhaps the best we can hope for
-        let same_id = this_files_controls.filter(c => c.data.id === cc.data.id);
-        let same_id_populated = same_id.find(
-          c => c.hdf.segments && c.hdf.segments.length
-        );
-
-        // If found a populated base, use that. If not, we substitute in the first found element in same_id
-        if (!same_id_populated) {
-          same_id_populated = same_id[0];
-        }
-
-        // If the object we end up with is "us", then just ignore
-        if (Object.is(cc, same_id_populated)) {
-          return;
+          // If it's not found, then we just assume it does not exist!
         } else {
-          // Otherwise, bind
-          same_id_populated.extended_by.push(cc);
-          cc.extends_from.push(same_id_populated);
+          // If we don't have a normal profile dependency layout, then we have to hunt ye-olde-fashioned-way
+          // Unfortunately, if theres more than 2 profiles there's ultimately no way to figure out which one was applied "last".
+          // This method leaves them as siblings. However, as a fallback method that is perhaps the best we can hope for
+          // First, hunt out all controls from this file that have the same id as cc
+          let same_id = this_files_controls.filter(
+            c => c.data.id === cc.data.id
+          );
+          // Find which of them, if any, is populated with results.
+          let same_id_populated = same_id.find(
+            c => c.hdf.segments && c.hdf.segments.length
+          );
+
+          // If found a populated base, use that. If not, we substitute in the first found element in same_id. This is arbitrary.
+          if (!same_id_populated) {
+            same_id_populated = same_id[0];
+          }
+
+          // If the object we end up with is "us", then just ignore
+          if (Object.is(cc, same_id_populated)) {
+            return;
+          } else {
+            // Otherwise, bind
+            same_id_populated.extended_by.push(cc);
+            cc.extends_from.push(same_id_populated);
+          }
         }
       });
     });
