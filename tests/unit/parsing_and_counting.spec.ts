@@ -5,9 +5,12 @@ const expect = chai.expect;
 
 import Store from "../../src/store/store";
 import ReportIntakeModule from "../../src/store/report_intake";
+import DataStore from "../../src/store/data_store";
 import { getModule } from "vuex-module-decorators";
 import { AllRaw } from "../util/fs";
-import { fail } from "assert";
+import FilteredDataModule from "@/store/data_filters";
+import StatusCountModule, { StatusHash } from "@/store/status_counts";
+import { readFileSync } from "fs";
 // import { shallowMount } from "@vue/test-utils";
 
 describe("Parsing", () => {
@@ -32,5 +35,44 @@ describe("Parsing", () => {
 
     // Done!
     return Promise.all(promises.map(p => expect(p).to.eventually.be.null));
+  });
+
+  // Note that the above side effect has LOADED THESE FILES! WE CAN USE THEM IN OTHER TESTS
+
+  it("Counts statuses correctly", function() {
+    // Grab modules
+    let data = getModule(DataStore, Store);
+    let filter = getModule(FilteredDataModule, Store);
+    let status_count = getModule(StatusCountModule, Store);
+
+    // Get the exec files
+    let exec_files = data.executionFiles;
+
+    // For each, we will filter then count
+    exec_files.forEach(file => {
+      // Get the corresponding count file
+      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
+      let count_file_content = readFileSync(count_filename, "utf-8");
+      let counts: any = JSON.parse(count_file_content);
+
+      // Get the expected counts
+      let expected: StatusHash = {
+        Failed: counts.failed.total,
+        Passed: counts.passed.total,
+        "From Profile": 0,
+        "Profile Error": counts.error.total,
+        "Not Reviewed": counts.skipped.total,
+        "Not Applicable": counts.no_impact.total
+      };
+
+      // Get the actual
+      let actual = status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: file.unique_id
+      });
+
+      // Compare 'em
+      expect(actual).to.eql(expected);
+    });
   });
 });
