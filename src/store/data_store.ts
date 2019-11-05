@@ -87,6 +87,9 @@ export interface ContextualizedControl
 
   /** Drills down to this controls root CC. In general you should use this for all data operations */
   root: ContextualizedControl;
+
+  /** Yields the full code of this control, by concatenating overlay code. */
+  full_code: string;
 }
 
 class ContextualizedControlImp implements ContextualizedControl {
@@ -117,6 +120,15 @@ class ContextualizedControlImp implements ContextualizedControl {
       curr = curr.extends_from[0];
     }
     return curr;
+  }
+
+  get full_code(): string {
+    let appendage = `# ${this.sourced_from.data.name}\n\n${this.data.code}`;
+    if (this.extends_from.length) {
+      return appendage + "\n\n" + this.extends_from[0].full_code.trim();
+    } else {
+      return appendage;
+    }
   }
 }
 
