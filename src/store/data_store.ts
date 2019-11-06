@@ -78,6 +78,7 @@ export interface ContextualizedProfile
     Sourced<ContextualizedExecution | ProfileFile>,
     Contains<ContextualizedControl[]>,
     Extendable<ContextualizedProfile> {
+  /** Helper flag tracking whether this profile is from an execution. */
   from_execution: boolean;
 }
 export interface ContextualizedControl
