@@ -165,7 +165,7 @@ export default class ProfileData extends Props {
       let exec = this.selected.sourced_from as ContextualizedExecution;
       from_file = exec.sourced_from;
       let with_time = this.selected.contains.find(x => x.root.hdf.start_time);
-      start_time = (with_time && with_time.hdf.start_time) || null;
+      start_time = (with_time && with_time.root.hdf.start_time) || null;
     } else {
       from_file = this.selected.sourced_from as ProfileFile;
       start_time = null;
