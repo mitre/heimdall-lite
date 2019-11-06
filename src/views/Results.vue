@@ -39,6 +39,7 @@
     <!-- Custom sidebar content -->
     <template #sidebar-content-tools>
       <ExportCaat :filter="all_filter"></ExportCaat>
+      <ExportNist :filter="all_filter"></ExportNist>
     </template>
 
     <!-- The main content: cards, etc -->
@@ -155,6 +156,7 @@ import SeverityChart from "@/components/cards/SeverityChart.vue";
 import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
+import ExportNist from "@/components/global/ExportNist.vue";
 
 import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -180,7 +182,8 @@ const ResultsProps = Vue.extend({
     SeverityChart,
     ComplianceChart,
     ProfileData,
-    ExportCaat
+    ExportCaat,
+    ExportNist
   }
 })
 export default class Results extends ResultsProps {
