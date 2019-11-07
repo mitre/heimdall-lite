@@ -5,7 +5,7 @@ on:
       - master
   release:
     types: [published]
-
+    
 jobs:
   test:
     name: Generate CHANGELOG.md

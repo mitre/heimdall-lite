@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 on:
   release:
     types: [published]
-
+    
 jobs:
   build-deploy:
     runs-on: ubuntu-18.04
