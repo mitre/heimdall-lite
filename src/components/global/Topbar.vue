@@ -51,11 +51,34 @@ export default class Topbar extends TopbarProps {
   clear(): void {
     this.$emit("clear");
   }
+  /** Whether or not we're dark mode */
+  dark: boolean = true;
+
+  /** Initial configuration of dark mode */
+  mounted() {
+    this.dark = this.$vuetify.theme.dark;
+  }
+
+  /** Updates theme darkness */
+  updateDark() {
+    this.$vuetify.theme.dark = this.dark;
+  }
+
   darkMode() {
     let metaThemeColor = document.querySelector("meta[name=theme-color]");
     this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+    // FIXME
+    // Do we need to call updateDark() here to update the prop?
+
+    // FIXME
+    // I think this is for the Server Worker setup - aka offline
+
     // if (localStorage)
     //   localStorage.setItem("darkMode", this.$vuetify.theme.dark);
+
+    // FIXME
+    // This seems like it could be useful??
+
     // if (this.$vuetify.theme.dark) {
     //   metaThemeColor.setAttribute("content", "#212121");
     // } else {

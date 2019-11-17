@@ -79,19 +79,6 @@ export default class Sidebar extends SidebarProps {
     files = files.sort((a, b) => a.filename.localeCompare(b.filename));
     return files;
   }
-
-  /** Whether or not we're dark mode */
-  dark: boolean = true;
-
-  /** Initial configuration of dark mode */
-  mounted() {
-    this.dark = this.$vuetify.theme.dark;
-  }
-
-  /** Updates theme darkness */
-  updateDark() {
-    this.$vuetify.theme.dark = this.dark;
-  }
 }
 </script>
 
