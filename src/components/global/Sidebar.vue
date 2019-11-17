@@ -41,12 +41,6 @@
           <LinkItem key="help" text="Help" icon="mdi-help-circle" v-on="on" />
         </template>
       </HelpModal>
-      <v-list-item>
-        <div class="d-flex justify-center">
-          <v-switch label="Light/Dark" v-model="dark" v-on:change="updateDark">
-          </v-switch>
-        </div>
-      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>

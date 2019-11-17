@@ -25,6 +25,10 @@
         ></v-img>
       </v-avatar>
     </v-btn>
+    <v-btn icon large v-on:click="darkMode">
+      <v-icon v-if="this.$vuetify.theme.dark">mdi-brightness-7</v-icon>
+      <v-icon color="white" v-else>mdi-brightness-4</v-icon>
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -46,6 +50,17 @@ export default class Topbar extends TopbarProps {
   /** Submits an event to clear all filters */
   clear(): void {
     this.$emit("clear");
+  }
+  darkMode() {
+    let metaThemeColor = document.querySelector("meta[name=theme-color]");
+    this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+    // if (localStorage)
+    //   localStorage.setItem("darkMode", this.$vuetify.theme.dark);
+    // if (this.$vuetify.theme.dark) {
+    //   metaThemeColor.setAttribute("content", "#212121");
+    // } else {
+    //   metaThemeColor.setAttribute("content", "#0277bd");
+    // }
   }
 }
 </script>
