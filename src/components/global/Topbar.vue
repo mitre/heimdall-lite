@@ -3,13 +3,9 @@
     <!-- The title and nav bar -->
     <v-toolbar-title class="pr-2">
       <v-app-bar-nav-icon @click.stop="$emit('toggle-drawer')">
-        <v-icon color="bar-visible">
-          mdi-menu
-        </v-icon>
+        <v-icon color="bar-visible">mdi-menu</v-icon>
       </v-app-bar-nav-icon>
-      <span class="hidden-sm-and-down bar-visible--text">
-        {{ title }}
-      </span>
+      <span class="hidden-sm-and-down bar-visible--text">{{ title }}</span>
     </v-toolbar-title>
     <v-spacer />
 
@@ -26,8 +22,10 @@
       </v-avatar>
     </v-btn>
     <v-btn icon large v-on:click="darkMode">
-      <v-icon v-if="this.$vuetify.theme.dark">mdi-brightness-7</v-icon>
-      <v-icon color="white" v-else>mdi-brightness-4</v-icon>
+      <v-icon color="grey" v-if="this.$vuetify.theme.dark"
+        >mdi-theme-light-dark</v-icon
+      >
+      <v-icon color="white" v-else>mdi-theme-light-dark</v-icon>
     </v-btn>
   </v-app-bar>
 </template>
