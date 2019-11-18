@@ -26,8 +26,6 @@ if (process.argv.length > 2) {
 }
 
 // Get index
-console.log(fs.readdirSync("."));
-console.log(__dirname);
 var txt = fs.readFileSync(path.join(__dirname, "../dist/index.html"));
 
 // respond to all requests with index.html
