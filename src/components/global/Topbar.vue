@@ -21,11 +21,10 @@
         ></v-img>
       </v-avatar>
     </v-btn>
-    <v-btn icon large v-on:click="darkMode">
-      <v-icon color="grey" v-if="this.$vuetify.theme.dark"
+    <v-btn icon large v-on:click="toggleDark">
+      <v-icon :color="this.$vuetify.theme.dark ? 'grey' : 'white'"
         >mdi-theme-light-dark</v-icon
       >
-      <v-icon color="white" v-else>mdi-theme-light-dark</v-icon>
     </v-btn>
   </v-app-bar>
 </template>
@@ -49,39 +48,19 @@ export default class Topbar extends TopbarProps {
   clear(): void {
     this.$emit("clear");
   }
-  /** Whether or not we're dark mode */
-  dark: boolean = true;
-
-  /** Initial configuration of dark mode */
-  mounted() {
-    this.dark = this.$vuetify.theme.dark;
-  }
 
   /** Updates theme darkness */
-  updateDark() {
-    this.$vuetify.theme.dark = this.dark;
-  }
-
-  darkMode() {
-    let metaThemeColor = document.querySelector("meta[name=theme-color]");
+  toggleDark() {
     this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
-    // FIXME
-    // Do we need to call updateDark() here to update the prop?
-
-    // FIXME
-    // I think this is for the Server Worker setup - aka offline
-
-    // if (localStorage)
-    //   localStorage.setItem("darkMode", this.$vuetify.theme.dark);
-
-    // FIXME
-    // This seems like it could be useful??
-
-    // if (this.$vuetify.theme.dark) {
-    //   metaThemeColor.setAttribute("content", "#212121");
-    // } else {
-    //   metaThemeColor.setAttribute("content", "#0277bd");
-    // }
   }
+
+  // FIXME
+  // This seems like it could be useful??
+
+  // if (this.$vuetify.theme.dark) {
+  //   metaThemeColor.setAttribute("content", "#212121");
+  // } else {
+  //   metaThemeColor.setAttribute("content", "#0277bd");
+  // }
 }
 </script>
