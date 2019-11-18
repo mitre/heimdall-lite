@@ -14,7 +14,10 @@
   "issues": "/issues/new/choose",
   "files": [
     "src/",
-    "dist/"
+    "dist/",
+    "*.json",
+    "*.config.js",
+    "Dockerfile"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
