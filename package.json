@@ -1,7 +1,7 @@
 {
   "name": "heimdall-lite",
   "bin": "./src/server.js",
-  "version": "2.0.7",
+  "version": "2.0.10",
   "description": "Heimdall Lite 2.0 is a JavaScript based security results viewer and review tool supporting multiple security results formats, such as: InSpec, SonarQube, OWASP-Zap and Fortify which you can load locally, from S3 and other data sources.",
   "repository": {
     "type": "git",
@@ -13,12 +13,13 @@
   "changelog": "CHANGELOG.md",
   "issues": "/issues/new/choose",
   "files": [
-    "./src"
+    "src/",
+    "dist/"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "postinstall": "vue-cli-service build",
+    "prepack": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },

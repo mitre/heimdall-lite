@@ -9,6 +9,7 @@
 // Node internals
 const process = require("process");
 const fs = require("fs");
+const path = require("path");
 const http = require("http");
 
 const connect = require("connect");
@@ -25,7 +26,9 @@ if (process.argv.length > 2) {
 }
 
 // Get index
-var txt = fs.readFileSync("./dist/index.html");
+console.log(fs.readdirSync("."));
+console.log(__dirname);
+var txt = fs.readFileSync(path.join(__dirname, "../dist/index.html"));
 
 // respond to all requests with index.html
 app.use(function(req, res) {
