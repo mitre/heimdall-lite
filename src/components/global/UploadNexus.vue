@@ -61,7 +61,7 @@ import InspecIntakeModule, { FileID } from "@/store/report_intake";
 import Modal from "@/components/global/Modal.vue";
 import FileReader from "@/components/global/upload_tabs/FileReader.vue";
 import HelpFooter from "@/components/global/upload_tabs/HelpFooter.vue";
-import S3Reader from "@/components/global/upload_tabs/S3Reader.vue";
+import S3Reader from "@/components/global/upload_tabs/aws/S3Reader.vue";
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
 
 // We declare the props separately to make props types inferable.
