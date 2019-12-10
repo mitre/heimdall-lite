@@ -100,14 +100,12 @@ export default class UploadNexus extends Props {
 
   // Handles change in tab
   selected_tab(new_tab: string) {
-    console.log(new_tab);
     this.active_tab = new_tab;
     local_tab.set(new_tab);
   }
 
   // Event passthrough
   got_files(files: FileID[]) {
-    console.log(this.active_tab);
     this.$emit("got-files", files);
   }
 }

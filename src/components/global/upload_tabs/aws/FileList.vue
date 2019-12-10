@@ -1,51 +1,42 @@
 <template>
   <v-stepper-content step="3">
-    <v-container>
-      <v-row>
-        <v-col>
-          <v-text-field v-model="form_bucket_name" label="Bucket name" />
-        </v-col>
-        <v-col cols="1">
-          <v-btn
-            title="Load"
-            @click="load"
-            :disabled="form_bucket_name.length < 1"
-            block
-            class="fill-height pa-0"
-          >
-            <v-icon>mdi-refresh</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-      <v-row v-if="error">
-        <p class="font-italic error--text">{{ error }}</p>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-list :two-line="true">
-            <v-list-item v-if="files.length === 0"
-              >No items found! Try refreshing?</v-list-item
-            >
-            <v-list-item v-for="(val, index) in files" :key="val.Key">
-              <v-list-item-content>
-                <!-- Title: The item key -->
-                <v-list-item-title>{{ val.Key }}</v-list-item-title>
-                <!-- Subtitle: Date of creation -->
-                <v-list-item-subtitle>
-                  {{ val.LastModified }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <!-- Action: Click to add -->
-              <v-list-item-action>
-                <v-btn icon @click="load_file(index)">
-                  <v-icon>mdi-plus-circle</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </v-col>
-      </v-row>
-    </v-container>
+    <div class="d-flex flex-column">
+      <div class="d-flex justify-space-between">
+        <v-text-field v-model="form_bucket_name" label="Bucket name" />
+        <v-btn
+          title="Load"
+          @click="load"
+          :disabled="form_bucket_name.length < 1"
+          class="fill-height pa-0"
+        >
+          <v-icon>mdi-cloud-download</v-icon>
+        </v-btn>
+      </div>
+      <v-list :two-line="true">
+        <v-list-item v-if="files.length === 0"
+          >No items found! Try refreshing?</v-list-item
+        >
+        <v-list-item v-for="(val, index) in files" :key="val.Key">
+          <v-list-item-content>
+            <!-- Title: The item key -->
+            <v-list-item-title>{{ val.Key }}</v-list-item-title>
+            <!-- Subtitle: Date of creation -->
+            <v-list-item-subtitle>
+              {{ val.LastModified }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+          <!-- Action: Click to add -->
+          <v-list-item-action>
+            <v-btn icon @click="load_file(index)">
+              <v-icon>mdi-plus-circle</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+      <v-btn color="red" @click="$emit('exit-list')" class="my-2 mr-3">
+        Cancel
+      </v-btn>
+    </div>
   </v-stepper-content>
 </template>
 

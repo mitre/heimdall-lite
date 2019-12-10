@@ -56,7 +56,6 @@ import FileList from "@/components/global/upload_tabs/aws/FileList.vue";
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    error: String, // What error to show
     access_token: String,
     secret_token: String
   }

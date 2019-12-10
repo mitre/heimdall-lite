@@ -58,10 +58,10 @@ export async function list_buckets(creds: AuthCreds) {
     .promise()
     .then(
       success => {
-        console.log(success);
+        throw "Not implemented";
       },
       failure => {
-        console.log(failure);
+        throw "Not implemented";
       }
     );
 
@@ -105,14 +105,12 @@ export async function get_session_token(
     .getCallerIdentity({})
     .promise()
     .then(success => {
-      console.log("User info:");
       wip_info.user_account = success.Account!;
       wip_info.user_arn = success.Arn!;
       wip_info.user_id = success.UserId;
       // Guess at mfa
       wip_info.probable_user_mfa_device = derive_mfa_serial(wip_info.user_arn!);
-    })
-    .catch(failure => console.log("Failed to get called identity"));
+    });
 
   // It's built - mark as such
   let info = wip_info as AuthInfo;
@@ -155,7 +153,6 @@ export async function get_session_token(
 export function transcribe_error(error: AWSError): string {
   // Unpack
   let { code, message } = error;
-  console.error(error);
 
   // Get what we're supposed to do with it
   switch (code) {
@@ -165,9 +162,9 @@ export function transcribe_error(error: AWSError): string {
     case "InvalidAccessKeyId":
       return "Provided access key is invalid.";
     case "AccessDenied":
-      return "Access denied. Your account may not have permission to access the given resource.";
+      return `Access denied: ${message}`;
     case "AccountProblem":
-      return `Account problem detected: ${message}. Log into the AWS console to diagnose.`;
+      return `Account problem detected: ${message}`;
     case "CredentialsNotSupported":
       return "Provided credentials not supported.";
     case "InvalidBucketName":

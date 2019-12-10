@@ -1,47 +1,41 @@
 <template>
-  <v-stepper v-model="step" non-linear="">
-    <v-stepper-header>
-      <v-stepper-step :complete="!!assumed_role" step="1">
-        Account Credentials
-      </v-stepper-step>
+  <v-stepper v-model="step" vertical>
+    <v-stepper-step :complete="!!assumed_role" step="1">
+      Account Credentials {{ step === 1 ? shown_error : "" }}
+    </v-stepper-step>
 
-      <v-divider></v-divider>
+    <AuthStepBasic
+      v-bind:access_token.sync="access_token"
+      v-bind:secret_token.sync="secret_token"
+      @auth-basic="handle_basic"
+      @goto-mfa="handle_goto_mfa"
+    />
 
-      <v-stepper-step
-        :complete="!!assumed_role && assumed_role.from_mfa"
-        step="2"
-      >
-        MFA Authorization
-      </v-stepper-step>
+    <v-stepper-step
+      :complete="!!assumed_role && assumed_role.from_mfa"
+      step="2"
+    >
+      MFA Authorization {{ step === 2 ? shown_error : "" }}
+    </v-stepper-step>
 
-      <v-divider></v-divider>
+    <AuthStepMFA
+      v-bind:mfa_token.sync="mfa_token"
+      v-bind:mfa_serial.sync="mfa_serial"
+      @auth-mfa="handle_mfa"
+      @exit-mfa="handle_cancel_mfa"
+    />
 
-      <v-stepper-step step="3">Browse Bucket</v-stepper-step>
-    </v-stepper-header>
+    <v-stepper-step step="3">
+      Browse Bucket {{ step === 3 ? shown_error : "" }}
+    </v-stepper-step>
 
-    <v-stepper-items>
-      <AuthStepBasic
-        v-bind:access_token.sync="access_token"
-        v-bind:secret_token.sync="secret_token"
-        :error="shown_error"
-        @auth-basic="handle_basic"
-        @goto-mfa="handle_goto_mfa"
-      />
-      <AuthStepMFA
-        v-bind:mfa_token.sync="mfa_token"
-        v-bind:mfa_serial.sync="mfa_serial"
-        :error="shown_error"
-        @auth-mfa="handle_mfa"
-        @exit-mfa="handle_cancel_mfa"
-      />
-      <FileList
-        :auth="assumed_role"
-        :error="shown_error"
-        :files="files"
-        @got-files="got_files"
-        @load-bucket="load_bucket"
-      />
-    </v-stepper-items>
+    <FileList
+      :auth="assumed_role"
+      :files="files"
+      @exit-list="handle_cancel_mfa"
+      @got-files="got_files"
+      @load-bucket="load_bucket"
+    />
   </v-stepper>
 </template>
 
@@ -88,12 +82,7 @@ const local_session_information = new LocalStorageVal<Auth | null>(
 })
 export default class S3Reader extends Props {
   /** What error is currently shown, if any. Shared between stages. */
-  shown_error: string | null = null;
-
-  falselog(v: any): any {
-    console.log(v);
-    return true;
-  }
+  error: string | null = null;
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
@@ -123,13 +112,21 @@ export default class S3Reader extends Props {
     this.mfa_token = "";
   }
 
+  get shown_error(): string {
+    if (this.error) {
+      return ` - ${this.error}`;
+    } else {
+      return "";
+    }
+  }
+
   /**
    * Handle a basic login.
    * Gets a session token
    */
   handle_basic() {
     // If we need another error, it will be set shortly. If not, the old one is probably not relevant
-    this.shown_error = null;
+    this.error = null;
 
     // Attempt to assume role based on if we've determined 2fa necessary
     get_session_token(this.access_token, this.secret_token).then(
@@ -156,12 +153,19 @@ export default class S3Reader extends Props {
     this.assumed_role = null; // Just in case
   }
 
+  handle_exit_list() {
+    this.step = 1;
+    this.mfa_token = "";
+    this.assumed_role = null;
+    this.files = []; // Just in case
+  }
+
   /** Handle an MFA login.
    * Determine whether further action is necessary
    */
   handle_mfa() {
     // If we need another error, it will be set here
-    this.shown_error = null;
+    this.error = null;
 
     // Build our mfa params
     let mfa: MFA_Info = {
@@ -171,7 +175,7 @@ export default class S3Reader extends Props {
     };
 
     // Attempt to assume role based on if we've determined 2fa necessary
-    get_session_token(this.access_token, this.secret_token).then(
+    get_session_token(this.access_token, this.secret_token, mfa).then(
       success => {
         // Keep them
         this.assumed_role = success;
@@ -200,7 +204,7 @@ export default class S3Reader extends Props {
     await s3
       .listObjectsV2({
         Bucket: name,
-        MaxKeys: 10
+        MaxKeys: 100
       })
       .promise()
       .then(success => {
@@ -219,7 +223,7 @@ export default class S3Reader extends Props {
    */
   handle_error(error: any): void {
     let t_error = error as AWSError;
-    this.shown_error = transcribe_error(t_error);
+    this.error = transcribe_error(t_error);
   }
 
   /** Callback on got files */

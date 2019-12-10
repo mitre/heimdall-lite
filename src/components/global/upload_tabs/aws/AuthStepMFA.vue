@@ -5,7 +5,7 @@
         :value="mfa_token"
         @input="change_mfa_token"
         label="MFA Token"
-        :rules="[req_rule]"
+        :rules="[req_rule, mfa_rule]"
       />
       <v-text-field
         :value="mfa_serial"
@@ -20,7 +20,7 @@
         color="primary"
         :disabled="!valid"
         class="my-2 mr-3"
-        @click="$emit('auth-mfa', [form_mfa_serial, form_mfa_token])"
+        @click="$emit('auth-mfa')"
       >
         Login
       </v-btn>
@@ -46,7 +46,6 @@ import InspecIntakeModule, { FileID } from "@/store/report_intake";
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    error: String, // What error to show
     mfa_serial: String,
     mfa_token: String
   }
@@ -70,6 +69,9 @@ export default class S3Reader extends Props {
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
     (v || "").trim().length > 0 || "Field is Required";
+  mfa_rule = (v: string | null | undefined) =>
+    (v || "").trim().match("^\\d{6}$") !== null ||
+    "Field must be the 6 number code from a valid authenticator device";
 
   /** On mount, try to look up stored auth info */
   mounted() {
