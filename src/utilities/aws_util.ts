@@ -1,5 +1,6 @@
 import STS from "aws-sdk/clients/sts";
 import S3 from "aws-sdk/clients/s3";
+import AWS from "aws-sdk";
 import { AWSError } from "aws-sdk/lib/error";
 import { PromiseResult } from "aws-sdk/lib/request";
 
@@ -52,20 +53,22 @@ export async function fetch_s3_file(
     });
 }
 
-export async function list_buckets(creds: AuthCreds) {
-  return new S3({ ...creds })
+let S3_AWS_PROXY = new AWS.Endpoint(
+  `http://${location.hostname}:8090/https://s3.us-east-1.amazonaws.com`
+);
+export async function list_buckets(creds: AuthCreds): Promise<S3.Bucket[]> {
+  return new S3({ ...creds, endpoint: (S3_AWS_PROXY as unknown) as string })
     .listBuckets()
     .promise()
     .then(
       success => {
-        throw "Not implemented";
+        return success.Buckets!;
       },
       failure => {
-        throw "Not implemented";
+        console.error(`Error: ${failure}`);
+        throw failure;
       }
     );
-
-  // */
 }
 
 /** Represents the bundle of parameters required for creating a session key using MFA */
