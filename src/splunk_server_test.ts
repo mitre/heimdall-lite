@@ -8,6 +8,7 @@ import { argv, env } from "process";
 import fetch, { Headers } from "node-fetch";
 import { xml2js, ElementCompact } from "xml-js";
 import { delay } from "./utilities/async_util";
+import { parse } from "inspecjs";
 env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Interfaces
@@ -125,19 +126,78 @@ async function main() {
   let auth_string = `Basic ${auth_b64}`;
 
   let get_evaluations_search =
-    'index="hdf"| spath "meta.subtype" | search "meta.subtype"=header';
-  let specific_evaluation =
-    'index="hdf"| spath "meta.subtype" | search "meta.subtype"=header';
-  perform_search('index="hdf', auth_string).then(evals => {
-    console.log(evals);
-  });
+    'index="hdf" | spath "meta.subtype" | search "meta.subtype"=header';
+  let specific_evaluation = (guid: string) =>
+    `index="hdf" | spath "meta.guid" | search "meta.guid"=${guid}`;
+
+  // Find evals, then get execs for each eval
+  perform_search(get_evaluations_search, auth_string)
+    .then(events => {
+      // Because we only searched for headers, we can assume these to be eval events
+      let eval_events = events as EvaluationPayload[];
+
+      for (let e of eval_events) {
+        console.log(
+          `Found eval with guid ${e.meta.guid} and filename ${e.meta.filename}`
+        );
+      }
+
+      // Did we find any?
+      if (!eval_events.length) {
+        throw new Error("No evaluations found in this search!");
+      }
+
+      // Pick the first one
+      let plucked = eval_events[0].meta.guid;
+
+      // Return a search string of it
+      let search_string = specific_evaluation(plucked);
+      return search_string;
+    })
+    .then(guid_search => perform_search(guid_search, auth_string))
+    .then(events => {
+      console.log(`Attempting to consolidate ${events.length} events.`);
+      return consolidate_payloads(events);
+    })
+    .then(full_evaluations => {
+      // Get the only item
+      let v = full_evaluations[0];
+
+      // Turn it into a report object
+      let result: parse.ConversionResult;
+
+      // This is dumb and we should make the inspecjs layer more accepting of many file types
+      result = parse.convertFile(JSON.stringify(v));
+
+      // Determine what sort of file we (hopefully) have, then add it
+      if (result["1_0_ExecJson"]) {
+        // Handle as exec
+        let execution = result["1_0_ExecJson"];
+        console.log(execution);
+        return execution;
+
+        //idk what do with it lmao
+        /*
+      execution = Object.freeze(execution);
+      let reportFile = {
+        unique_id: options.unique_id,
+        filename: options.filename,
+        execution
+      };
+      data.addExecution(reportFile);
+      */
+      } else {
+        throw new Error("Data somehow wasn't an exec???");
+      }
+    })
+    .catch(console.error);
 }
 
 /** Performs the entire process of search string -> results array */
 async function perform_search(
   search_string: string,
   auth_string: string
-): Promise<EvaluationPayload[]> {
+): Promise<UnknownPayload[]> {
   return create_search(search_string, auth_string)
     .then(job_id => pend_job(job_id, auth_string, 500))
     .then(job_state => {
@@ -146,8 +206,8 @@ async function perform_search(
       }
 
       return get_search_results(job_state.job_id, auth_string);
-    })
-    .then(results => consolidate_payloads(results));
+    });
+  // .then(results => consolidate_payloads(results));
 }
 
 // Returns the job id
@@ -160,7 +220,7 @@ async function create_search(
     headers: new Headers({
       Authorization: auth_string
     }),
-    body: "search=search ${search_string}"
+    body: `search=search ${search_string}`
   })
     .then(response => {
       if (!response.ok) throw new Error(response.status.toString());
@@ -180,7 +240,6 @@ async function check_job(
   job_id: string,
   auth_string: string
 ): Promise<JobState> {
-  console.log("Checking job");
   return fetch(`https://localhost:8089/services/search/jobs/${job_id}`, {
     method: "GET",
     headers: new Headers({
@@ -254,7 +313,7 @@ async function get_search_results(
   auth_string: string
 ): Promise<UnknownPayload[]> {
   return fetch(
-    `https://localhost:8089/services/search/jobs/${job_id}/results/?output_mode=json`,
+    `https://localhost:8089/services/search/jobs/${job_id}/results/?output_mode=json&count=0`,
     {
       headers: {
         Authorization: auth_string
@@ -263,7 +322,6 @@ async function get_search_results(
     }
   )
     .then(response => {
-      console.log("Got get_search_results response");
       if (!response.ok) throw new Error(response.status.toString());
       return response.json();
     })
@@ -281,6 +339,7 @@ async function get_search_results(
           console.warn(err);
         }
       }
+
       return parsed;
     });
 }
@@ -307,7 +366,7 @@ function consolidate_file_payloads(
   // In the end we wish to produce a single evaluation EventPayload which in fact contains all data for the guid
   // Group by subtype
   let subtypes = group_by(file_payloads, event => event.meta.subtype);
-  let exec_events = (subtypes["evaluation"] || []) as EvaluationPayload[];
+  let exec_events = (subtypes["header"] || []) as EvaluationPayload[];
   let profile_events = (subtypes["profile"] || []) as ProfilePayload[];
   let control_events = (subtypes["control"] || []) as ControlPayload[];
 
@@ -356,6 +415,20 @@ function group_by<T>(
   key_getter: (v: T) => string
 ): Hash<Array<T>> {
   let result: Hash<Array<T>> = {};
+  for (let i of items) {
+    // Get the items key
+    let key = key_getter(i);
+
+    // Get the list it should go in
+    let corr_list = result[key];
+    if (corr_list) {
+      // If list exists, place
+      corr_list.push(i);
+    } else {
+      // List does not exist; create and put
+      result[key] = [i];
+    }
+  }
   return result;
 }
 
