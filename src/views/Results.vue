@@ -332,7 +332,7 @@ export default class Results extends ResultsProps {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter);
       if (file) {
-        return file.filename;
+        return file.name;
       }
     }
     return undefined;

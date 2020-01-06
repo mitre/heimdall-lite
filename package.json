@@ -31,6 +31,7 @@
     "@types/d3": "^5.7.2",
     "@types/diff": "^4.0.2",
     "@types/prismjs": "^1.16.0",
+    "@types/yauzl": "^2.9.1",
     "@vue/cli": "^4.0.5",
     "apexcharts": "^3.10.1",
     "aws-sdk": "^2.573.0",
@@ -67,7 +68,8 @@
     "vue-toasted": "^1.1.27",
     "vuetify": "^2.1.10",
     "vuex": "^3.1.2",
-    "xlsx": "^0.15.2"
+    "xlsx": "^0.15.2",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "@mdi/font": "^3.9.97",

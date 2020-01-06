@@ -367,7 +367,7 @@ export default class S3Reader extends Props {
           intake_module
             .loadText({
               text: content,
-              filename: file.Key!,
+              name: file.Key!,
               unique_id
             })
             .then(() => this.$emit("got-files", [unique_id]));

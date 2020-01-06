@@ -80,7 +80,7 @@ export default class ExportNIST extends Props {
     let id: FileID | undefined = undefined;
     if (file) {
       id = file.unique_id;
-      filename = file.filename;
+      filename = file.name;
     }
 
     // Get our data

@@ -6,13 +6,13 @@ import { parse } from "inspecjs";
 import { Module, VuexModule, getModule, Action } from "vuex-module-decorators";
 import DataModule from "@/store/data_store";
 import Store from "@/store/store";
-import { read_file_async } from "@/utilities/async_util";
+import { FileContents } from "@/utilities/async_util";
 
 /** Each FileID corresponds to a unique File in this store */
 export type FileID = number;
 
 /** Represents the minimum data to represent an uploaded file handle. */
-export type InspecFile = {
+export interface InspecFile {
   /**
    * Unique identifier for this file. Used to encode which file is currently selected, etc.
    *
@@ -21,12 +21,14 @@ export type InspecFile = {
    * Using this property, one might order files by order in which they were added.
    */
   unique_id: FileID;
+
   /** The filename that this file was uploaded under. */
-  filename: string;
-};
+  name: string;
+}
+
 export function isInspecFile(f: any): f is InspecFile {
   const t = f as InspecFile;
-  return t.filename !== undefined && t.unique_id !== undefined;
+  return t.name !== undefined && t.unique_id !== undefined;
 }
 
 /** Represents a file containing an Inspec Execution output */
@@ -34,24 +36,10 @@ export type ExecutionFile = InspecFile & { execution: parse.AnyExec };
 /** Represents a file containing an Inspec Profile (not run) */
 export type ProfileFile = InspecFile & { profile: parse.AnyProfile };
 
-export type FileLoadOptions = {
-  /** The file to load */
-  file: File;
-
+export interface TextLoadOptions extends FileContents {
   /** The unique id to grant it */
   unique_id: FileID;
-};
-
-export type TextLoadOptions = {
-  /** The filename to denote this object with */
-  filename: string;
-
-  /** The unique id to grant it */
-  unique_id: FileID;
-
-  /** The text to use for it. */
-  text: string;
-};
+}
 
 @Module({
   namespaced: true,
@@ -60,25 +48,6 @@ export type TextLoadOptions = {
   name: "intake"
 })
 class InspecIntakeModule extends VuexModule {
-  /**
-   * Load a file with the specified options. Promises an error message on failure
-   */
-  @Action
-  async loadFile(options: FileLoadOptions): Promise<Error | null> {
-    let read = read_file_async(options.file);
-    return read
-      .then(text =>
-        this.loadText({
-          text,
-          unique_id: options.unique_id,
-          filename: options.file.name
-        })
-      )
-      .then(err => {
-        return err;
-      });
-  }
-
   /*
    * Due to issues with catching errors from Actions, this function returns its
    * errors. null implies the text load was successful.
@@ -94,7 +63,7 @@ class InspecIntakeModule extends VuexModule {
       result = parse.convertFile(options.text);
     } catch (e) {
       return new Error(
-        `Failed to convert file ${options.filename} due to error "${e}".`
+        `Failed to convert file ${options.name} due to error "${e}".`
       );
     }
 
@@ -104,8 +73,7 @@ class InspecIntakeModule extends VuexModule {
       let execution = result["1_0_ExecJson"];
       execution = Object.freeze(execution);
       let reportFile = {
-        unique_id: options.unique_id,
-        filename: options.filename,
+        ...options,
         execution
       };
       data.addExecution(reportFile);
@@ -113,8 +81,7 @@ class InspecIntakeModule extends VuexModule {
       // Handle as profile
       let profile = result["1_0_ProfileJson"];
       let profileFile = {
-        unique_id: options.unique_id,
-        filename: options.filename,
+        ...options,
         profile
       };
       data.addProfile(profileFile);

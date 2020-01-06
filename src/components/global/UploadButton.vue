@@ -12,7 +12,7 @@
         type="file"
         multiple
         @change="select_file"
-        accept=".json, application/json"
+        accept=".json, application/json, .zip"
       />
     </div>
   </div>

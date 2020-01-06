@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { FileContents } from "@/utilities/async_util";
 
 /** Returns sorted list of files in a directory */
 export function list_files(dir_path: string) {
@@ -9,32 +10,24 @@ export function list_files(dir_path: string) {
   return result.sort();
 }
 
-export interface FileResult {
-  /** The filename */
-  name: string;
-
-  /** The file's content (utf-8) */
-  content: string;
-}
-
-export function read_files(dir_name: string): FileResult[] {
+export function read_files(dir_name: string): FileContents[] {
   // List the files
   let files = list_files(dir_name);
 
   // Read them all
-  let result = files.map(filename => {
-    let content = fs.readFileSync(dir_name + filename, "utf-8");
-    let result: FileResult = {
-      name: filename,
-      content
+  let result = files.map(name => {
+    let text = fs.readFileSync(dir_name + name, "utf-8");
+    let result: FileContents = {
+      name,
+      text
     };
     return result;
   });
   return result;
 }
 
-export type FileHash = { [key: string]: FileResult };
-function populate_hash(results: FileResult[]) {
+export type FileHash = { [key: string]: FileContents };
+function populate_hash(results: FileContents[]) {
   let hash: FileHash = {};
   results.forEach(f => {
     hash[f.name] = f;

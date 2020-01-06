@@ -110,7 +110,7 @@ export default class SampleList extends Props {
     fetch(sample.url, { method: "get" })
       .then(response => response.text())
       .then(text =>
-        intake_module.loadText({ filename: sample.name, unique_id, text })
+        intake_module.loadText({ name: sample.name, unique_id, text })
       )
       .then(err => {
         // Handle errors if necessary

@@ -40,7 +40,9 @@ export default class Landing extends LandingProps {
    */
   on_got_files(ids: FileID[]) {
     // Close the dialog
-    this.dialog = false;
+    // this.dialog = true;
+    console.log("Finally got:");
+    console.log(ids);
 
     // If just one file, focus it
     if (ids.length === 1) {

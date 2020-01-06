@@ -51,6 +51,12 @@ import InspecIntakeModule, {
   next_free_file_ID
 } from "@/store/report_intake";
 import AppInfoModule from "@/store/app_info";
+import {
+  read_file_async,
+  read_zip_async,
+  zip_handle_each,
+  FileContents
+} from "@/utilities/async_util";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -72,32 +78,111 @@ export default class FileReader extends Props {
     let valid_ids: FileID[] = []; // Use this to track those that get successfully uploaded
 
     // Promise an upload of each
-    let upload_promises = files.map(file => {
-      // Generate file id
-      let unique_id = next_free_file_ID();
+    let upload_promises = files.map(this.multiplex_file);
 
-      // Submit it to be loaded, and display an error if it fails
-      let intake_module = getModule(InspecIntakeModule, this.$store);
-      return intake_module.loadFile({ file, unique_id }).then(err => {
-        if (err) {
-          console.error(`Error loading file ${file.name}`);
-          this.$toasted.global.error({
-            message: String(err),
-            isDark: this.$vuetify.theme.dark
-          });
-        } else {
-          // Store the given id as valid
-          valid_ids.push(unique_id);
-        }
-      });
+    // Fetch fileids of the successes, catch errors. We must catch errors to use Promise.all
+    let successmark_promises = upload_promises.map(p => {
+      return p
+        .then(file_ids => {
+          valid_ids.push(...file_ids);
+        })
+        .catch(err => {
+          console.warn(err);
+        });
     });
 
     // When they're all done, emit event.
-    // To use promise.all we must make each promise explicitly allow rejection without breaking promise.all failfast
-    let guaranteed_promises = upload_promises.map(p => p.catch(err => err));
-    Promise.all(guaranteed_promises).then(_ =>
+    Promise.all(successmark_promises).then(_ =>
       this.$emit("got-files", valid_ids)
     );
+  }
+
+  /** Decides what to do with a file based on its filename */
+  async multiplex_file(file: File | FileContents): Promise<FileID[]> {
+    let extension = get_extension(file.name);
+
+    // If file, we want to generally just decode, but in case of a zip we want to parse directly
+    if (is_file(file)) {
+      if (extension === ".zip") {
+        return this.handle_zip(file);
+      } else {
+        // Want to turn it to string, then that string to contents
+        return read_file_async(file, false)
+          .then(text => {
+            return {
+              name: file.name,
+              text: text as string
+            } as FileContents;
+          })
+          .then(this.multiplex_file);
+      }
+    } else {
+      // It's already been parsed into contents
+      if (extension === ".json") {
+        return this.handle_json_content(file);
+      } else if (extension === ".xml") {
+        return this.handle_xml_content(file);
+      } else if (extension === ".zip") {
+        console.error(
+          `Something went wrong ${file.name} being parsed as text. Perhaps a nested zip occurred?`
+        );
+        return [];
+      } else {
+        throw new Error("Unhandled filetype found: " + extension);
+      }
+    }
+  }
+
+  // Uploads a zip file. Spits out contents then delegates to handle_json and handle_xml
+  async handle_zip(zip: File): Promise<FileID[]> {
+    return read_zip_async(zip)
+      .then(zip_handle_each)
+      .then(files => {
+        // Handle each file properly
+        return Promise.all(files.map(this.multiplex_file)).then(lol => {
+          let results: FileID[] = [];
+          for (let l of lol) {
+            results.push(...l);
+          }
+          return results;
+        });
+      });
+  }
+
+  /** note to luke: After parsing the xml into json, probably repack into a new FileContents and
+   * deligate it on to handle_json_contents.
+   *
+   * This is just my best guess at how best to do it since I don't know exactly how your json code works.
+   */
+  async handle_xml_content(xml_content: FileContents): Promise<FileID[]> {
+    throw "Hey LUKE! Go here";
+    // return [];
+  }
+
+  /** Parses a JSON file and uploads it to the Data Store. */
+  async handle_json_content(json: FileContents): Promise<FileID[]> {
+    // Generate file id
+    let unique_id = next_free_file_ID();
+
+    // Submit it to be loaded, and display an error if it fails
+    let intake_module = getModule(InspecIntakeModule, this.$store);
+    return intake_module.loadText({ ...json, unique_id }).then(err => {
+      if (err) {
+        this.toast_file_error(json.name, err);
+        return [];
+      } else {
+        // Store the given id as valid
+        return [unique_id];
+      }
+    });
+  }
+
+  // Toasts that a file failed to load
+  toast_file_error(filename: string, err: Error) {
+    this.$toasted.global.error({
+      message: String(err),
+      isDark: this.$vuetify.theme.dark
+    });
   }
 
   get title_class(): string[] {
@@ -111,5 +196,19 @@ export default class FileReader extends Props {
   get version(): string {
     return getModule(AppInfoModule, this.$store).version;
   }
+}
+
+/** Return the extension of a filename */
+function get_extension(filename: string): string | null {
+  let last_period = filename.lastIndexOf(".");
+  if (last_period >= 0) {
+    return filename.substring(last_period);
+  }
+  return null;
+}
+
+/** Distinguishes between files and file contents. Trivial but best broken out */
+function is_file(f: File | FileContents): f is File {
+  return typeof (f as any).text != "string";
 }
 </script>

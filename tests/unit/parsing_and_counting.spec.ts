@@ -21,15 +21,14 @@ describe("Parsing", () => {
     let intake = getModule(ReportIntakeModule, Store);
     let id = 0;
 
-    let promises = Object.values(raw).map(file_result => {
+    let promises = Object.values(raw).map(file_content => {
       // Increment counter
       id += 1;
 
       // Do intake
       return intake.loadText({
-        filename: file_result.name,
-        unique_id: id,
-        text: file_result.content
+        ...file_content,
+        unique_id: id
       });
     });
 
@@ -51,7 +50,7 @@ describe("Parsing", () => {
     // For each, we will filter then count
     exec_files.forEach(file => {
       // Get the corresponding count file
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
+      let count_filename = `tests/hdf_data/counts/${file.name}.info.counts`;
       let count_file_content = readFileSync(count_filename, "utf-8");
       let counts: any = JSON.parse(count_file_content);
 
@@ -66,7 +65,7 @@ describe("Parsing", () => {
       };
 
       let expected_with_filename = {
-        filename: file.filename,
+        name: file.name,
         ...expected
       };
 
@@ -77,7 +76,7 @@ describe("Parsing", () => {
       });
 
       let actual_with_filename = {
-        filename: file.filename,
+        name: file.name,
         ...actual
       };
 

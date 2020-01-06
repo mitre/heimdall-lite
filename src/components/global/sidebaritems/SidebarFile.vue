@@ -1,11 +1,11 @@
 <template>
-  <v-list-item :to="`/results/${file.unique_id}`" :title="file.filename">
+  <v-list-item :to="`/results/${file.unique_id}`" :title="file.name">
     <v-list-item-avatar>
       <v-icon v-text="icon" small />
     </v-list-item-avatar>
 
     <v-list-item-content>
-      <v-list-item-title v-text="file.filename" />
+      <v-list-item-title v-text="file.name" />
     </v-list-item-content>
 
     <v-list-item-action @click="close_this_file">

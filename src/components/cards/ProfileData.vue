@@ -174,7 +174,7 @@ export default class ProfileData extends Props {
     // And put the filename
     output.push({
       label: "From file",
-      text: from_file.filename
+      text: from_file.name
     });
 
     if (start_time) {
