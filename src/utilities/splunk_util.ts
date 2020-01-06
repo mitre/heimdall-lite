@@ -380,8 +380,8 @@ function consolidate_file_payloads(
 }
 
 export enum ErrorCodes {
-  BadHostname, // Server could not be reached at all!
-  BadCORS, // Server couldn't be reached because CORS
+  BadNetwork, // Server could not be reached, either due to bad address or bad CORS
+  PageNotFound, // Server gave error 404
   BadAuth, // Authorization credentials are no good
   SearchFailed, // For whatever reason, the splunk search failed
   ConsolidationFailed, // Something went wrong during event consolidation phase
@@ -395,8 +395,8 @@ function process_error(r: Response | ErrorCodes | TypeError): ErrorCodes {
   console.error(r);
   if (r instanceof TypeError) {
     console.log("typerrror");
-    if (r.message.includes("NetworkError when attempting to fetch resource.")) {
-      return ErrorCodes.BadCORS;
+    if (r.message.includes("NetworkError")) {
+      return ErrorCodes.BadNetwork;
     }
   } else if (r instanceof Response) {
     console.log("response");
@@ -404,11 +404,14 @@ function process_error(r: Response | ErrorCodes | TypeError): ErrorCodes {
     let response = r as Response;
     switch (response.status) {
       case 404:
-        return ErrorCodes.BadHostname;
+        return ErrorCodes.PageNotFound;
+      default:
+        console.log("Unsure how to handle error " + response.status);
+        return ErrorCodes.UnknownError;
     }
-  } else if (typeof r === typeof ErrorCodes.BadHostname) {
-    console.log("errorcode");
+  } else if (typeof r === typeof ErrorCodes.UnknownError) {
     // It's already an error code - pass along
+    console.log("errorcode");
     return r;
   }
   // idk lol
