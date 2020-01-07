@@ -12,9 +12,10 @@
           <v-icon>mdi-cloud-download</v-icon>
         </v-btn>
       </div>
+
       <v-list :two-line="true">
         <v-list-item v-if="files.length === 0"
-          >No items found! Try refreshing?</v-list-item
+          >No items found! Try different terms?</v-list-item
         >
         <v-list-item v-for="(val, index) in files" :key="val.Key">
           <v-list-item-content>

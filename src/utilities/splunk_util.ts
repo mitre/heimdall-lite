@@ -123,12 +123,6 @@ export class SplunkEndpoint {
       // Because we only searched for headers, we can assume these to be eval events
       let eval_events = events as ExecutionPayload[];
 
-      for (let e of eval_events) {
-        console.log(
-          `Found eval with guid ${e.meta.guid} and filename ${e.meta.filename}`
-        );
-      }
-
       // Could perhaps just return e but I'd rather people didn't screw themselves
       return eval_events.map(e => e.meta);
     });
@@ -149,7 +143,7 @@ export class SplunkEndpoint {
       .then(events => consolidate_payloads(events))
       .then(execs => {
         if (execs.length != 1) {
-          throw ErrorCodes.InvalidGUID;
+          throw SplunkErrorCode.InvalidGUID;
         } else {
           return execs[0];
         }
@@ -162,10 +156,9 @@ export class SplunkEndpoint {
         if (result["1_0_ExecJson"]) {
           // Handle as exec
           let execution = result["1_0_ExecJson"];
-          console.log(execution);
           return execution;
         } else {
-          throw ErrorCodes.SchemaViolation;
+          throw SplunkErrorCode.SchemaViolation;
         }
       });
   }
@@ -185,7 +178,7 @@ export class SplunkEndpoint {
       .then(job_id => this.pend_job(job_id, 500))
       .then(job_state => {
         if (job_state.status === "failed") {
-          throw ErrorCodes.SearchFailed;
+          throw SplunkErrorCode.SearchFailed;
         }
 
         return this.get_search_results(job_state.job_id);
@@ -379,7 +372,7 @@ function consolidate_file_payloads(
   return exec;
 }
 
-export enum ErrorCodes {
+export enum SplunkErrorCode {
   BadNetwork, // Server could not be reached, either due to bad address or bad CORS
   PageNotFound, // Server gave error 404
   BadAuth, // Authorization credentials are no good
@@ -391,29 +384,32 @@ export enum ErrorCodes {
 }
 
 /** Converts Responses and Errorcodes into purely just errorcodes */
-function process_error(r: Response | ErrorCodes | TypeError): ErrorCodes {
-  console.error(r);
+function process_error(
+  r: Response | SplunkErrorCode | TypeError
+): SplunkErrorCode {
+  console.warn("Got error in splunk operations");
+  console.warn(r);
   if (r instanceof TypeError) {
-    console.log("typerrror");
+    console.warn("Typeerror");
     if (r.message.includes("NetworkError")) {
-      return ErrorCodes.BadNetwork;
+      return SplunkErrorCode.BadNetwork;
     }
   } else if (r instanceof Response) {
-    console.log("response");
+    console.warn("Bad Response");
     // Based on the network code, guess
     let response = r as Response;
     switch (response.status) {
       case 404:
-        return ErrorCodes.PageNotFound;
+        return SplunkErrorCode.PageNotFound;
       default:
         console.log("Unsure how to handle error " + response.status);
-        return ErrorCodes.UnknownError;
+        return SplunkErrorCode.UnknownError;
     }
-  } else if (typeof r === typeof ErrorCodes.UnknownError) {
+  } else if (typeof r === typeof SplunkErrorCode.UnknownError) {
     // It's already an error code - pass along
-    console.log("errorcode");
+    console.warn("SplunkErrorCode");
     return r;
   }
   // idk lol
-  return ErrorCodes.UnknownError;
+  return SplunkErrorCode.UnknownError;
 }
