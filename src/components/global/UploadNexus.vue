@@ -33,11 +33,11 @@
       </v-tab-item>
 
       <v-tab-item value="uploadtab-s3">
-        <S3Reader class="pa-4" @got-files="got_files" />
+        <S3Reader @got-files="got_files" />
       </v-tab-item>
 
       <v-tab-item value="uploadtab-splunk">
-        <SplunkReader class="pa-4" @got-files="got_files" />
+        <SplunkReader @got-files="got_files" />
       </v-tab-item>
     </v-tabs>
     <HelpFooter />

@@ -1,29 +1,25 @@
 <template>
-  <v-stepper v-model="step" vertical>
-    <v-stepper-step step="1">
-      Login Credentials
-    </v-stepper-step>
+  <ErrorTooltip ref="error_tooltip">
+    <v-stepper v-model="step" vertical>
+      <v-stepper-step step="1">
+        Login Credentials
+      </v-stepper-step>
+      <v-stepper-step step="2">
+        Search Execution Events
+      </v-stepper-step>
 
-    <AuthStep
-      v-bind:username.sync="username"
-      v-bind:password.sync="password"
-      v-bind:hostname.sync="hostname"
-      @auth="handle_login"
-      @error="handle_error"
-    />
+      <AuthStep @authenticated="handle_login" @error="handle_error" />
 
-    <!-- :complete="!!assumed_role && assumed_role.from_mfa" -->
-    <v-stepper-step step="2">
-      Search Execution Events
-    </v-stepper-step>
+      <!-- :complete="!!assumed_role && assumed_role.from_mfa" -->
 
-    <FileList
-      :endpoint="splunk_state"
-      @exit-list="handle_loguout"
-      @got-files="got_files"
-      @error="handle_error"
-    />
-  </v-stepper>
+      <FileList
+        :endpoint="splunk_state"
+        @exit-list="handle_logout"
+        @got-files="got_files"
+        @error="handle_error"
+      />
+    </v-stepper>
+  </ErrorTooltip>
 </template>
 
 <script lang="ts">
@@ -37,16 +33,12 @@ import {
   SplunkEndpoint,
   SplunkErrorCode
 } from "../../../../utilities/splunk_util";
-import { LocalStorageVal } from "../../../../utilities/helper_util";
+import ErrorTooltip from "../../../generic/ErrorTooltip.vue";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {}
 });
-
-const local_username = new LocalStorageVal<string>("splunk_username");
-const local_password = new LocalStorageVal<string>("splunk_password");
-const local_hostname = new LocalStorageVal<string>("splunk_hostname");
 
 /**
  * File reader component for taking in inspec JSON data.
@@ -56,18 +48,11 @@ const local_hostname = new LocalStorageVal<string>("splunk_hostname");
 @Component({
   components: {
     AuthStep,
-    FileList
+    FileList,
+    ErrorTooltip
   }
 })
-export default class S3Reader extends Props {
-  /** What error is currently shown, if any. Shared between stages. */
-  error: string | null = null;
-
-  /** State of all globally relevant fields */
-  username: string = "";
-  password: string = "";
-  hostname: string = "";
-
+export default class SplunkReader extends Props {
   /** Our session information, saved iff valid */
   splunk_state: SplunkEndpoint | null = null;
 
@@ -75,66 +60,63 @@ export default class S3Reader extends Props {
   step: number = 1;
 
   /** When login is clicked - save credentials, verify that they work, then proceed if they do*/
-  handle_login() {
-    // If we need another error, it will be set shortly. If not, the old one is probably not relevant
-    this.error = null;
+  handle_login(new_endpoint: SplunkEndpoint) {
+    // Store the state
+    this.splunk_state = new_endpoint;
 
-    // Save credentials
-    local_username.set(this.username);
-    local_password.set(this.password);
-    local_hostname.set(this.hostname);
-
-    // Check splunk
-    let s = new SplunkEndpoint(this.hostname, this.username, this.password);
-
-    s.hdf_event_search("search *")
-      .then(ok => {
-        // all goes well, proceed
-        this.step = 2;
-        this.splunk_state = s;
-      })
-      .catch(err => {
-        console.error("Oh no! Splunk search failed with following error");
-        console.error(err);
-      });
+    // Move the carousel
+    this.step = 2;
   }
 
   /** When cancel/logoutis clicked from the search window */
-  handle_loguout() {
+  handle_logout() {
     this.step = 1;
     this.splunk_state = null;
-  }
-
-  /** On mount, try to look up stored auth info */
-  mounted() {
-    // Load our saved garbage
-    this.username = local_username.get_default("");
-    this.password = local_password.get_default("");
-    this.hostname = local_hostname.get_default("");
   }
 
   /** Callback to handle a splunk error.
    * Sets shown error.
    */
   handle_error(error: SplunkErrorCode): void {
+    console.log(error);
     switch (error) {
       case SplunkErrorCode.BadNetwork:
+        this.show_error_message(
+          "Connection to host failed. Please ensure that the hostname is correct, and that your splunk server has been properly configured to allow CORS requests"
+        );
         break;
       case SplunkErrorCode.PageNotFound:
+        this.show_error_message(
+          "Connection made with errors. Please ensure your hostname is formatted as shown in the example."
+        );
         break;
       case SplunkErrorCode.BadAuth:
+        this.show_error_message("Bad username or password.");
         break;
       case SplunkErrorCode.SearchFailed:
+        this.show_error_message("Internal splunk error while searching");
         break;
       case SplunkErrorCode.ConsolidationFailed:
-        break;
       case SplunkErrorCode.SchemaViolation:
+        this.show_error_message("Error creating execution from splunk events.");
         break;
       case SplunkErrorCode.InvalidGUID:
+        this.show_error_message(
+          "Duplicate execution GUID detected. The odds of this happening should be astronomically low. Please file a bug report."
+        );
         break;
       case SplunkErrorCode.UnknownError:
+        this.show_error_message(
+          "Something went wrong, but we're not sure what. Please file a bug report."
+        );
         break;
     }
+  }
+
+  /** Give our error tooltip the message */
+  show_error_message(msg: string) {
+    let tt = this.$refs["error_tooltip"] as ErrorTooltip;
+    tt.show_error(msg);
   }
 
   /** Callback on got files */

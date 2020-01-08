@@ -1,20 +1,38 @@
 <template>
   <v-stepper-content step="2">
     <div class="d-flex flex-column">
-      <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
       <v-data-table
         :headers="headers"
         item-key="guid"
         :items="items"
         :search="search"
-      />
-      <v-btn color="red" @click="$emit('exit-list')" class="my-2">
+        :items-per-page="5"
+      >
+        <template v-slot:top>
+          <v-toolbar>
+            <v-toolbar-title>Splunk Executions</v-toolbar-title>
+            <v-divider class="mx-4" inset vertical></v-divider>
+            <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-toolbar>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <v-icon @click="load_event(item)">
+            mdi-plus-circle
+          </v-icon>
+        </template>
+        <template v-slot:no-data>
+          No data. Try relaxing your search conditions, or expanding the date
+          range.
+        </template>
+      </v-data-table>
+      <v-btn color="red" @click="logout" class="my-2">
         Logout
       </v-btn>
     </div>
@@ -63,6 +81,11 @@ export default class FileList extends Props {
     {
       text: "Time",
       value: "start_time"
+    },
+    {
+      text: "Action",
+      value: "action",
+      sortable: false
     }
   ];
 
@@ -81,19 +104,21 @@ export default class FileList extends Props {
    * Loads it into our system.
    * We assume we're auth'd if this is called
    */
-  async load_event(index: number): Promise<void> {
+  async load_event(event: ExecutionMetaInfo): Promise<void> {
     // Get it out of the list
-    let event = (null as unknown) as ExecutionMetaInfo;
+    //let event = (null as unknown) as ExecutionMetaInfo;
 
     // Get its full event list and reconstruct
     return this._endpoint!.get_execution(event.guid)
       .then(exec => {
+        let unique_id = next_free_file_ID();
         let file = {
-          unique_id: next_free_file_ID(),
-          filename: `Splunk ${event.guid}`,
+          unique_id,
+          filename: `${event.filename} (Splunk)`,
           execution: exec
         } as ExecutionFile;
         getModule(InspecDataModule, this.$store).addExecution(file);
+        this.$emit("got-files", [unique_id]);
       })
       .catch((failure: SplunkErrorCode) => {
         this.$emit("error", failure);
@@ -145,6 +170,11 @@ export default class FileList extends Props {
     }
   }
 
+  logout() {
+    this.$emit("exit-list");
+    this.items = [];
+  }
+
   /** Used for timer functions */
   last_search_time: number = 0;
   time_since_last_search(): number {
@@ -153,12 +183,14 @@ export default class FileList extends Props {
 
   // Init search timers
   mounted() {
-    this.searcher = setInterval(this.search_poller, 100);
+    this.searcher = setInterval(this.search_poller, 1000);
   }
 
-  // Clear timers
+  // Clear timer on destroy as well
   beforeDestroy() {
-    clearInterval(this.searcher);
+    if (this.searcher) {
+      clearInterval(this.searcher);
+    }
   }
 }
 </script>

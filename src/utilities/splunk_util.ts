@@ -111,6 +111,29 @@ export class SplunkEndpoint {
     this.password = password;
   }
 
+  /** Checks whether we're able to successfully get jobs,
+   * which indicates proper auth.
+   *
+   * Will error if we aren't
+   */
+  async check_auth(): Promise<void> {
+    return fetch(`${this.host}/services/search/jobs`, {
+      headers: {
+        Authorization: this.auth_string
+      },
+      method: "GET"
+    }).then(
+      response => {
+        if (!response.ok) {
+          throw process_error(response);
+        }
+      },
+      failure => {
+        throw process_error(failure);
+      }
+    );
+  }
+
   /** Provides a list of Evaluation meta headers from recent executions.
    * We should eventually change this to allow more specific criteria
    */
@@ -184,7 +207,7 @@ export class SplunkEndpoint {
         return this.get_search_results(job_state.job_id);
       })
       .catch(error => {
-        throw new Error(process_error(error).toString());
+        throw process_error(error);
       });
   }
 
@@ -198,7 +221,7 @@ export class SplunkEndpoint {
       body: `search=search index="hdf" | ${search_string}`
     })
       .then(response => {
-        if (!response.ok) throw response;
+        if (!response.ok) throw process_error(response);
         return response.text();
       })
       .then(text => {
@@ -219,7 +242,7 @@ export class SplunkEndpoint {
       })
     })
       .then(response => {
-        if (!response.ok) throw response;
+        if (!response.ok) throw process_error(response);
         return response.text();
       })
       .then(text => {
@@ -288,7 +311,7 @@ export class SplunkEndpoint {
       }
     )
       .then(response => {
-        if (!response.ok) throw response;
+        if (!response.ok) throw process_error(response);
         return response.json();
       })
       .then(data => {
@@ -298,7 +321,7 @@ export class SplunkEndpoint {
           (datum: any) => datum._raw
         );
 
-        // Parse to json
+        // Parse to json, and freeze
         let parsed = [] as UnknownPayload[];
         for (let v of raws) {
           try {
@@ -399,7 +422,9 @@ function process_error(
     // Based on the network code, guess
     let response = r as Response;
     switch (response.status) {
-      case 404:
+      case 401: // Bad username/password
+        return SplunkErrorCode.BadAuth;
+      case 404: // URL got borked
         return SplunkErrorCode.PageNotFound;
       default:
         console.log("Unsure how to handle error " + response.status);
