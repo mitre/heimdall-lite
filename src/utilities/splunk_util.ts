@@ -173,7 +173,12 @@ export class SplunkEndpoint {
       })
       .then(full_event => {
         // This is dumb and we should make the inspecjs layer more accepting of many file types
-        let result = parse.convertFile(JSON.stringify(full_event));
+        let result: parse.ConversionResult;
+        try {
+          result = parse.convertFile(JSON.stringify(full_event));
+        } catch (e) {
+          throw SplunkErrorCode.SchemaViolation;
+        }
 
         // Determine what sort of file we (hopefully) have, then add it
         if (result["1_0_ExecJson"]) {
@@ -407,7 +412,7 @@ export enum SplunkErrorCode {
 }
 
 /** Converts Responses and Errorcodes into purely just errorcodes */
-function process_error(
+export function process_error(
   r: Response | SplunkErrorCode | TypeError
 ): SplunkErrorCode {
   console.warn("Got error in splunk operations");

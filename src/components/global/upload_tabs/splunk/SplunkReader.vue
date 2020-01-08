@@ -78,11 +78,11 @@ export default class SplunkReader extends Props {
    * Sets shown error.
    */
   handle_error(error: SplunkErrorCode): void {
-    console.log(error);
     switch (error) {
       case SplunkErrorCode.BadNetwork:
+        // https://docs.splunk.com/Documentation/Splunk/8.0.1/Admin/Serverconf
         this.show_error_message(
-          "Connection to host failed. Please ensure that the hostname is correct, and that your splunk server has been properly configured to allow CORS requests"
+          "Connection to host failed. Please ensure that the hostname is correct, and that your splunk server has been properly configured to allow CORS requests. Please see https://docs.splunk.com/Documentation/Splunk/8.0.1/Admin/Serverconf for information on how to enable CORS."
         );
         break;
       case SplunkErrorCode.PageNotFound:

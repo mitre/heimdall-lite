@@ -120,8 +120,8 @@ export default class FileList extends Props {
         getModule(InspecDataModule, this.$store).addExecution(file);
         this.$emit("got-files", [unique_id]);
       })
-      .catch((failure: SplunkErrorCode) => {
-        this.$emit("error", failure);
+      .catch(fail => {
+        this.$emit("error", fail);
       });
   }
 

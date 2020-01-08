@@ -1,10 +1,10 @@
 <template>
   <v-tooltip :value="errors.length" top :open-on-hover="false">
-    <template #activator>
-      <slot />
+    <template #activator="data">
+      <slot v-on="data.on" />
     </template>
     <ul>
-      <li>Error:</li>
+      <li><strong>Errors encountered:</strong></li>
       <li v-for="item in errors" :key="item.key" v-text="item.text" />
     </ul>
   </v-tooltip>
