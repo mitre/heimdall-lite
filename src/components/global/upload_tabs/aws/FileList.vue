@@ -2,7 +2,11 @@
   <v-stepper-content step="3">
     <div class="d-flex flex-column">
       <div class="d-flex justify-space-between">
-        <v-text-field v-model="form_bucket_name" label="Bucket name" />
+        <v-text-field
+          v-model="form_bucket_name"
+          label="Bucket name"
+          @keyup.enter="load"
+        />
         <v-btn
           title="Load"
           @click="load"

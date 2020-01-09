@@ -39,12 +39,12 @@ export default class ErrorTooltip extends Props {
     // Increment counter
     this.counter += 1;
 
-    // Add the error, but clear it after 3 seconds
+    // Add the error, but clear it after X seconds
     this.errors.push({
       text: message,
       key: this.counter
     });
-    setTimeout(() => this.errors.shift(), 6000);
+    setTimeout(() => this.errors.shift(), 12000);
   }
 }
 </script>
