@@ -402,6 +402,7 @@ function consolidate_file_payloads(
 
 export enum SplunkErrorCode {
   BadNetwork, // Server could not be reached, either due to bad address or bad CORS
+  BadUrl, // URL poorly formed
   PageNotFound, // Server gave error 404
   BadAuth, // Authorization credentials are no good
   SearchFailed, // For whatever reason, the splunk search failed
@@ -421,6 +422,8 @@ export function process_error(
     console.warn("Typeerror");
     if (r.message.includes("NetworkError")) {
       return SplunkErrorCode.BadNetwork;
+    } else if (r.message.includes("not a valid URL")) {
+      return SplunkErrorCode.BadUrl;
     }
   } else if (r instanceof Response) {
     console.warn("Bad Response");

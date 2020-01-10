@@ -18,6 +18,29 @@
         @got-files="got_files"
         @error="handle_error"
       />
+
+      <v-overlay :opacity="50" absolute="absolute" :value="error_count >= 3">
+        <div class="text-center">
+          <p>
+            It seems you may be having trouble using the Splunk toolkit. Are you
+            sure that you have configured it properly? <br />See here for more
+            details:
+            <v-btn
+              target="_blank"
+              ref="https://github.com/mitre/hdf-json-to-splunk/"
+              text
+              color="info"
+              px-0
+            >
+              <v-icon pr-2>mdi-github-circle</v-icon>
+              Splunk HDF Plugin
+            </v-btn>
+          </p>
+          <v-btn color="info" @click="error_count = 0">
+            Ok
+          </v-btn>
+        </div>
+      </v-overlay>
     </v-stepper>
   </ErrorTooltip>
 </template>
@@ -59,6 +82,9 @@ export default class SplunkReader extends Props {
   /** Current step. 1 for login, 2 for search */
   step: number = 1;
 
+  /** Count errors to know if we should show overlay */
+  error_count = 0;
+
   /** When login is clicked - save credentials, verify that they work, then proceed if they do*/
   handle_login(new_endpoint: SplunkEndpoint) {
     // Store the state
@@ -80,12 +106,14 @@ export default class SplunkReader extends Props {
   handle_error(error: SplunkErrorCode): void {
     switch (error) {
       case SplunkErrorCode.BadNetwork:
+        this.error_count += 1;
         // https://docs.splunk.com/Documentation/Splunk/8.0.1/Admin/Serverconf
         this.show_error_message(
           "Connection to host failed. Please ensure that the hostname is correct, and that your splunk server has been properly configured to allow CORS requests. Please see https://docs.splunk.com/Documentation/Splunk/8.0.1/Admin/Serverconf for information on how to enable CORS."
         );
         break;
       case SplunkErrorCode.PageNotFound:
+        this.error_count += 1;
         this.show_error_message(
           "Connection made with errors. Please ensure your hostname is formatted as shown in the example."
         );
@@ -98,11 +126,17 @@ export default class SplunkReader extends Props {
         break;
       case SplunkErrorCode.ConsolidationFailed:
       case SplunkErrorCode.SchemaViolation:
+        this.error_count += 1;
         this.show_error_message("Error creating execution from splunk events.");
         break;
       case SplunkErrorCode.InvalidGUID:
         this.show_error_message(
           "Duplicate execution GUID detected. The odds of this happening should be astronomically low. Please file a bug report."
+        );
+        break;
+      case SplunkErrorCode.BadUrl:
+        this.show_error_message(
+          "Invalid URL. Please ensure you have typed it correctly."
         );
         break;
       case SplunkErrorCode.UnknownError:
