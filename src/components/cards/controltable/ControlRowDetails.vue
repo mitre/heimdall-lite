@@ -37,7 +37,7 @@
             <v-divider></v-divider>
             <br />
             <v-clamp class="pb-2" autoresize :max-lines="2">
-              <template slot="default">{{ control.data.desc.trim() }}</template>
+              <template slot="default">{{ description }}</template>
               <template slot="after" slot-scope="{ toggle, expanded, clamped }">
                 <v-icon
                   fab
@@ -176,6 +176,16 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
     }
   }
 
+  /** Shown above the description */
+  get description(): string {
+    let hdf = this.control.hdf;
+    if ("caveat" in hdf.descriptions || "caveat" in hdf.tags) {
+      return hdf.descriptions.caveat;
+    } else {
+      return this.control.data.desc.trim();
+    }
+  }
+
   get details(): Detail[] {
     let c = this._control;
     return [
@@ -188,7 +198,7 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
         value: c.data.title
       },
       {
-        name: "Desc",
+        name: "Description",
         value: c.data.desc
       },
       {
