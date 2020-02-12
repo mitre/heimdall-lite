@@ -8,7 +8,11 @@
         Search Execution Events
       </v-stepper-step>
 
-      <AuthStep @authenticated="handle_login" @error="handle_error" />
+      <AuthStep
+        @authenticated="handle_login"
+        @error="handle_error"
+        @show-help="error_count = -1"
+      />
 
       <!-- :complete="!!assumed_role && assumed_role.from_mfa" -->
 
@@ -19,12 +23,21 @@
         @error="handle_error"
       />
 
-      <v-overlay :opacity="50" absolute="absolute" :value="error_count >= 3">
+      <v-overlay
+        :opacity="50"
+        absolute="absolute"
+        :value="error_count >= 3 || error_count < 0"
+      >
         <div class="text-center">
           <p>
-            It seems you may be having trouble using the Splunk toolkit. Are you
-            sure that you have configured it properly? <br />See here for more
-            details:
+            <span v-if="error_count > 0">
+              It seems you may be having trouble using the Splunk toolkit. Are
+              you sure that you have configured it properly?
+            </span>
+            <br />
+            <span>
+              For installation instructions and further information, check here:
+            </span>
             <v-btn
               target="_blank"
               ref="https://github.com/mitre/hdf-json-to-splunk/"

@@ -17,15 +17,24 @@
         hint="Ex: https://my.website.com:8089"
       />
     </v-form>
-    <v-btn
-      color="primary"
-      :disabled="!valid || logging_in"
-      :loading="logging_in"
-      @click="try_login"
-      class="my-2"
-    >
-      Login
-    </v-btn>
+    <v-row class="mx-1">
+      <v-btn
+        color="primary"
+        :disabled="!valid || logging_in"
+        :loading="logging_in"
+        @click="try_login"
+        class="my-2"
+      >
+        Login
+      </v-btn>
+      <v-spacer />
+      <v-btn @click="$emit('show-help')">
+        Help
+        <v-icon class="ml-2">
+          mdi-help-circle
+        </v-icon>
+      </v-btn>
+    </v-row>
   </v-stepper-content>
 </template>
 

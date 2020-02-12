@@ -97,7 +97,7 @@
     "fibers": "^4.0.2",
     "lint-staged": "^8.1.5",
     "material-design-icons-iconfont": "^5.0.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.13.1",
     "prettier": "^1.19.1",
     "sass": "^1.23.6",
     "sass-loader": "^7.3.1",
