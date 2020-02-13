@@ -40,7 +40,7 @@
             </span>
             <v-btn
               target="_blank"
-              ref="https://github.com/mitre/hdf-json-to-splunk/"
+              href="https://github.com/mitre/hdf-json-to-splunk/"
               text
               color="info"
               px-0
