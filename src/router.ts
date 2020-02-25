@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Results from "@/views/Results.vue";
 import Compare from "@/views/Compare.vue";
 import Landing from "@/views/Landing.vue";
+import Login from "@/views/Login.vue";
 
 Vue.use(Router);
 
@@ -17,6 +18,11 @@ export default new Router({
       path: "/compare",
       name: "compare",
       component: Compare
+    },
+    {
+      path: "/login",
+      name: "Login",
+      component: Login
     },
     /*
     {
