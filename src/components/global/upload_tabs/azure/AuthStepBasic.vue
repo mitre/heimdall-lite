@@ -1,0 +1,135 @@
+<template>
+  <v-stepper-content step="1">
+    <v-form v-model="valid">
+      <v-text-field
+        :value="account_name"
+        @input="change_account_name"
+        label="Storage Account Name"
+        lazy-validation="lazy"
+        :rules="[req_rule]"
+      />
+      <v-text-field
+        :value="account_suffix"
+        @input="change_account_suffix"
+        label="Account Suffix"
+        lazy-validation="lazy"
+        :rules="[req_rule]"
+      />
+      <v-text-field
+        :value="shared_access_signature"
+        @input="change_shared_access_signature"
+        label="Shared Access Signature"
+        :rules="[req_rule]"
+        :append-icon="show_secret ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="show_secret ? 'text' : 'password'"
+        @click:append="show_secret = !show_secret"
+      />
+      <v-text-field
+        :value="get_full_account_url()"
+        label="Full Storage Account URL"
+        readonly
+        outlined
+      />
+    </v-form>
+    <h2>OR</h2>
+    <v-form v-model="valid_conn_string">
+      <v-text-field
+        :value="connection_string"
+        @input="change_connection_string"
+        label="Connection String"
+        lazy-validation="lazy"
+        :rules="[req_rule]"
+      />
+    </v-form>
+    <v-btn
+      color="primary"
+      :disabled="!(valid || valid_conn_string)"
+      @click="$emit('auth-basic')"
+      class="my-2 mr-3"
+    >
+      Basic Login
+    </v-btn>
+  </v-stepper-content>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+import { LocalStorageVal } from "../../../../utilities/helper_util";
+import { get_blob_account_url } from "../../../../utilities/azure_util";
+
+// We declare the props separately to make props types inferable.
+const Props = Vue.extend({
+  props: {
+    account_name: String,
+    connection_string: String,
+    account_suffix: String,
+    shared_access_signature: String
+  }
+});
+
+/**
+ * File reader component for taking in inspec JSON data.
+ * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
+ * Emits "got-files" with a list of the unique_ids of the loaded files.
+ */
+@Component({
+  components: {}
+})
+export default class AuthStepBasic extends Props {
+  /** Models if currently displayed form is valid.
+   * Shouldn't be used to interpret literally anything else as valid - just checks fields filled
+   */
+  valid: boolean = false;
+  valid_conn_string: boolean = false;
+  show_secret: boolean = false;
+
+  /** Localstorage keys */
+  local_account_name = new LocalStorageVal<string>("azure_account_name");
+  local_connection_string = new LocalStorageVal<string>(
+    "azure_connection_string"
+  );
+  local_shared_access_signature = new LocalStorageVal<string>(
+    "azure_blob_shared_access_signature"
+  );
+  local_account_suffix = new LocalStorageVal<string>(
+    "azure_blob_account_suffix"
+  );
+
+  /** Form required field rules. Maybe eventually expand to other stuff */
+  req_rule = (v: string | null | undefined) =>
+    (v || "").trim().length > 0 || "Field is Required";
+
+  get_full_account_url(): string {
+    return get_blob_account_url(
+      this.account_name,
+      this.account_suffix,
+      this.shared_access_signature
+    );
+  }
+
+  // Callback for change in account url
+  change_account_suffix(new_value: string) {
+    this.local_account_suffix.set(new_value);
+    this.$emit("update:account_suffix", new_value);
+  }
+
+  // Callback for change in account_name
+  change_account_name(new_value: string) {
+    this.local_account_name.set(new_value);
+    this.$emit("update:account_name", new_value);
+  }
+
+  // Callback for change in connection_string
+  change_connection_string(new_value: string) {
+    this.local_connection_string.set(new_value);
+    this.$emit("update:connection_string", new_value);
+  }
+
+  // Callback for change in account key
+  change_shared_access_signature(new_value: string) {
+    this.local_shared_access_signature.set(new_value);
+    this.$emit("update:shared_access_signature", new_value);
+  }
+}
+</script>
