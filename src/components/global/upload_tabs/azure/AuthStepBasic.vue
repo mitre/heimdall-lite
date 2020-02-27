@@ -68,6 +68,18 @@ const Props = Vue.extend({
   }
 });
 
+/** Localstorage keys */
+const local_account_name = new LocalStorageVal<string>("azure_account_name");
+const local_connection_string = new LocalStorageVal<string>(
+  "azure_connection_string"
+);
+const local_shared_access_signature = new LocalStorageVal<string>(
+  "azure_blob_shared_access_signature"
+);
+const local_account_suffix = new LocalStorageVal<string>(
+  "azure_blob_account_suffix"
+);
+
 /**
  * File reader component for taking in inspec JSON data.
  * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
@@ -84,18 +96,6 @@ export default class AuthStepBasic extends Props {
   valid_conn_string: boolean = false;
   show_secret: boolean = false;
 
-  /** Localstorage keys */
-  local_account_name = new LocalStorageVal<string>("azure_account_name");
-  local_connection_string = new LocalStorageVal<string>(
-    "azure_connection_string"
-  );
-  local_shared_access_signature = new LocalStorageVal<string>(
-    "azure_blob_shared_access_signature"
-  );
-  local_account_suffix = new LocalStorageVal<string>(
-    "azure_blob_account_suffix"
-  );
-
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
     (v || "").trim().length > 0 || "Field is Required";
@@ -110,26 +110,37 @@ export default class AuthStepBasic extends Props {
 
   // Callback for change in account url
   change_account_suffix(new_value: string) {
-    this.local_account_suffix.set(new_value);
+    local_account_suffix.set(new_value);
     this.$emit("update:account_suffix", new_value);
   }
 
   // Callback for change in account_name
   change_account_name(new_value: string) {
-    this.local_account_name.set(new_value);
+    local_account_name.set(new_value);
     this.$emit("update:account_name", new_value);
   }
 
   // Callback for change in connection_string
   change_connection_string(new_value: string) {
-    this.local_connection_string.set(new_value);
+    local_connection_string.set(new_value);
     this.$emit("update:connection_string", new_value);
   }
 
   // Callback for change in account key
   change_shared_access_signature(new_value: string) {
-    this.local_shared_access_signature.set(new_value);
+    local_shared_access_signature.set(new_value);
     this.$emit("update:shared_access_signature", new_value);
+  }
+
+  /** On mount, try to look up stored auth info */
+  mounted() {
+    // Load our credentials
+    this.change_account_suffix(local_account_suffix.get_default(""));
+    this.change_account_name(local_account_name.get_default(""));
+    this.change_connection_string(local_connection_string.get_default(""));
+    this.change_shared_access_signature(
+      local_shared_access_signature.get_default("")
+    );
   }
 }
 </script>
