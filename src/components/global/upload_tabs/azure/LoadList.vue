@@ -12,7 +12,7 @@
             >
               <v-icon>mdi-folder</v-icon>
             </v-btn>
-            {{ blob.name }}
+            {{ basename(blob.name) }}
           </v-list-item-title>
           <!-- Subtitle: Date of creation -->
           <v-list-item-subtitle v-if="blob.kind === 'blob'">
@@ -41,6 +41,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import path from "path";
 import { BlobItem, BlobPrefix } from "@azure/storage-blob";
 
 // We declare the props separately to make props types inferable.
@@ -61,6 +62,10 @@ export default class BlobList extends Props {
 
   remove_item(item: BlobItem | BlobPrefix) {
     this.$emit("remove-item", item);
+  }
+
+  basename(str: String) {
+    return path.basename(str.valueOf());
   }
 }
 </script>

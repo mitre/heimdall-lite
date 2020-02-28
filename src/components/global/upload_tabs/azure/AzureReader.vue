@@ -40,13 +40,13 @@
       @load-files="load_files"
       @remove-item="remove_item"
     />
-
   </v-stepper>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import path from "path";
 import { getModule } from "vuex-module-decorators";
 import InspecIntakeModule, {
   FileID,
@@ -87,7 +87,6 @@ const Props = Vue.extend({
     ContainerList
   }
 })
-
 export default class AzureReader extends Props {
   /** What error is currently shown, if any. Shared between stages. */
   error: string | null = null;
@@ -100,9 +99,9 @@ export default class AzureReader extends Props {
   containers: ContainerItem[] = [];
 
   /** Currently loaded blob list from container */
-  blobs: (BlobItem|BlobPrefix)[] = [];
+  blobs: (BlobItem | BlobPrefix)[] = [];
 
-  blobs_to_load: (BlobItem|BlobPrefix)[] = [];
+  blobs_to_load: (BlobItem | BlobPrefix)[] = [];
 
   blob_prefix: string = "";
   prev_blob_prefixs: string[] = [];
@@ -134,7 +133,12 @@ export default class AzureReader extends Props {
     // If we need another error, it will be set shortly. If not, the old one is probably not relevant
     this.error = null;
 
-    let storage_client = get_storage_client(this.connection_string, this.account_name, this.shared_access_signature, this.account_suffix);
+    let storage_client = get_storage_client(
+      this.connection_string,
+      this.account_name,
+      this.shared_access_signature,
+      this.account_suffix
+    );
     storage_client.getProperties().then(
       success => {
         console.log(storage_client);
@@ -144,17 +148,18 @@ export default class AzureReader extends Props {
       },
       err => {
         this.handle_error(err);
-      })
+      }
+    );
   }
 
   async load_containers() {
     let containers: ContainerItem[] = [];
 
-    if (!this.storage_client){
+    if (!this.storage_client) {
       return;
     }
 
-    for await (const container of this.storage_client.listContainers()){
+    for await (const container of this.storage_client.listContainers()) {
       containers.push(container);
     }
 
@@ -163,8 +168,8 @@ export default class AzureReader extends Props {
 
   async load_container_blobs(prefix: string = "") {
     this.blobs = [];
-    
-    if (!this.container_client){
+
+    if (!this.container_client) {
       this.step = 2;
       return;
     }
@@ -172,34 +177,30 @@ export default class AzureReader extends Props {
     this.prev_blob_prefixs.push(this.blob_prefix);
     this.blob_prefix = prefix;
 
-    list_blobs_hierarchy(this.container_client, prefix).then(
-      (blobs: (BlobPrefix|BlobItem)[]) => this.blobs = blobs
-    ).catch(
-      (err: any) => this.handle_error(err)
-    )
+    list_blobs_hierarchy(this.container_client, prefix)
+      .then((blobs: (BlobPrefix | BlobItem)[]) => (this.blobs = blobs))
+      .catch((err: any) => this.handle_error(err));
   }
 
   async navigate_back_prefix() {
     this.blobs = [];
-    
-    if (!this.container_client){
+
+    if (!this.container_client) {
       this.step = 2;
       return;
     }
 
-    list_blobs_hierarchy(this.container_client, this.prev_blob_prefixs.pop()).then(
-      (blobs: (BlobPrefix|BlobItem)[]) => this.blobs = blobs
-    ).catch(
-      (err: any) => this.handle_error(err)
-    )
+    list_blobs_hierarchy(this.container_client, this.prev_blob_prefixs.pop())
+      .then((blobs: (BlobPrefix | BlobItem)[]) => (this.blobs = blobs))
+      .catch((err: any) => this.handle_error(err));
   }
 
   async load_container(name: string) {
-    if (!this.storage_client){
+    if (!this.storage_client) {
       this.step = 1;
       return;
-    };
-    
+    }
+
     let container_client = get_container_client(this.storage_client, name);
     container_client.getProperties().then(
       success => {
@@ -210,56 +211,59 @@ export default class AzureReader extends Props {
       },
       (err: any) => {
         this.handle_error(err);
-      })
+      }
+    );
   }
 
   /** Callback to handle an Azure error.
    * Sets shown error.
    */
   handle_error(error: any): void {
-    this.error = error
+    this.error = error;
   }
 
-  add_item(item: BlobItem|BlobPrefix) {
+  add_item(item: BlobItem | BlobPrefix) {
     this.blobs_to_load.push(item);
     console.log(this.blobs_to_load);
   }
 
-  remove_item(item: BlobItem|BlobPrefix) {
+  remove_item(item: BlobItem | BlobPrefix) {
     let idx = this.blobs_to_load.findIndex(elem => elem.name === item.name);
     if (idx != undefined) {
       this.blobs_to_load.splice(idx, 1);
     }
   }
 
-  async load_files() {
-    if (!this.container_client){
-      this.step = 2;
-      return;
-    }
-
-    for (let item of this.blobs_to_load){
-      // check if prefix or blob item
-      if ((<BlobItem>item).properties != undefined) {
-        this.load_file(item as BlobItem);
-      } else {
-        list_blobs_flat(this.container_client, item.name).then(
-          blobs => {
-            for (let blob of blobs){
-              this.load_file(blob);
-            }
-          }
-        ).catch(
-          (err: any) => this.handle_error(err)
-        )
-      }
-    }
+  instanceOfBlobItem(object: any): object is BlobItem {
+    return "properties" in object;
   }
 
-  async load_file(item: BlobItem): Promise<void> {
-    if (!this.container_client){
+  async load_files() {
+    if (!this.container_client) {
       this.step = 2;
       return;
+    }
+    let files = [];
+
+    for (let item of this.blobs_to_load) {
+      // check if prefix or blob item
+      if (this.instanceOfBlobItem(item)) {
+        let fid = await this.load_file(item);
+      } else {
+        let blobs = await list_blobs_flat(this.container_client, item.name);
+        for (let blob of blobs) {
+          let fid = await this.load_file(blob);
+          if (fid != undefined) files.push(fid);
+        }
+      }
+    }
+
+    this.$emit("got-files", files);
+  }
+
+  async load_file(item: BlobItem): Promise<FileID | void> {
+    if (!this.container_client || path.extname(item.name) != ".json") {
+      return new Promise((res, rej) => res());
     }
 
     // Generate file id for it, and prep module for load
@@ -267,7 +271,7 @@ export default class AzureReader extends Props {
     let intake_module = getModule(InspecIntakeModule, this.$store);
 
     // Fetch it from azure, and promise to submit it to be loaded afterwards
-    await download_blob_file(this.container_client, item.name)
+    return download_blob_file(this.container_client, item.name)
       .then((content: String) => {
         return intake_module.loadText({
           text: content.valueOf(),
@@ -275,7 +279,7 @@ export default class AzureReader extends Props {
           unique_id
         });
       })
-      .then(() => this.$emit("got-files", [unique_id]))
+      .then(() => unique_id)
       .catch((failure: any) => this.handle_error(failure));
   }
 }

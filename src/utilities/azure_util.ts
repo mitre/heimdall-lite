@@ -145,6 +145,7 @@ export async function download_blob_file(
     })
     .then(body => {
       if (body) {
+        // @ts-ignore
         return body.text();
       } else {
         throw `Blob ${blob_name} does not exist in container ${container_client.containerName}`;

@@ -17,7 +17,7 @@
             >
               <v-icon>mdi-folder</v-icon>
             </v-btn>
-            {{ blob.name }}
+            {{ basename(blob.name) }}
           </v-list-item-title>
           <!-- Subtitle: Date of creation -->
           <v-list-item-subtitle v-if="blob.kind === 'blob'">
@@ -36,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import path from "path";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { ContainerClient, BlobItem, BlobPrefix } from "@azure/storage-blob";
@@ -65,6 +66,10 @@ export default class BlobList extends Props {
 
   navigate_back_prefix() {
     this.$emit("navigate-back-prefix");
+  }
+
+  basename(str: String) {
+    return path.basename(str.valueOf());
   }
 }
 </script>
