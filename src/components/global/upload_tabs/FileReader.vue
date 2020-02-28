@@ -131,6 +131,7 @@ export default class FileReader extends Props {
         return [];
       } else {
         console.log(new Error("Unhandled filetype found: " + extension));
+        return [];
       }
     }
   }
@@ -158,9 +159,9 @@ export default class FileReader extends Props {
    */
   async handle_xml_content(xml_content: FileContents): Promise<FileID[]> {
     let xccdf: XCCDF = new XCCDF(xml_content.text);
-    console.log(xccdf);
-    return [];
-    // return [];
+    xml_content.text = xccdf.jsonify();
+    console.log(xml_content.text);
+    return this.handle_json_content(xml_content);
   }
 
   /** Parses a JSON file and uploads it to the Data Store. */

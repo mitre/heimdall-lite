@@ -27,12 +27,16 @@ class XCCDF {
   xmlJSON: { [key: string]: any };
   profileJSON: parse.ConversionResult;
   constructor(fileString: string) {
-    this.xmlJSON = parser.parseString(
-      fileString,
-      (err: Error, result: Hash) => {
-        return result.root;
-      }
-    ).Benchmark;
+    let json: Hash;
+    let parse = new parser.Parser({
+      explicitArray: false,
+      mergeAttrs: true,
+      async: false
+    });
+    parse.parseString(fileString, (err: Error, result: Hash) => {
+      json = result.Benchmark;
+    });
+    this.xmlJSON = json;
     var cci: CCI = new CCI();
     var profile: Hash = {};
     profile.controls = [];
@@ -78,10 +82,18 @@ class XCCDF {
       var control: any = {};
       control["id"] = group.id;
       control["title"] = group.Rule.title;
-      group.Rule.description = parser.toJson(
-        "<root>" + group.Rule.description + "</root>",
-        { object: true }
-      )["root"];
+
+      let p = new parser.Parser({
+        explicitArray: false,
+        mergeAttrs: true,
+        async: false
+      });
+      p.parseString(
+        "<rooty>" + group.Rule.description + "</rooty>",
+        (err: Error, result2: Hash) => {
+          group.Rule.description = result2.rooty;
+        }
+      );
       control["desc"] = group.Rule.description.VulnDiscussion.split(
         "Satisfies: "
       )[0];
@@ -101,13 +113,13 @@ class XCCDF {
       control["tags"]["rid"] = group.Rule.id;
       control["tags"]["stig_id"] = group.Rule.version;
       control["tags"]["fix_id"] = group.Rule.fix.id;
-      control["tags"]["cci"] = group.Rule.ident.$t;
+      control["tags"]["cci"] = group.Rule.ident._;
       control["tags"]["nist"] = []; //@cci_items.fetch_nists(group.Rule.idents)
-      if (!group.Rule.ident.$t)
+      if (!group.Rule.ident._)
         for (var cciTag of group.Rule.ident)
-          control["tags"]["nist"].push(cci.lookup(cciTag.$t));
+          control["tags"]["nist"].push(cci.lookup(cciTag._));
       //@cci_items.fetch_nists(group.Rule.idents)
-      else control["tags"]["nist"] = [cci.lookup(group.Rule.ident.$t)]; //@cci_items.fetch_nists(group.Rule.idents)
+      else control["tags"]["nist"] = [cci.lookup(group.Rule.ident._)]; //@cci_items.fetch_nists(group.Rule.idents)
       control["tags"]["nist"].push("Rev_4");
       if (group.Rule.description.FalseNegatives != "")
         control["tags"]["false_negatives"] =
@@ -137,7 +149,7 @@ class XCCDF {
       if (group.Rule.description.IAControls != "")
         control["tags"]["ia_controls"] = group.Rule.description.IAControls;
       control["tags"]["check"] = group.Rule["check-content"];
-      control["tags"]["fix"] = group.Rule.fixtext.$t;
+      control["tags"]["fix"] = group.Rule.fixtext._;
       control["code"] = "";
       control["source_location"] = { ref: "", line: 0 };
       control["results"] = [];
@@ -160,7 +172,7 @@ class XCCDF {
     return 0.0;
   }
 
-  stringify() {
+  jsonify() {
     return JSON.stringify(this.profileJSON);
   }
 }

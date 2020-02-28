@@ -38418,34 +38418,36 @@ class CCI {
   cciRAJSON: Hash = {};
   cciR1JSON: Hash = {};
   constructor() {
-    let parse = new parser.Parser({ explicitArray: false, mergeAttrs: true });
-    parse.parseString(
-      fileString,
-      (err: Error, xmlJSON: Hash): Hash => {
-        xmlJSON = xmlJSON.cci_list.cci_items;
-        console.log(JSON.stringify(xmlJSON, null, 4));
-        var cci: Hash = {};
-        for (var item of xmlJSON.cci_item) {
-          if (item.references.reference.index)
-            item.references.reference = [item.references.reference];
-          for (var ref of item.references.reference) {
-            switch (ref.title) {
-              case "NIST SP 800-53 Revision 4":
-                this.cciR4JSON[item.id] = ref.index;
-                break;
-              case "NIST SP 800-53A":
-                this.cciRAJSON[item.id] = ref.index;
-                break;
-              case "NIST SP 800-53":
-                this.cciR1JSON[item.id] = ref.index;
-                break;
-            }
+    let parse = new parser.Parser({
+      explicitArray: false,
+      mergeAttrs: true,
+      async: false
+    });
+    let json: Hash;
+    parse.parseString(fileString, (err: Error, xmlJSON: Hash) => {
+      xmlJSON = xmlJSON.cci_list.cci_items;
+      console.log(JSON.stringify(xmlJSON, null, 4));
+      var cci: Hash = {};
+      for (var item of xmlJSON.cci_item) {
+        if (item.references.reference.index)
+          item.references.reference = [item.references.reference];
+        for (var ref of item.references.reference) {
+          switch (ref.title) {
+            case "NIST SP 800-53 Revision 4":
+              this.cciR4JSON[item.id] = ref.index;
+              break;
+            case "NIST SP 800-53A":
+              this.cciRAJSON[item.id] = ref.index;
+              break;
+            case "NIST SP 800-53":
+              this.cciR1JSON[item.id] = ref.index;
+              break;
           }
         }
-        this.xmlJSON = xmlJSON;
       }
-    );
-    console.log(JSON.stringify(this.xmlJSON, null, 4));
+      json = xmlJSON;
+    });
+    this.xmlJSON = json;
   }
 
   lookup(tag: string): string {
