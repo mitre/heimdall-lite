@@ -46,6 +46,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
 import UploadButton from "@/components/global/UploadButton.vue";
+import XCCDF from "@/utilities/xccdf";
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
@@ -121,6 +122,7 @@ export default class FileReader extends Props {
       if (extension === ".json") {
         return this.handle_json_content(file);
       } else if (extension === ".xml") {
+        console.log("found " + extension);
         return this.handle_xml_content(file);
       } else if (extension === ".zip") {
         console.error(
@@ -128,7 +130,7 @@ export default class FileReader extends Props {
         );
         return [];
       } else {
-        throw new Error("Unhandled filetype found: " + extension);
+        console.log(new Error("Unhandled filetype found: " + extension));
       }
     }
   }
@@ -155,7 +157,9 @@ export default class FileReader extends Props {
    * This is just my best guess at how best to do it since I don't know exactly how your json code works.
    */
   async handle_xml_content(xml_content: FileContents): Promise<FileID[]> {
-    throw "Hey LUKE! Go here";
+    let xccdf: XCCDF = new XCCDF(xml_content.text);
+    console.log(xccdf);
+    return [];
     // return [];
   }
 
