@@ -56,19 +56,48 @@ const Props = Vue.extend({
   components: {}
 })
 export default class BlobList extends Props {
+  /**
+   * Helper function to load blobs for a selected folder
+   *
+   * @param {string} prefix The name of the prefix to load files for.
+   *
+   * @affects
+   *   "load-container-blobs" is emitted with the given prefix to load
+   */
   load_container_blobs(prefix: string) {
     this.$emit("load-container-blobs", prefix);
   }
 
+  /**
+   * Helper function to add a blob item to the list to download
+   *
+   * @param {BlobItem | BlobPrefix} item The blob item or folder to add to the list
+   *
+   * @affects
+   *   "add-item" is emitted with the given prefix to load
+   */
   add_item(item: BlobItem | BlobPrefix) {
     this.$emit("add-item", item);
   }
 
+  /**
+   * Helper function to navigate to the last blob prefix loaded
+   *
+   * @affects
+   *   "navigate-back-prefix" is emitted
+   */
   navigate_back_prefix() {
     this.$emit("navigate-back-prefix");
   }
 
-  basename(str: String) {
+  /**
+   * Helper function to get just the basename of a path
+   *
+   * @param {String} str The path to get the basename from
+   *
+   * @return {String} the basename of the path
+   */
+  basename(str: String): String {
     return path.basename(str.valueOf());
   }
 }

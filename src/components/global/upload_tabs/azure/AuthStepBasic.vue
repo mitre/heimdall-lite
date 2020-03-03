@@ -81,9 +81,6 @@ const local_account_suffix = new LocalStorageVal<string>(
 );
 
 /**
- * File reader component for taking in inspec JSON data.
- * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
- * Emits "got-files" with a list of the unique_ids of the loaded files.
  */
 @Component({
   components: {}
@@ -100,6 +97,11 @@ export default class AuthStepBasic extends Props {
   req_rule = (v: string | null | undefined) =>
     (v || "").trim().length > 0 || "Field is Required";
 
+  /**
+   * Helper function to generate the full connection url from the storage account name, suffix, and SAS token
+   *
+   * @return {string} the url
+   */
   get_full_account_url(): string {
     return get_blob_account_url(
       this.account_name,
@@ -108,25 +110,57 @@ export default class AuthStepBasic extends Props {
     );
   }
 
-  // Callback for change in account url
+  /**
+   * Callback for a change in account suffix
+   *
+   * @param {string} new_value The new value for account_suffix
+   *
+   * @affects
+   *   update:account_suffix emmitted with the new_value
+   *   local_account_suffix is set to new_value
+   */
   change_account_suffix(new_value: string) {
     local_account_suffix.set(new_value);
     this.$emit("update:account_suffix", new_value);
   }
 
-  // Callback for change in account_name
+  /**
+   * Callback for a change in account name
+   *
+   * @param {string} new_value The new value for account_name
+   *
+   * @affects
+   *   update:account_name emmitted with the new_value
+   *   local_account_name is set to new_value
+   */
   change_account_name(new_value: string) {
     local_account_name.set(new_value);
     this.$emit("update:account_name", new_value);
   }
 
-  // Callback for change in connection_string
+  /**
+   * Callback for a change in connection string
+   *
+   * @param {string} new_value The new value for connection_string
+   *
+   * @affects
+   *   update:connection_string emmitted with the new_value
+   *   local_connection_string is set to new_value
+   */
   change_connection_string(new_value: string) {
     local_connection_string.set(new_value);
     this.$emit("update:connection_string", new_value);
   }
 
-  // Callback for change in account key
+  /**
+   * Callback for a change in sas token
+   *
+   * @param {string} new_value The new value for shared_access_signature
+   *
+   * @affects
+   *   update:shared_access_signature emmitted with the new_value
+   *   local_shared_access_signature is set to new_value
+   */
   change_shared_access_signature(new_value: string) {
     local_shared_access_signature.set(new_value);
     this.$emit("update:shared_access_signature", new_value);

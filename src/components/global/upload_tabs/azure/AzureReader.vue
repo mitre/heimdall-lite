@@ -64,7 +64,6 @@ import BlobList from "@/components/global/upload_tabs/azure/BlobList.vue";
 import LoadList from "@/components/global/upload_tabs/azure/LoadList.vue";
 import ContainerList from "@/components/global/upload_tabs/azure/ContainerList.vue";
 import {
-  Auth,
   get_storage_client,
   get_container_client,
   list_blobs_hierarchy,
@@ -101,16 +100,19 @@ export default class AzureReader extends Props {
   /** Currently loaded blob list from container */
   blobs: (BlobItem | BlobPrefix)[] = [];
 
+  /** List of blobs to load this is generated as users select files */
   blobs_to_load: (BlobItem | BlobPrefix)[] = [];
 
+  /** The prefix of the blobs to load for BlobList */
   blob_prefix: string = "";
+
+  /** A list of blob paths traversed. This is used by BlobList to go back. */
   prev_blob_prefixs: string[] = [];
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
     (v || "").trim().length > 0 || "Field is Required";
 
-  /** Passed from step 1 to step 2 (MFA) if necessary */
   /** State of all globally relevant fields */
   connection_string: string = "";
   account_name: string = "";
@@ -127,21 +129,31 @@ export default class AzureReader extends Props {
 
   /**
    * Handle a basic login.
-   * Gets a session token
+   * Gets a storage client
+   *
+   * @affects
+   *   this.storage_client is initialized with the given configuration
    */
   handle_basic() {
     // If we need another error, it will be set shortly. If not, the old one is probably not relevant
     this.error = null;
+    let storage_client: BlobServiceClient;
 
-    let storage_client = get_storage_client(
-      this.connection_string,
-      this.account_name,
-      this.shared_access_signature,
-      this.account_suffix
-    );
+    try {
+      storage_client = get_storage_client(
+        this.connection_string,
+        this.account_name,
+        this.shared_access_signature,
+        this.account_suffix
+      );
+    } catch (error) {
+      this.handle_error(error);
+      return;
+    }
+
+    // try to fetch the properties to see if the storage client actually exists. The client only fails when data is actually fetched.
     storage_client.getProperties().then(
       success => {
-        console.log(storage_client);
         this.storage_client = storage_client;
         this.step = 2;
         this.load_containers();
@@ -152,6 +164,12 @@ export default class AzureReader extends Props {
     );
   }
 
+  /**
+   * Load all the containers for the given storage client.
+   *
+   * @affects
+   *   this.containers is set to the containers in the currently loaded storage account.
+   */
   async load_containers() {
     let containers: ContainerItem[] = [];
 
@@ -166,6 +184,12 @@ export default class AzureReader extends Props {
     this.containers = containers;
   }
 
+  /**
+   * Load all the blobs for the currently loaded container client.
+   *
+   * @affects
+   *   this.blobs is set to the list of blobs in the container
+   */
   async load_container_blobs(prefix: string = "") {
     this.blobs = [];
 
@@ -182,6 +206,12 @@ export default class AzureReader extends Props {
       .catch((err: any) => this.handle_error(err));
   }
 
+  /**
+   * List the blobs in the last container path that was searched.
+   *
+   * @affects
+   *   this.blobs is set to the list of blobs in the container with the last prefix searched.
+   */
   async navigate_back_prefix() {
     this.blobs = [];
 
@@ -195,6 +225,14 @@ export default class AzureReader extends Props {
       .catch((err: any) => this.handle_error(err));
   }
 
+  /**
+   * Get the container client for the given container name.
+   *
+   * @param {string} name The name of the container to load.
+   *
+   * @affects
+   *   this.container_client is set to the initialized container client.
+   */
   async load_container(name: string) {
     if (!this.storage_client) {
       this.step = 1;
@@ -204,7 +242,6 @@ export default class AzureReader extends Props {
     let container_client = get_container_client(this.storage_client, name);
     container_client.getProperties().then(
       success => {
-        console.log(container_client);
         this.container_client = container_client;
         this.step = 3;
         this.load_container_blobs();
@@ -215,29 +252,64 @@ export default class AzureReader extends Props {
     );
   }
 
-  /** Callback to handle an Azure error.
+  /**
+   * Callback to handle an Azure error.
    * Sets shown error.
+   *
+   * @param {any} error The error to display
+   *
+   * @affects
+   *   this.error is set to the error
    */
   handle_error(error: any): void {
     this.error = error;
   }
 
+  /**
+   * Callback to handle adding a blob item or folder to the list of blobs to load.
+   *
+   * @param {BlobItem | BlobPrefix} item The file item or folder to eventually load.
+   *
+   * @affects
+   *   this.blobs_to_load the item is appended to it
+   */
   add_item(item: BlobItem | BlobPrefix) {
     this.blobs_to_load.push(item);
-    console.log(this.blobs_to_load);
   }
 
+  /**
+   * Callback to handle removing the given blob item or prefix from the list of blobs to load. The item is matched based on the blob name.
+   *
+   * @param {BlobItem | BlobPrefix} item The item to remove from blobs to load.
+   *
+   * @affects
+   *   this.blobs_to_load the item is remove from it
+   */
   remove_item(item: BlobItem | BlobPrefix) {
+    // fetch the index based on the element name.
     let idx = this.blobs_to_load.findIndex(elem => elem.name === item.name);
     if (idx != undefined) {
       this.blobs_to_load.splice(idx, 1);
     }
   }
 
-  instanceOfBlobItem(object: any): object is BlobItem {
+  /**
+   * Helper function to determine if the given object is a BlobItem. This is used for type checking between a BlobItem and a BlobPrefix.
+   *
+   * @param {BlobItem|BlobPrefix} object
+   *
+   * @return {bool} A boolean stating if the object is a blob item or not (ie blob prefix)
+   */
+  instanceOfBlobItem(object: BlobItem | BlobPrefix): object is BlobItem {
     return "properties" in object;
   }
 
+  /**
+   * Load all the files storage in this.blobs_to_load. This actually downloads the contents and loads the file into heimdall.
+   *
+   * @affects
+   *   'got-files' is emitted with all the json files specified in this.blobs_to_load
+   */
   async load_files() {
     if (!this.container_client) {
       this.step = 2;
@@ -245,22 +317,37 @@ export default class AzureReader extends Props {
     }
     let files = [];
 
-    for (let item of this.blobs_to_load) {
-      // check if prefix or blob item
-      if (this.instanceOfBlobItem(item)) {
-        let fid = await this.load_file(item);
-      } else {
-        let blobs = await list_blobs_flat(this.container_client, item.name);
-        for (let blob of blobs) {
-          let fid = await this.load_file(blob);
-          if (fid != undefined) files.push(fid);
+    try {
+      this.$emit("start-loading");
+
+      for (let item of this.blobs_to_load) {
+        // check if prefix or blob item
+        if (this.instanceOfBlobItem(item)) {
+          let fid = await this.load_file(item);
+        } else {
+          let blobs = await list_blobs_flat(this.container_client, item.name);
+          for (let blob of blobs) {
+            let fid = await this.load_file(blob);
+            if (fid != undefined) files.push(fid);
+          }
         }
       }
-    }
 
-    this.$emit("got-files", files);
+      this.$emit("stop-loading");
+      this.$emit("got-files", files);
+    } catch (error) {
+      this.$emit("stop-loading");
+      throw error;
+    }
   }
 
+  /**
+   * Helper function to actually load a blob and initialize it as an inspec file
+   *
+   * @param {BlobItem} item The blob item to load.
+   *
+   * @return {Promise<FileID | void>} The file id for the inspec file or void if no file is loaded.
+   */
   async load_file(item: BlobItem): Promise<FileID | void> {
     if (!this.container_client || path.extname(item.name) != ".json") {
       return new Promise((res, rej) => res());

@@ -48,6 +48,14 @@ const Props = Vue.extend({
   components: {}
 })
 export default class ContainerList extends Props {
+  /**
+   * Helper function to load the given container.
+   *
+   * @param {String} name The name of the container to load
+   *
+   * @affects
+   *   "load-container" is emmitted with the value name
+   */
   load_container(name: String) {
     this.$emit("load-container", name);
   }

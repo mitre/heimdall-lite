@@ -4,6 +4,7 @@
     @input="$emit('input', $event.target.value)"
     :persistent="persistent"
   >
+    <v-progress-linear indeterminate v-if="loading"></v-progress-linear>
     <v-tabs
       :vertical="$vuetify.breakpoint.mdAndUp"
       active
@@ -39,7 +40,12 @@
       </v-tab-item>
 
       <v-tab-item value="uploadtab-azure">
-        <AzureReader class="pa-4" @got-files="got_files" />
+        <AzureReader
+          class="pa-4"
+          @got-files="got_files"
+          @start-loading="start_loading"
+          @stop-loading="stop_loading"
+        />
       </v-tab-item>
 
       <v-tab-item value="uploadtab-splunk">
@@ -101,6 +107,8 @@ const Props = Vue.extend({
 export default class UploadNexus extends Props {
   active_tab: string = ""; // Set in mounted
 
+  loading: boolean = false; // determine if you should render loading screen
+
   // Loads the last open tab
   mounted() {
     this.active_tab = local_tab.get_default("uploadtab-local");
@@ -115,6 +123,18 @@ export default class UploadNexus extends Props {
   // Event passthrough
   got_files(files: FileID[]) {
     this.$emit("got-files", files);
+  }
+
+  // Handle loading
+  start_loading() {
+    console.log("start loading");
+    this.loading = true;
+  }
+
+  // Handle stop loading
+  stop_loading() {
+    console.log("stop loading");
+    this.loading = false;
   }
 }
 </script>
