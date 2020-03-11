@@ -324,6 +324,7 @@ export default class AzureReader extends Props {
         // check if prefix or blob item
         if (this.instanceOfBlobItem(item)) {
           let fid = await this.load_file(item);
+          if (fid != undefined) files.push(fid);
         } else {
           let blobs = await list_blobs_flat(this.container_client, item.name);
           for (let blob of blobs) {
