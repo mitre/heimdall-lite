@@ -363,12 +363,23 @@ export default class AzureReader extends Props {
       .then((content: String) => {
         return intake_module.loadText({
           text: content.valueOf(),
-          filename: item.name!,
+          filename: this.basename(item.name!).valueOf(),
           unique_id
         });
       })
       .then(() => unique_id)
       .catch((failure: any) => this.handle_error(failure));
+  }
+
+  /**
+   * Helper function to get just the basename of a path
+   *
+   * @param {String} str The path to get the basename from
+   *
+   * @return {String} the basename of the path
+   */
+  basename(str: String): String {
+    return path.basename(str.valueOf());
   }
 }
 </script>
