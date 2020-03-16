@@ -24,7 +24,6 @@
               <v-container>
                 <v-text-field
                   v-model="username"
-                  :counter="70"
                   label="email address"
                   maxlength="70"
                   required
@@ -34,15 +33,15 @@
                   type="password"
                   v-model="password"
                   label="password"
+                  maxlength="70"
                   required
                 />
                 <!-- :counter="20" -->
 
                 <v-text-field
                   v-model="host"
-                  :counter="20"
                   label="host"
-                  maxlength="20"
+                  maxlength="200"
                   required
                 />
               </v-container>
@@ -57,7 +56,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
@@ -86,20 +85,18 @@ export default class ServerLogin extends Props {
   loading = false;
 
   username_rules = [
-    v => !!v || "Username is required",
-    v =>
-      (v && v.length > 3) || "A username must be more than 3 characters long",
-    v =>
-      /^[a-z0-9_]+$/.test(v) || "A username can only contain letters and digits"
+    (v: string) => !!v || "Username is required"
+    // (v: string) => (v && v.length > 3) || "A username must be more than 3 characters long",
+    // (v: string) => /^[a-z0-9_]+$/.test(v) || "A username can only contain letters and digits"
   ];
   password_rules = [
-    v => !!v || "Password is required",
-    v => (v && v.length > 7) || "The password must be longer than 7 characters"
+    (v: string) => !!v || "Password is required"
+    // (v: string) => (v && v.length > 7) || "The password must be longer than 7 characters"
   ];
 
   async login(): Promise<void> {
     // checking if the input is valid
-    if (this.$refs.form.validate()) {
+    if ((this.$refs.form as any).validate()) {
       this.loading = true;
       let mod = getModule(ServerModule, this.$store);
       await mod
@@ -117,6 +114,7 @@ export default class ServerLogin extends Props {
         })
         .then(() => {
           console.log("Good!");
+          console.log(mod.token);
         });
     }
   }

@@ -45,6 +45,7 @@
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
+        <ServerLogin />
         <!-- Count Cards -->
         <StatusCardRow
           :filter="all_filter"
@@ -157,6 +158,7 @@ import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 import ExportNist from "@/components/global/ExportNist.vue";
+import ServerLogin from "@/components/global/ServerLogin.vue";
 
 import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -183,7 +185,8 @@ const ResultsProps = Vue.extend({
     ComplianceChart,
     ProfileData,
     ExportCaat,
-    ExportNist
+    ExportNist,
+    ServerLogin
   }
 })
 export default class Results extends ResultsProps {

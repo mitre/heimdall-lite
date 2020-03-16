@@ -77,6 +77,7 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to login to the server */
   @Action
   async login(username: string, password: string): Promise<void> {
+    console.log("Logging in");
     this.requires_connection();
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
     fetch(this.connection!.url + "/auth/login", {
@@ -90,7 +91,7 @@ class HeimdallServerModule extends VuexModule {
       .then(res => res.json())
       .then((v: any) => {
         if (typeof v == "string") {
-          this.token = v;
+          this.set_token(v);
         } else {
           console.error(`Something went wrong: Got ${v} for login response`);
           throw new ConnectionError(
