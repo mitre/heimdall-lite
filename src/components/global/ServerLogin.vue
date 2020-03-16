@@ -23,7 +23,7 @@
             <v-form v-else ref="form" v-model="valid" lazy-validation>
               <v-container>
                 <v-text-field
-                  v-model="credentials.username"
+                  v-model="username"
                   :counter="70"
                   label="email address"
                   maxlength="70"
@@ -32,15 +32,14 @@
 
                 <v-text-field
                   type="password"
-                  v-model="credentials.password"
-                  :counter="20"
+                  v-model="password"
                   label="password"
-                  maxlength="20"
                   required
                 />
+                <!-- :counter="20" -->
 
                 <v-text-field
-                  v-model="credentials.host"
+                  v-model="host"
                   :counter="20"
                   label="host"
                   maxlength="20"
@@ -70,5 +69,53 @@ const Props = Vue.extend({
 @Component({
   components: {}
 })
-export default class ServerLogin extends Props {}
+export default class ServerLogin extends Props {
+  // The fields
+  username: string = "";
+  password: string = "";
+  host: string = "";
+
+  // Whether fields are valid
+  valid = true;
+
+  // Whether we're currently loading
+  loading = false;
+
+  username_rules = [
+    v => !!v || "Username is required",
+    v =>
+      (v && v.length > 3) || "A username must be more than 3 characters long",
+    v =>
+      /^[a-z0-9_]+$/.test(v) || "A username can only contain letters and digits"
+  ];
+  password_rules = [
+    v => !!v || "Password is required",
+    v => (v && v.length > 7) || "The password must be longer than 7 characters"
+  ];
+
+  login() {
+    // checking if the input is valid
+    if (this.$refs.form.validate()) {
+      this.loading = true;
+      axios
+        .post("http://localhost:8000/auth/", this.credentials)
+        .then(res => {
+          this.$session.start();
+          this.$session.set("token", res.data.token);
+          router.push("/");
+        })
+        .catch(e => {
+          this.loading = false;
+          swal({
+            type: "warning",
+            title: "Error",
+            text: "Wrong username or password",
+            showConfirmButton: false,
+            showCloseButton: false,
+            timer: 3000
+          });
+        });
+    }
+  }
+}
 </script>
