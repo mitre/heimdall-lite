@@ -60,6 +60,10 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
+import { getModule } from "vuex-module-decorators";
+import ServerModule from "@/store/server";
+
+// TODO: Swap to sweetalert2?
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -93,27 +97,26 @@ export default class ServerLogin extends Props {
     v => (v && v.length > 7) || "The password must be longer than 7 characters"
   ];
 
-  login() {
+  async login(): Promise<void> {
     // checking if the input is valid
     if (this.$refs.form.validate()) {
       this.loading = true;
-      axios
-        .post("http://localhost:8000/auth/", this.credentials)
-        .then(res => {
-          this.$session.start();
-          this.$session.set("token", res.data.token);
-          router.push("/");
+      let mod = getModule(ServerModule, this.$store);
+      await mod
+        .connect(this.host)
+        .catch(bad => {
+          console.error(`Unable to connect to ${this.host}`);
+          throw bad;
         })
-        .catch(e => {
-          this.loading = false;
-          swal({
-            type: "warning",
-            title: "Error",
-            text: "Wrong username or password",
-            showConfirmButton: false,
-            showCloseButton: false,
-            timer: 3000
-          });
+        .then(() => {
+          return mod.login(this.username, this.password);
+        })
+        .catch(bad => {
+          console.error(`bad login ${bad}`);
+          throw bad;
+        })
+        .then(() => {
+          console.log("Good!");
         });
     }
   }
