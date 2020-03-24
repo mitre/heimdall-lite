@@ -62,6 +62,10 @@ import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 
+export interface LoginHash {
+  username: string;
+  password: string;
+}
 // TODO: Swap to sweetalert2?
 
 // We declare the props separately to make props types inferable.
@@ -97,6 +101,11 @@ export default class ServerLogin extends Props {
   async login(): Promise<void> {
     // checking if the input is valid
     if ((this.$refs.form as any).validate()) {
+      console.log("Login to " + this.host + " with password " + this.password);
+      let creds: LoginHash = {
+        username: this.username,
+        password: this.password
+      };
       this.loading = true;
       let mod = getModule(ServerModule, this.$store);
       await mod
@@ -106,7 +115,7 @@ export default class ServerLogin extends Props {
           throw bad;
         })
         .then(() => {
-          return mod.login(this.username, this.password);
+          return mod.login(creds);
         })
         .catch(bad => {
           console.error(`bad login ${bad}`);

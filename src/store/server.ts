@@ -8,6 +8,10 @@ import {
 import Store from "@/store/store";
 import { LocalStorageVal } from "@/utilities/helper_util";
 
+export interface LoginHash {
+  username: string;
+  password: string;
+}
 const local_token = new LocalStorageVal<string | null>("auth_token");
 
 type ConnErrorType =
@@ -76,12 +80,21 @@ class HeimdallServerModule extends VuexModule {
 
   /** Attempts to login to the server */
   @Action
-  async login(username: string, password: string): Promise<void> {
-    console.log("Logging in");
-    this.requires_connection();
+  async login(creds: LoginHash): Promise<void> {
+    console.log(
+      "Logging in to " +
+        this.connection!.url +
+        "/auth/login" +
+        " with " +
+        creds["username"] +
+        "/" +
+        creds["password"]
+    );
+    //this.requires_connection();
+    console.log("has connection");
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
     fetch(this.connection!.url + "/auth/login", {
-      body: `{"username": "${username}", "password": "${password}"}`,
+      body: `{"username": "${creds.username}", "password": "${creds.password}"}`,
       headers: {
         "Content-Type": "application/json"
       },
@@ -90,6 +103,7 @@ class HeimdallServerModule extends VuexModule {
       .then(this.check_code)
       .then(res => res.json())
       .then((v: any) => {
+        console.log("got token" + v);
         if (typeof v == "string") {
           this.set_token(v);
         } else {
