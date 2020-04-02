@@ -1,6 +1,31 @@
 <template>
   <v-stepper-content step="1">
+    <br />
+    <v-form>
+      <v-select
+        :items="auth_methods"
+        v-model="auth_method_model"
+        @change="change_auth_method"
+        return-object
+        item-text="text"
+        item-value="value"
+        label="Select Auth Method"
+        dense
+      ></v-select>
+    </v-form>
     <v-form v-model="valid">
+      <v-text-field
+        :value="container_name"
+        @input="change_container_name"
+        label="Container Name (optional)"
+        lazy-validation="lazy"
+        :rules="[]"
+      />
+    </v-form>
+    <v-form
+      v-model="valid"
+      v-if="auth_method_model && auth_method_model.value == 'sas'"
+    >
       <v-text-field
         :value="account_name"
         @input="change_account_name"
@@ -31,8 +56,10 @@
         outlined
       />
     </v-form>
-    <h2>OR</h2>
-    <v-form v-model="valid_conn_string">
+    <v-form
+      v-model="valid_conn_string"
+      v-if="auth_method_model && auth_method_model.value == 'conn_string'"
+    >
       <v-text-field
         :value="connection_string"
         @input="change_connection_string"
@@ -47,7 +74,7 @@
       @click="$emit('auth-basic')"
       class="my-2 mr-3"
     >
-      Basic Login
+      Login
     </v-btn>
   </v-stepper-content>
 </template>
@@ -57,21 +84,28 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { LocalStorageVal } from "../../../../utilities/helper_util";
 import { get_blob_account_url } from "../../../../utilities/azure_util";
+import { Dictionary } from "vue-router/types/router";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
+    auth_method: Object,
     account_name: String,
     connection_string: String,
+    container_name: String,
     account_suffix: String,
     shared_access_signature: String
   }
 });
 
 /** Localstorage keys */
+const local_auth_method = new LocalStorageVal<object>("azure_auth_method");
 const local_account_name = new LocalStorageVal<string>("azure_account_name");
 const local_connection_string = new LocalStorageVal<string>(
   "azure_connection_string"
+);
+const local_container_name = new LocalStorageVal<string>(
+  "azure_container_name"
 );
 const local_shared_access_signature = new LocalStorageVal<string>(
   "azure_blob_shared_access_signature"
@@ -92,6 +126,17 @@ export default class AuthStepBasic extends Props {
   valid: boolean = false;
   valid_conn_string: boolean = false;
   show_secret: boolean = false;
+  auth_methods: Array<object> = [
+    {
+      text: "SAS Token",
+      value: "sas"
+    },
+    {
+      text: "Connection String",
+      value: "conn_string"
+    }
+  ];
+  auth_method_model: object = null;
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
@@ -108,6 +153,21 @@ export default class AuthStepBasic extends Props {
       this.account_suffix,
       this.shared_access_signature
     );
+  }
+
+  /**
+   * Callback for a change in auth method
+   *
+   * @param {string} new_value The new value for auth_method
+   *
+   * @affects
+   *   update:local_auth_method emmitted with the new_value
+   *   local_auth_method is set to new_value
+   */
+  change_auth_method(new_value: object) {
+    this.auth_method_model = new_value;
+    local_auth_method.set(new_value);
+    this.$emit("update:auth_method", new_value);
   }
 
   /**
@@ -153,6 +213,20 @@ export default class AuthStepBasic extends Props {
   }
 
   /**
+   * Callback for a change in container name
+   *
+   * @param {string} new_value The new value for container_name
+   *
+   * @affects
+   *   update:container_name emmitted with the new_value
+   *   local_container_name is set to new_value
+   */
+  change_container_name(new_value: string) {
+    local_container_name.set(new_value);
+    this.$emit("update:container_name", new_value);
+  }
+
+  /**
    * Callback for a change in sas token
    *
    * @param {string} new_value The new value for shared_access_signature
@@ -169,9 +243,13 @@ export default class AuthStepBasic extends Props {
   /** On mount, try to look up stored auth info */
   mounted() {
     // Load our credentials
+    this.change_auth_method(
+      local_auth_method.get_default(this.auth_methods[0])
+    );
     this.change_account_suffix(local_account_suffix.get_default(""));
     this.change_account_name(local_account_name.get_default(""));
     this.change_connection_string(local_connection_string.get_default(""));
+    this.change_container_name(local_container_name.get_default(""));
     this.change_shared_access_signature(
       local_shared_access_signature.get_default("")
     );

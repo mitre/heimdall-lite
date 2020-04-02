@@ -5,10 +5,12 @@
     </v-stepper-step>
 
     <AuthStepBasic
+      v-bind:auth_method.sync="auth_method"
       v-bind:account_name.sync="account_name"
       v-bind:shared_access_signature.sync="shared_access_signature"
       v-bind:account_suffix.sync="account_suffix"
       v-bind:connection_string.sync="connection_string"
+      v-bind:container_name.sync="container_name"
       @auth-basic="handle_basic"
     />
 
@@ -114,10 +116,12 @@ export default class AzureReader extends Props {
     (v || "").trim().length > 0 || "Field is Required";
 
   /** State of all globally relevant fields */
+  auth_method: Object = {};
   connection_string: string = "";
   account_name: string = "";
   shared_access_signature: string = "";
   account_suffix: string = "";
+  container_name: string = "";
 
   get shown_error(): string {
     if (this.error) {
@@ -140,28 +144,37 @@ export default class AzureReader extends Props {
     let storage_client: BlobServiceClient;
 
     try {
-      storage_client = get_storage_client(
-        this.connection_string,
-        this.account_name,
-        this.shared_access_signature,
-        this.account_suffix
-      );
+      if (this.auth_method.value == "sas") {
+        storage_client = get_storage_client(
+          null,
+          this.account_name,
+          this.shared_access_signature,
+          this.account_suffix
+        );
+      } else if (this.auth_method.value == "conn_string") {
+        storage_client = get_storage_client(
+          this.connection_string,
+          null,
+          null,
+          null
+        );
+      } else {
+        this.handle_error("Unknown auth method " + this.auth_method.value);
+      }
     } catch (error) {
       this.handle_error(error);
       return;
     }
 
-    // try to fetch the properties to see if the storage client actually exists. The client only fails when data is actually fetched.
-    storage_client.getProperties().then(
-      success => {
-        this.storage_client = storage_client;
-        this.step = 2;
-        this.load_containers();
-      },
-      err => {
-        this.handle_error(err);
-      }
-    );
+    this.storage_client = storage_client;
+
+    if (this.container_name != "") {
+      this.step = 3;
+      this.load_container(this.container_name);
+    } else {
+      this.step = 2;
+      this.load_containers();
+    }
   }
 
   /**
@@ -177,8 +190,12 @@ export default class AzureReader extends Props {
       return;
     }
 
-    for await (const container of this.storage_client.listContainers()) {
-      containers.push(container);
+    try {
+      for await (const container of this.storage_client.listContainers()) {
+        containers.push(container);
+      }
+    } catch (error) {
+      this.handle_error(error);
     }
 
     this.containers = containers;
@@ -240,16 +257,10 @@ export default class AzureReader extends Props {
     }
 
     let container_client = get_container_client(this.storage_client, name);
-    container_client.getProperties().then(
-      success => {
-        this.container_client = container_client;
-        this.step = 3;
-        this.load_container_blobs();
-      },
-      (err: any) => {
-        this.handle_error(err);
-      }
-    );
+
+    this.container_client = container_client;
+    this.step = 3;
+    this.load_container_blobs();
   }
 
   /**

@@ -44,7 +44,7 @@ export function get_blob_account_url(
   account_suffix: string,
   shared_access_signature: string
 ): string {
-  return `https://${account_name}.blob.${account_suffix}${shared_access_signature}`;
+  return `https://${account_name}.blob.${account_suffix}?${shared_access_signature}`;
 }
 
 /**
@@ -76,6 +76,7 @@ export function get_storage_client(
       connection_string,
       pipelineOptions
     );
+
     return blobServiceClient;
 
     // get client by account name, suffix, and sas token
@@ -89,6 +90,7 @@ export function get_storage_client(
       ),
       pipeline
     );
+
     return blobServiceClient;
   }
 }
