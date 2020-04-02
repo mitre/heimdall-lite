@@ -16,6 +16,10 @@
       <!-- Define our tabs -->
       <v-tab href="#uploadtab-local">Local Files</v-tab>
 
+      <v-tab v-if="is_logged_in()" href="#uploadtab-database">
+        Database Files
+      </v-tab>
+
       <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
 
       <v-tab href="#uploadtab-splunk">Splunk</v-tab>
@@ -26,6 +30,10 @@
       <!-- Include those components -->
       <v-tab-item value="uploadtab-local">
         <FileReader @got-files="got_files" />
+      </v-tab-item>
+
+      <v-tab-item value="uploadtab-database">
+        <DatabaseReader @got-files="got_files" />
       </v-tab-item>
 
       <v-tab-item value="uploadtab-samples">
@@ -62,12 +70,14 @@ import { getModule } from "vuex-module-decorators";
 import InspecIntakeModule, { FileID } from "@/store/report_intake";
 import Modal from "@/components/global/Modal.vue";
 import FileReader from "@/components/global/upload_tabs/FileReader.vue";
+import DatabaseReader from "@/components/global/upload_tabs/DatabaseReader.vue";
 import HelpFooter from "@/components/global/upload_tabs/HelpFooter.vue";
 import S3Reader from "@/components/global/upload_tabs/aws/S3Reader.vue";
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
 import { LocalStorageVal } from "../../utilities/helper_util";
 
 const local_tab = new LocalStorageVal<string>("nexus_curr_tab");
+const local_token = new LocalStorageVal<string | null>("auth_token");
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -85,6 +95,7 @@ const Props = Vue.extend({
   components: {
     Modal,
     FileReader,
+    DatabaseReader,
     HelpFooter,
     S3Reader,
     SampleList
@@ -93,9 +104,19 @@ const Props = Vue.extend({
 export default class UploadNexus extends Props {
   active_tab: string = ""; // Set in mounted
 
+  /** Our currently granted JWT token */
+  token: string | null = local_token.get();
+
   // Loads the last open tab
   mounted() {
+    console.log("mount UploadNexus");
     this.active_tab = local_tab.get_default("uploadtab-local");
+    //this.token = local_token.get();
+  }
+
+  is_logged_in() {
+    console.log("is_logged_in - token: " + this.token + "end token");
+    return this.token != "";
   }
 
   // Handles change in tab

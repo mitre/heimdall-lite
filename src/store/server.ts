@@ -69,6 +69,7 @@ class HeimdallServerModule extends VuexModule {
   @Mutation
   set_token(new_token: string | null) {
     this.token = new_token;
+    console.log("server.ts - set token: " + this.token);
     local_token.set(new_token);
   }
 
@@ -94,7 +95,7 @@ class HeimdallServerModule extends VuexModule {
     console.log("has connection");
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
     fetch(this.connection!.url + "/auth/login", {
-      body: `{"username": "${creds.username}", "password": "${creds.password}"}`,
+      body: `{"username": "${creds["username"]}", "password": "${creds["password"]}"}`,
       headers: {
         "Content-Type": "application/json"
       },
@@ -103,11 +104,13 @@ class HeimdallServerModule extends VuexModule {
       .then(this.check_code)
       .then(res => res.json())
       .then((v: any) => {
-        console.log("got token" + v);
-        if (typeof v == "string") {
-          this.set_token(v);
+        if (typeof v === "object") {
+          this.set_token(v.access_token);
+          console.log("got token" + v.access_token);
         } else {
-          console.error(`Something went wrong: Got ${v} for login response`);
+          console.error(
+            `Something went wrong: Got ${v.access_token} for login response`
+          );
           throw new ConnectionError(
             "BAD_RESPONSE",
             "Got unrecognized login response"
@@ -128,6 +131,7 @@ class HeimdallServerModule extends VuexModule {
 
   private async check_code(res: Response): Promise<Response> {
     // if ok, pass
+    console.log("check_code");
     if (res.ok) {
       return res;
     }

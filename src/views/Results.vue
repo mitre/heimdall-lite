@@ -34,6 +34,14 @@
           mdi-filter-remove
         </v-icon>
       </v-btn>
+      <v-btn @click="log_out" class="mx-2">
+        <span class="d-none d-md-inline pr-2">
+          Logout
+        </span>
+        <v-icon>
+          mdi-logout
+        </v-icon>
+      </v-btn>
     </template>
 
     <!-- Custom sidebar content -->
@@ -45,7 +53,6 @@
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
-        <ServerLogin />
         <!-- Count Cards -->
         <StatusCardRow
           :filter="all_filter"
@@ -158,7 +165,6 @@ import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 import ExportNist from "@/components/global/ExportNist.vue";
-import ServerLogin from "@/components/global/ServerLogin.vue";
 
 import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -166,6 +172,9 @@ import InspecIntakeModule, { FileID } from "@/store/report_intake";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import { need_redirect_file } from "@/utilities/helper_util";
+import { LocalStorageVal } from "@/utilities/helper_util";
+
+const local_token = new LocalStorageVal<string | null>("auth_token");
 
 // We declare the props separately
 // to make props types inferrable.
@@ -185,13 +194,15 @@ const ResultsProps = Vue.extend({
     ComplianceChart,
     ProfileData,
     ExportCaat,
-    ExportNist,
-    ServerLogin
+    ExportNist
   }
 })
 export default class Results extends ResultsProps {
   /** Whether or not the model is showing */
   dialog: boolean = false;
+
+  /** Our currently granted JWT token */
+  token: string | null = local_token.get();
 
   /**
    * The currently selected severity, as modeled by the severity chart
@@ -297,6 +308,10 @@ export default class Results extends ResultsProps {
     this.tree_filters = [];
   }
 
+  log_out() {
+    local_token.set(null);
+    this.$router.push("/home");
+  }
   /**
    * Returns true if we can currently clear.
    * Essentially, just controls whether the button is available
