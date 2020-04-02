@@ -39,7 +39,7 @@ export default class Auth extends AuthProps {
     console.log("logged in - go to root");
     // Close the dialog
     this.dialog = false;
-    this.$router.push("/home");
+    this.$router.push("/");
   }
 }
 </script>

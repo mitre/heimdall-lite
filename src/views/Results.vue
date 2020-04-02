@@ -172,9 +172,7 @@ import InspecIntakeModule, { FileID } from "@/store/report_intake";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import { need_redirect_file } from "@/utilities/helper_util";
-import { LocalStorageVal } from "@/utilities/helper_util";
-
-const local_token = new LocalStorageVal<string | null>("auth_token");
+import ServerModule from "@/store/server";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -200,9 +198,6 @@ const ResultsProps = Vue.extend({
 export default class Results extends ResultsProps {
   /** Whether or not the model is showing */
   dialog: boolean = false;
-
-  /** Our currently granted JWT token */
-  token: string | null = local_token.get();
 
   /**
    * The currently selected severity, as modeled by the severity chart
@@ -309,9 +304,10 @@ export default class Results extends ResultsProps {
   }
 
   log_out() {
-    local_token.set(null);
+    getModule(ServerModule, this.$store).clear_token();
     this.$router.push("/");
   }
+
   /**
    * Returns true if we can currently clear.
    * Essentially, just controls whether the button is available

@@ -16,12 +16,11 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import UploadNexus from "@/components/global/UploadNexus.vue";
+import ServerModule from "@/store/server";
+import { getModule } from "vuex-module-decorators";
 
 import { Filter } from "@/store/data_filters";
 import { FileID } from "@/store/report_intake";
-import { LocalStorageVal } from "@/utilities/helper_util";
-
-const local_token = new LocalStorageVal<string | null>("auth_token");
 
 // We declare the props separately
 // to make props types inferrable.
@@ -38,9 +37,6 @@ export default class Landing extends LandingProps {
   /** Whether or not the model is showing */
   dialog: boolean = true;
 
-  /** Our currently granted JWT token */
-  token: string | null = local_token.get();
-
   /* This is supposed to cause the dialog to automatically appear if there is
    * no file uploaded
    */
@@ -48,8 +44,17 @@ export default class Landing extends LandingProps {
     this.checkLoggedIn();
   }
 
+  get is_logged_in(): boolean {
+    console.log("is_logged_in - token: " + this.token + "end token");
+    return this.token != "";
+  }
+
+  get token(): string {
+    let mod = getModule(ServerModule, this.$store);
+    return mod.token || "";
+  }
+
   checkLoggedIn() {
-    this.token = local_token.get();
     console.log("token: " + this.token + "end token");
     if (!this.token) {
       console.log("Go to auth");
