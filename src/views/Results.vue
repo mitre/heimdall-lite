@@ -310,7 +310,7 @@ export default class Results extends ResultsProps {
 
   log_out() {
     local_token.set(null);
-    this.$router.push("/home");
+    this.$router.push("/");
   }
   /**
    * Returns true if we can currently clear.

@@ -16,7 +16,7 @@
       <!-- Define our tabs -->
       <v-tab href="#uploadtab-local">Local Files</v-tab>
 
-      <v-tab v-if="is_logged_in()" href="#uploadtab-database">
+      <v-tab v-if="is_logged_in" href="#uploadtab-database">
         Database Files
       </v-tab>
 
@@ -74,10 +74,10 @@ import DatabaseReader from "@/components/global/upload_tabs/DatabaseReader.vue";
 import HelpFooter from "@/components/global/upload_tabs/HelpFooter.vue";
 import S3Reader from "@/components/global/upload_tabs/aws/S3Reader.vue";
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
-import { LocalStorageVal } from "../../utilities/helper_util";
+import ServerModule from "@/store/server";
+import { LocalStorageVal } from "@/utilities/helper_util";
 
 const local_tab = new LocalStorageVal<string>("nexus_curr_tab");
-const local_token = new LocalStorageVal<string | null>("auth_token");
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -104,9 +104,6 @@ const Props = Vue.extend({
 export default class UploadNexus extends Props {
   active_tab: string = ""; // Set in mounted
 
-  /** Our currently granted JWT token */
-  token: string | null = local_token.get();
-
   // Loads the last open tab
   mounted() {
     console.log("mount UploadNexus");
@@ -114,9 +111,14 @@ export default class UploadNexus extends Props {
     //this.token = local_token.get();
   }
 
-  is_logged_in() {
+  get is_logged_in(): boolean {
     console.log("is_logged_in - token: " + this.token + "end token");
     return this.token != "";
+  }
+
+  get token(): string {
+    let mod = getModule(ServerModule, this.$store);
+    return mod.token || "";
   }
 
   // Handles change in tab

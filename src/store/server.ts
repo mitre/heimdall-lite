@@ -94,7 +94,7 @@ class HeimdallServerModule extends VuexModule {
     //this.requires_connection();
     console.log("has connection");
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
-    fetch(this.connection!.url + "/auth/login", {
+    return fetch(this.connection!.url + "/auth/login", {
       body: `{"username": "${creds["username"]}", "password": "${creds["password"]}"}`,
       headers: {
         "Content-Type": "application/json"
