@@ -21,7 +21,7 @@ export default new Router({
       component: Compare
     },
     {
-      path: "/auth",
+      path: "/",
       name: "auth",
       component: Auth
     },
@@ -45,7 +45,7 @@ export default new Router({
     },
     */
     {
-      path: "/",
+      path: "/home",
       name: "home",
       component: Landing
     },

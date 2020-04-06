@@ -58,7 +58,8 @@ export default class Landing extends LandingProps {
     console.log("token: " + this.token + "end token");
     if (!this.token) {
       console.log("Go to auth");
-      this.$router.push("/auth");
+      this.dialog = false;
+      this.$router.push("/");
     }
   }
 

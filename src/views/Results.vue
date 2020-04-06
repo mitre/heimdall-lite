@@ -253,7 +253,7 @@ export default class Results extends ResultsProps {
     );
     if (redir !== "ok") {
       if (redir === "root") {
-        this.$router.push("/");
+        this.$router.push("/home");
       } else {
         this.$router.push(`/results/${redir}`);
         result = redir;
@@ -305,6 +305,7 @@ export default class Results extends ResultsProps {
 
   log_out() {
     getModule(ServerModule, this.$store).clear_token();
+    this.dialog = false;
     this.$router.push("/");
   }
 

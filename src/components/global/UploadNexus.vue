@@ -108,7 +108,6 @@ export default class UploadNexus extends Props {
   mounted() {
     console.log("mount UploadNexus");
     this.active_tab = local_tab.get_default("uploadtab-local");
-    //this.token = local_token.get();
   }
 
   get is_logged_in(): boolean {
