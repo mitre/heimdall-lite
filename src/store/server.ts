@@ -119,6 +119,49 @@ class HeimdallServerModule extends VuexModule {
       });
   }
 
+  /** Attempts to login to the server */
+  @Action
+  async register(creds: LoginHash): Promise<void> {
+    console.log(
+      "Registering to " +
+        this.connection!.url +
+        "/auth/register" +
+        " with " +
+        creds["username"] +
+        "/" +
+        creds["password"]
+    );
+    //this.requires_connection();
+    console.log("has connection");
+    //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
+    return (
+      fetch(this.connection!.url + "/auth/register", {
+        body: `{"email": "${creds["username"]}", "password": "${creds["password"]}"}`,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "POST"
+      })
+        //.then(this.check_code)
+        //.then(res => res.json())
+        .then((v: Response) => {
+          if (v.ok) {
+            console.log("registration returned " + v.ok);
+          } else {
+            console.error(
+              `Something went wrong: Got ${JSON.stringify(
+                v
+              )} for register response`
+            );
+            throw new ConnectionError(
+              "BAD_RESPONSE",
+              "Got unrecognized register response"
+            );
+          }
+        })
+    );
+  }
+
   /** Our supposed role */
   // TODO:
 
@@ -131,10 +174,12 @@ class HeimdallServerModule extends VuexModule {
 
   private async check_code(res: Response): Promise<Response> {
     // if ok, pass
-    console.log("check_code");
+    console.log("check_code res.ok: " + res.ok);
     if (res.ok) {
       return res;
     }
+    console.log("check_code res.status: " + res.status);
+    console.log("check_code res.body: " + res.body);
 
     switch (res.status) {
       case 401:
