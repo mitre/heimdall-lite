@@ -36,7 +36,7 @@
       </v-tab-item>
 
       <v-tab-item value="uploadtab-s3">
-        <S3Reader class="pa-4" @got-files="got_files" />
+        <S3Reader @got-files="got_files" />
       </v-tab-item>
 
       <v-tab-item value="uploadtab-azure">
@@ -49,18 +49,7 @@
       </v-tab-item>
 
       <v-tab-item value="uploadtab-splunk">
-        <v-container>
-          <v-row class="title pa-2">
-            <p>Coming Soon</p>
-          </v-row>
-          <v-row class="pa-2 text-justify">
-            <p>
-              Soon Heimdall will be able to consume Heimdall Results Format data
-              from a Splunk data source making it easy to access your enterprise
-              security data right from the browsers, any-time and any-where.
-            </p>
-          </v-row>
-        </v-container>
+        <SplunkReader @got-files="got_files" />
       </v-tab-item>
     </v-tabs>
     <HelpFooter />
@@ -77,6 +66,7 @@ import FileReader from "@/components/global/upload_tabs/FileReader.vue";
 import HelpFooter from "@/components/global/upload_tabs/HelpFooter.vue";
 import S3Reader from "@/components/global/upload_tabs/aws/S3Reader.vue";
 import AzureReader from "@/components/global/upload_tabs/azure/AzureReader.vue";
+import SplunkReader from "@/components/global/upload_tabs/splunk/SplunkReader.vue";
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
 import { LocalStorageVal } from "../../utilities/helper_util";
 
@@ -101,6 +91,7 @@ const Props = Vue.extend({
     HelpFooter,
     S3Reader,
     AzureReader,
+    SplunkReader,
     SampleList
   }
 })
