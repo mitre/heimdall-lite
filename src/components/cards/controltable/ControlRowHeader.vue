@@ -9,9 +9,9 @@
         hover
         @click="$emit('toggle', !expanded)"
       >
-        <v-icon left>{{
-          expanded ? "mdi-chevron-down" : "mdi-chevron-up"
-        }}</v-icon>
+        <v-icon left>
+          {{ expanded ? "mdi-chevron-down" : "mdi-chevron-up" }}
+        </v-icon>
         {{ control.root.hdf.status }}
       </v-btn>
     </template>
@@ -46,9 +46,9 @@
 
     <!-- ID and Tags -->
     <template #id>
-      <v-card-text class="pa-2 title font-weight-bold">{{
-        control.data.id
-      }}</v-card-text>
+      <v-card-text class="pa-2 title font-weight-bold">
+        {{ control.data.id }}
+      </v-card-text>
     </template>
     <template #tags>
       <v-chip-group column active-class="NONE">
@@ -62,11 +62,7 @@
           </template>
           <span>{{ tooltip(tag) }}</span>
         </v-tooltip>
-        <v-tooltip
-          bottom
-          v-for="(cci, i) in control.hdf.wraps.tags.cci"
-          :key="'tooltip' + i"
-        >
+        <v-tooltip bottom v-for="(cci, i) in fixedCCI" :key="'tooltip' + i">
           <template v-slot:activator="{ on }">
             <v-chip v-on="on" active-class="NONE">{{ cci }}</v-chip>
           </template>
@@ -159,6 +155,17 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   // and relies on a script not contained in the project
   descriptionForTag(tag: string): string {
     return NIST_DESCRIPTIONS[tag] || "Unrecognized tag";
+  }
+
+  get fixedCCI(): string[] {
+    let cci: string | string[] | undefined = this._control.hdf.wraps.tags.cci;
+    if (!cci) {
+      return [];
+    } else if (Array.isArray(cci)) {
+      return cci;
+    } else {
+      return [cci];
+    }
   }
 }
 </script>
