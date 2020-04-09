@@ -2,19 +2,18 @@
   <!-- Need to catch for ResponsiveRowSwitch @toggle events for small view -->
   <ResponsiveRowSwitch>
     <template #status>
-      <v-card
+      <v-btn
         :color="status_color"
-        class="pl-2 font-weight-bold"
+        block
+        class="pl-2 button title"
         hover
         @click="$emit('toggle', !expanded)"
       >
-        <v-card-text class="pa-2 font-weight-bold">
-          {{ control.root.hdf.status }}
-          <v-icon class="float-right">
-            {{ expanded ? "mdi-chevron-down" : "mdi-chevron-up" }}
-          </v-icon>
-        </v-card-text>
-      </v-card>
+        <v-icon left>{{
+          expanded ? "mdi-chevron-down" : "mdi-chevron-up"
+        }}</v-icon>
+        {{ control.root.hdf.status }}
+      </v-btn>
     </template>
 
     <template #severity>
@@ -32,12 +31,24 @@
     </template>
 
     <template #title>
-      <v-card-text class="pa-2">{{ truncated_title }}</v-card-text>
+      <v-clamp class="pa-2 title" autoresize :max-lines="4">
+        <template slot="default">{{ control.data.title }}</template>
+        <template slot="after" slot-scope="{ toggle, expanded, clamped }">
+          <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
+            >mdi-plus-box</v-icon
+          >
+          <v-icon fab v-if="expanded" right medium @click="toggle"
+            >mdi-minus-box</v-icon
+          >
+        </template>
+      </v-clamp>
     </template>
 
     <!-- ID and Tags -->
     <template #id>
-      <v-card-text class="pa-2">{{ control.data.id }}</v-card-text>
+      <v-card-text class="pa-2 title font-weight-bold">{{
+        control.data.id
+      }}</v-card-text>
     </template>
     <template #tags>
       <v-chip-group column active-class="NONE">
@@ -69,6 +80,8 @@ import { HDFControl, ControlStatus, Severity } from "inspecjs";
 import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
 import { ContextualizedControl } from "../../../store/data_store";
 import { NIST_DESCRIPTIONS } from "@/utilities/nist_util";
+//@ts-ignore
+import VClamp from "vue-clamp/dist/vue-clamp.js";
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -86,7 +99,8 @@ const ControlRowHeaderProps = Vue.extend({
 
 @Component({
   components: {
-    ResponsiveRowSwitch
+    ResponsiveRowSwitch,
+    VClamp
   }
 })
 export default class ControlRowHeader extends ControlRowHeaderProps {
@@ -101,14 +115,6 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
     return (tag: string) => {
       return this.descriptionForTag(tag);
     };
-  }
-
-  get truncated_title(): string {
-    if (this._control.data.title && this._control.data.title.length > 80) {
-      return this._control.data.title.substr(0, 80) + "...";
-    } else {
-      return this._control.data.title || "Untitled";
-    }
   }
 
   get status_color(): string {
