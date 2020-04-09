@@ -1,0 +1,81 @@
+../raw_data/71859-71861-71863.json
+
+compliance: 0.0%
+
+55959$.info created
+../raw_data/aws-s3-baseline.json
+
+compliance: 0.0%
+
+../raw_data/aws-s3-baseline.json.info created
+../raw_data/aws_rds_mysql_overlay.json
+
+compliance: 29.4%
+
+55959$.info created
+../raw_data/bad_nginx.json
+
+compliance: 85.0%
+
+../raw_data/bad_nginx.json.info created
+../raw_data/cis-aws-foundations-baseline.json
+
+compliance: 76.9%
+
+55959$.info created
+../raw_data/cms-ars3.1-cis-aws-foundations-baseline.json
+
+compliance: 75.0%
+
+55959$.info created
+../raw_data/cms-ars3.1-moderate-redhat7-inspec-profile-disa_stig-el7.json
+
+compliance: 31.6%
+
+55959$.info created
+../raw_data/cms_3.1_aws_rds_infrastructure_overlay_results.json
+
+compliance: 45.5%
+
+55959$.info created
+../raw_data/cms_3.1_aws_rds_mysql_overlay.json
+
+compliance: 29.4%
+
+55959$.info created
+../raw_data/cms_3.1_aws_rds_postgres_overlay.json
+
+compliance: 15.2%
+
+55959$.info created
+../raw_data/cms_overlay_simp_nh.json
+
+compliance: 31.9%
+
+55959$.info created
+../raw_data/cms_overlay_tag100_nh.json
+
+compliance: 32.2%
+
+55959$.info created
+../raw_data/cms_postgres_overlay_sample.json
+
+compliance: 12.5%
+
+55959$.info created
+../raw_data/fortify_h_tools_conv_webgoat.json
+
+compliance: 0.0%
+
+55959$.info created
+../raw_data/good_nginxresults.json
+
+compliance: 92.5%
+
+55959$.info created
+../raw_data/iis-server-baseline.json
+
+compliance: 34.1%
+
+55959$.info created
+../raw_data/iis-site-baseline.json

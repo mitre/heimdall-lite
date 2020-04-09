@@ -1,0 +1,276 @@
+../raw_data/71859-71861-71863.json
+
+compliance: 0.0%
+
+../raw_data/aws-s3-baseline.json
+
+compliance: 0.0%
+
+../raw_data/aws_rds_mysql_overlay.json
+
+compliance: 29.4%
+
+../raw_data/bad_nginx.json
+
+compliance: 85.0%
+
+../raw_data/cis-aws-foundations-baseline.json
+
+compliance: 76.9%
+
+../raw_data/cms-ars3.1-cis-aws-foundations-baseline.json
+
+compliance: 75.0%
+
+../raw_data/cms-ars3.1-moderate-redhat7-inspec-profile-disa_stig-el7.json
+
+compliance: 31.6%
+
+../raw_data/cms_3.1_aws_rds_infrastructure_overlay_results.json
+
+compliance: 45.5%
+
+../raw_data/cms_3.1_aws_rds_mysql_overlay.json
+
+compliance: 29.4%
+
+../raw_data/cms_3.1_aws_rds_postgres_overlay.json
+
+compliance: 15.2%
+
+../raw_data/cms_overlay_simp_nh.json
+
+compliance: 31.9%
+
+../raw_data/cms_overlay_tag100_nh.json
+
+compliance: 32.2%
+
+../raw_data/cms_postgres_overlay_sample.json
+
+compliance: 12.5%
+
+../raw_data/fortify_h_tools_conv_webgoat.json
+
+compliance: 0.0%
+
+../raw_data/good_nginxresults.json
+
+compliance: 92.5%
+
+../raw_data/iis-server-baseline.json
+
+compliance: 34.1%
+
+../raw_data/iis-site-baseline.json
+
+compliance: 45.5%
+
+../raw_data/microsoft_sql_2014_db_instance_stig_baseline.json
+
+compliance: 73.0%
+
+../raw_data/microsoft_sql_2014_server_stig_baseline.json
+
+compliance: 40.7%
+
+../raw_data/nginx-baseline.json
+
+compliance: 90.2%
+
+../raw_data/oracle_early_results.json
+
+compliance: 11.8%
+
+../raw_data/overlay-iis-server-stig-baseline.json
+
+compliance: 20.0%
+
+../raw_data/overlay-microsoft-iis-site-stig-baseline.json
+
+compliance: 47.1%
+
+../raw_data/overlay-mongo.json
+
+compliance: 25.6%
+
+../raw_data/owasp_zap_webgoat.json
+
+compliance: 0.0%
+
+../raw_data/owasp_zap_zero.webappsecurity.json
+
+compliance: 0.0%
+
+../raw_data/postgres_overlay.json
+
+compliance: 15.2%
+
+../raw_data/redhat6-prototype-profile-results.json
+
+compliance: 24.6%
+
+../raw_data/redhat7-inspec-profile-disa_stig-el7.json
+
+compliance: 32.4%
+
+../raw_data/redhat_cve_vulnerability_scan_baseline_with_failures.json
+
+compliance: 0.0%
+
+../raw_data/results.json
+
+compliance: 0.0%
+
+../raw_data/rhel-6-results.json
+
+compliance: 24.6%
+
+../raw_data/rhel-7-output.json
+
+compliance: 26.5%
+
+../raw_data/rhel-ece-merge-results-pretty.json
+
+compliance: 28.7%
+
+../raw_data/rhel-ece-merge-results.json
+
+compliance: 28.7%
+
+../raw_data/rhel-ece-merge-results_05142018.json
+
+compliance: 28.7%
+
+../raw_data/rhel-ece-nt-results.json
+
+compliance: 31.3%
+
+../raw_data/rhel-ece-nt-results_05142018.json
+
+compliance: 31.3%
+
+../raw_data/rhel-ece-results-1.0.0.json
+
+compliance: 25.9%
+
+../raw_data/rhel-ece-results-simp.json
+
+compliance: 25.9%
+
+../raw_data/rhel-ece-results.json
+
+compliance: 26.9%
+
+../raw_data/rhel-ece-results_07032018.json
+
+compliance: 26.9%
+
+../raw_data/rhel6-results.json
+
+compliance: 23.5%
+
+../raw_data/rhel7-ece-results.json
+
+compliance: 27.4%
+
+../raw_data/rhel7-ece-results2.json
+
+compliance: 27.4%
+
+../raw_data/rhel7-results-simp.json
+
+compliance: 31.0%
+
+../raw_data/rhel7_cms_simp.json
+
+compliance: 29.9%
+
+../raw_data/rhel7_cms_tag100.json
+
+compliance: 30.7%
+
+../raw_data/rhel_cve_vulnerability_scan_baseline_with_failures.json
+
+compliance: 0.0%
+
+../raw_data/s3-results.json
+
+compliance: 0.0%
+
+../raw_data/s3-results_07182018.json
+
+compliance: 0.0%
+
+../raw_data/sample-results.json
+
+compliance: 0.0%
+
+../raw_data/simp_nh.json
+
+compliance: 33.0%
+
+../raw_data/simp_results_inspec_4.18.24.json
+
+compliance: 73.7%
+
+../raw_data/sonarqube_java_sample.json
+
+compliance: 0.0%
+
+../raw_data/tag100_nh.json
+
+compliance: 33.3%
+
+../raw_data/ubuntu-16.04-baseline-results.json
+
+compliance: 37.8%
+
+../raw_data/ubuntu-16.04-cms-high-overlay-results-10-1-2019.json
+
+compliance: 37.3%
+
+../raw_data/ubuntu-16.04-cms-high-overlay-results-latest.json
+
+compliance: 37.3%
+
+../raw_data/ubuntu-16.04-cms-high-overlay-results.json
+
+compliance: 38.1%
+
+../raw_data/ubuntu-16.04-cms-low-overlay-results-10-1-2019.json
+
+compliance: 36.1%
+
+../raw_data/ubuntu-16.04-cms-low-overlay-results-latest.json
+
+compliance: 36.1%
+
+../raw_data/ubuntu-16.04-cms-low-overlay-results.json
+
+compliance: 36.7%
+
+../raw_data/ubuntu-16.04-cms-moderate-overlay-results-10-1-2019.json
+
+compliance: 37.1%
+
+../raw_data/ubuntu-16.04-cms-moderate-overlay-results-latest.json
+
+compliance: 38.1%
+
+../raw_data/ubuntu-16.04-cms-moderate-overlay-results.json
+
+compliance: 38.9%
+
+../raw_data/ubuntu-16.04-cms-overlay-results.json
+
+compliance: 38.1%
+
+../raw_data/v-71863.json
+
+compliance: 0.0%
+
+../raw_data/windows_2012r2_memberserver_stig_baseline.json
+
+compliance: 27.3%
+

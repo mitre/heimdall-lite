@@ -10,9 +10,9 @@
       >
         <v-card-text class="pa-2 font-weight-bold">
           {{ control.root.hdf.status }}
-          <v-icon class="float-right">
-            {{ expanded ? "mdi-chevron-down" : "mdi-chevron-up" }}
-          </v-icon>
+          <v-icon class="float-right">{{
+            expanded ? "mdi-chevron-down" : "mdi-chevron-up"
+          }}</v-icon>
         </v-card-text>
       </v-card>
     </template>
@@ -45,13 +45,22 @@
           bottom
           v-for="(tag, i) in control.hdf.raw_nist_tags"
           :key="i"
+          v-if="tag != 'Rev_4'"
         >
           <template v-slot:activator="{ on }">
-            <v-chip v-on="on" active-class="NONE">
-              {{ tag }}
-            </v-chip>
+            <v-chip v-on="on" active-class="NONE">{{ tag }}</v-chip>
           </template>
           <span>{{ tooltip(tag) }}</span>
+        </v-tooltip>
+        <v-tooltip
+          bottom
+          v-for="(cci, i) in control.hdf.wraps.tags.cci"
+          :key="i"
+        >
+          <template v-slot:activator="{ on }">
+            <v-chip v-on="on" active-class="NONE">{{ cci }}</v-chip>
+          </template>
+          <span>{{ tooltip(cci) }}</span>
         </v-tooltip>
       </v-chip-group>
     </template>
