@@ -18,10 +18,10 @@
 
     <template #severity>
       <v-card-text class="pa-2">
-        <v-icon small v-for="i in severity_arrow_count" :key="i"
+        <v-icon small v-for="i in severity_arrow_count" :key="'sev0' + i"
           >mdi-checkbox-blank-circle</v-icon
         >
-        <v-icon small v-for="i in 4 - severity_arrow_count" :key="5 - i"
+        <v-icon small v-for="i in 4 - severity_arrow_count" :key="'sev1' + i"
           >mdi-checkbox-blank-circle-outline</v-icon
         >
         <br />
@@ -52,7 +52,11 @@
     </template>
     <template #tags>
       <v-chip-group column active-class="NONE">
-        <v-tooltip bottom v-for="(tag, i) in filteredNistTags" :key="i">
+        <v-tooltip
+          bottom
+          v-for="(tag, i) in filteredNistTags"
+          :key="'chip' + i"
+        >
           <template v-slot:activator="{ on }">
             <v-chip v-on="on" active-class="NONE">{{ tag }}</v-chip>
           </template>
@@ -61,7 +65,7 @@
         <v-tooltip
           bottom
           v-for="(cci, i) in control.hdf.wraps.tags.cci"
-          :key="i"
+          :key="'tooltip' + i"
         >
           <template v-slot:activator="{ on }">
             <v-chip v-on="on" active-class="NONE">{{ cci }}</v-chip>
@@ -140,8 +144,10 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
 
   get filteredNistTags(): string[] {
     {
-      var value = "Rev_4";
-      return this._control.hdf.raw_nist_tags.filter(item => item !== value);
+      let ignored = /Rev_\d/;
+      return this._control.hdf.raw_nist_tags.filter(
+        item => !item.search(ignored)
+      );
     }
   }
 
