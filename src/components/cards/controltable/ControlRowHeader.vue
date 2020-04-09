@@ -10,9 +10,9 @@
       >
         <v-card-text class="pa-2 font-weight-bold">
           {{ control.root.hdf.status }}
-          <v-icon class="float-right">{{
-            expanded ? "mdi-chevron-down" : "mdi-chevron-up"
-          }}</v-icon>
+          <v-icon class="float-right">
+            {{ expanded ? "mdi-chevron-down" : "mdi-chevron-up" }}
+          </v-icon>
         </v-card-text>
       </v-card>
     </template>
@@ -41,12 +41,7 @@
     </template>
     <template #tags>
       <v-chip-group column active-class="NONE">
-        <v-tooltip
-          bottom
-          v-for="(tag, i) in control.hdf.raw_nist_tags"
-          :key="i"
-          v-if="tag != 'Rev_4'"
-        >
+        <v-tooltip bottom v-for="(tag, i) in filteredNistTags" :key="i">
           <template v-slot:activator="{ on }">
             <v-chip v-on="on" active-class="NONE">{{ tag }}</v-chip>
           </template>
@@ -134,6 +129,13 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
         return 3;
       case "critical":
         return 4;
+    }
+  }
+
+  get filteredNistTags(): string[] {
+    {
+      var value = "Rev_4";
+      return this._control.hdf.raw_nist_tags.filter(item => item !== value);
     }
   }
 
