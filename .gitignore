@@ -25,3 +25,6 @@ tests/hdf_data/inspec_tools_info
 *.njsproj
 *.sln
 *.sw?
+
+# Misc
+tests/scripts/.log
