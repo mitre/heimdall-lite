@@ -139,12 +139,10 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   }
 
   get filteredNistTags(): string[] {
-    {
-      let ignored = /Rev_\d/;
-      return this._control.hdf.raw_nist_tags.filter(
-        item => !item.search(ignored)
-      );
-    }
+    let ignored = /Rev_\d/;
+    return this._control.hdf.raw_nist_tags.filter(
+      item => item.search(ignored) != 0
+    );
   }
 
   fmtNist(nist: string[]): string {
