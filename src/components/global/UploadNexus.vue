@@ -17,7 +17,7 @@
       <v-tab href="#uploadtab-local">Local Files</v-tab>
 
       <v-tab v-if="is_logged_in" href="#uploadtab-database">
-        Database Files
+        {{ user }} Files
       </v-tab>
 
       <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
@@ -108,6 +108,8 @@ export default class UploadNexus extends Props {
   mounted() {
     console.log("mount UploadNexus");
     this.active_tab = local_tab.get_default("uploadtab-local");
+    let mod = getModule(ServerModule, this.$store);
+    mod.profile();
   }
 
   get is_logged_in(): boolean {
@@ -118,6 +120,10 @@ export default class UploadNexus extends Props {
   get token(): string {
     let mod = getModule(ServerModule, this.$store);
     return mod.token || "";
+  }
+
+  get user(): string {
+    return "User";
   }
 
   // Handles change in tab

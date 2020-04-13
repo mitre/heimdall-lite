@@ -131,8 +131,6 @@ class HeimdallServerModule extends VuexModule {
         "/" +
         creds["password"]
     );
-    //this.requires_connection();
-    console.log("has connection");
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
     return (
       fetch(this.connection!.url + "/auth/register", {
@@ -162,24 +160,40 @@ class HeimdallServerModule extends VuexModule {
     );
   }
 
+  /** Attempts to login to the server */
+  @Action
+  async profile(): Promise<void> {
+    console.log("Getting " + this.connection!.url + "/auth/profile");
+    //curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
+    return (
+      //fetch(this.connection!.url + '/auth/profile', {
+      fetch(this.connection!.url + "/auth/profile", {
+        headers: {
+          //"Content-Type": "application/json",
+          "Authorization:": `Bearer ${this.token}`
+        },
+        method: "GET"
+      })
+        //.then(this.check_code)
+        .then(res => res.json())
+        .then((v: any) => {
+          console.log("got profile" + JSON.stringify(v));
+          return v;
+        })
+    );
+  }
+
   /** Our supposed role */
   // TODO:
-
-  private requires_connection() {
-    if (!this.connection) {
-      console.error("Attempted to login without valid connection!");
-      throw new ConnectionError("NO_CONNECTION", "Invalid vuex state");
-    }
-  }
 
   private async check_code(res: Response): Promise<Response> {
     // if ok, pass
     console.log("check_code res.ok: " + res.ok);
     if (res.ok) {
+      console.log("check_code res.status: " + res.status);
+      console.log("check_code res.body: " + res.body);
       return res;
     }
-    console.log("check_code res.status: " + res.status);
-    console.log("check_code res.body: " + res.body);
 
     switch (res.status) {
       case 401:

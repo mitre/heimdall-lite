@@ -175,14 +175,14 @@ export default class Auth extends AuthProps {
         .connect(this.host)
         .catch(bad => {
           console.error("Unable to connect to " + this.host);
-          throw bad;
+          this.$router.go(0);
         })
         .then(() => {
           return mod.login(creds);
         })
         .catch(bad => {
           console.error(`bad login ${bad}`);
-          throw bad;
+          this.$router.go(0);
         })
         .then(() => {
           console.log("Good!");
@@ -206,7 +206,7 @@ export default class Auth extends AuthProps {
         .connect(this.host)
         .catch(bad => {
           console.error("Unable to connect to " + this.host);
-          throw bad;
+          this.$router.go(0);
         })
         .then(() => {
           return mod.register(creds);
