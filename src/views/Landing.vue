@@ -3,6 +3,7 @@
     <v-row>
       <v-col center xl="8" md="8" sm="12" xs="12">
         <UploadNexus
+          v-if="is_logged_in"
           :value="dialog"
           @got-files="on_got_files"
           :persistent="true"
@@ -45,8 +46,12 @@ export default class Landing extends LandingProps {
   }
 
   get is_logged_in(): boolean {
-    console.log("is_logged_in - token: " + this.token + "end token");
-    return this.token != "";
+    if (this.token) {
+      console.log("is_logged_in - token: " + this.token + "end token");
+      return true;
+    } else {
+      return false;
+    }
   }
 
   get token(): string {

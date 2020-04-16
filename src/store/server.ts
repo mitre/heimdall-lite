@@ -131,7 +131,7 @@ class HeimdallServerModule extends VuexModule {
         "/" +
         creds["password"]
     );
-    //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
+    //curl -X POST http://localhost:8050/auth/register -d '{"email": "blah@gmail.com", "password": "blaah"}' -H "Content-Type: application/json"
     return (
       fetch(this.connection!.url + "/auth/register", {
         body: `{"email": "${creds["username"]}", "password": "${creds["password"]}"}`,
@@ -161,24 +161,23 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to login to the server */
-  @Action
-  async profile(): Promise<void> {
+  @Mutation
+  profile(): Promise<void> {
     console.log("Getting " + this.connection!.url + "/auth/profile");
     //curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return (
       //fetch(this.connection!.url + '/auth/profile', {
       fetch(this.connection!.url + "/auth/profile", {
+        method: "GET",
         headers: {
-          //"Content-Type": "application/json",
           "Authorization:": `Bearer ${this.token}`
-        },
-        method: "GET"
+        }
       })
         //.then(this.check_code)
         .then(res => res.json())
         .then((v: any) => {
           console.log("got profile" + JSON.stringify(v));
-          return v;
+          //return v;
         })
     );
   }

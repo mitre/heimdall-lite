@@ -1,66 +1,69 @@
 <template>
-  <Modal
-    :value="value"
-    @input="$emit('input', $event.target.value)"
-    :persistent="persistent"
-  >
-    <v-tabs
-      :vertical="$vuetify.breakpoint.mdAndUp"
-      active
-      :value="active_tab"
-      @change="selected_tab"
-      color="primary-visible"
-      show-arrows
+  <v-container>
+    <Modal
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+      :persistent="persistent"
     >
-      <v-tabs-slider></v-tabs-slider>
-      <!-- Define our tabs -->
-      <v-tab href="#uploadtab-local">Local Files</v-tab>
+      <v-tabs
+        :vertical="$vuetify.breakpoint.mdAndUp"
+        active
+        :value="active_tab"
+        @change="selected_tab"
+        color="primary-visible"
+        show-arrows
+      >
+        <v-tabs-slider></v-tabs-slider>
+        <!-- Define our tabs -->
+        <v-tab href="#uploadtab-local">Local Files</v-tab>
 
-      <v-tab v-if="is_logged_in" href="#uploadtab-database">
-        {{ user }} Files
-      </v-tab>
+        <v-tab v-if="is_logged_in" href="#uploadtab-database">
+          {{ user }} Files
+        </v-tab>
 
-      <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
+        <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
 
-      <v-tab href="#uploadtab-splunk">Splunk</v-tab>
-      <v-spacer />
-      <v-divider />
-      <v-tab href="#uploadtab-samples">Samples</v-tab>
+        <v-tab href="#uploadtab-splunk">Splunk</v-tab>
+        <v-spacer />
+        <v-divider />
+        <v-tab href="#uploadtab-samples">Samples</v-tab>
 
-      <!-- Include those components -->
-      <v-tab-item value="uploadtab-local">
-        <FileReader @got-files="got_files" />
-      </v-tab-item>
+        <!-- Include those components -->
+        <v-tab-item value="uploadtab-local">
+          <FileReader @got-files="got_files" />
+        </v-tab-item>
 
-      <v-tab-item value="uploadtab-database">
-        <DatabaseReader @got-files="got_files" />
-      </v-tab-item>
+        <v-tab-item value="uploadtab-database">
+          <DatabaseReader @got-files="got_files" />
+        </v-tab-item>
 
-      <v-tab-item value="uploadtab-samples">
-        <SampleList @got-files="got_files" />
-      </v-tab-item>
+        <v-tab-item value="uploadtab-samples">
+          <SampleList @got-files="got_files" />
+        </v-tab-item>
 
-      <v-tab-item value="uploadtab-s3">
-        <S3Reader class="pa-4" @got-files="got_files" />
-      </v-tab-item>
+        <v-tab-item value="uploadtab-s3">
+          <S3Reader class="pa-4" @got-files="got_files" />
+        </v-tab-item>
 
-      <v-tab-item value="uploadtab-splunk">
-        <v-container>
-          <v-row class="title pa-2">
-            <p>Coming Soon</p>
-          </v-row>
-          <v-row class="pa-2 text-justify">
-            <p>
-              Soon Heimdall will be able to consume Heimdall Results Format data
-              from a Splunk data source making it easy to access your enterprise
-              security data right from the browsers, any-time and any-where.
-            </p>
-          </v-row>
-        </v-container>
-      </v-tab-item>
-    </v-tabs>
-    <HelpFooter />
-  </Modal>
+        <v-tab-item value="uploadtab-splunk">
+          <v-container>
+            <v-row class="title pa-2">
+              <p>Coming Soon</p>
+            </v-row>
+            <v-row class="pa-2 text-justify">
+              <p>
+                Soon Heimdall will be able to consume Heimdall Results Format
+                data from a Splunk data source making it easy to access your
+                enterprise security data right from the browsers, any-time and
+                any-where.
+              </p>
+            </v-row>
+          </v-container>
+        </v-tab-item>
+      </v-tabs>
+      <HelpFooter />
+    </Modal>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -113,8 +116,11 @@ export default class UploadNexus extends Props {
   }
 
   get is_logged_in(): boolean {
-    console.log("is_logged_in - token: " + this.token + "end token");
-    return this.token != "";
+    if (this.token) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   get token(): string {
