@@ -7,12 +7,28 @@ import {
 } from "vuex-module-decorators";
 import Store from "@/store/store";
 import { LocalStorageVal } from "@/utilities/helper_util";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { plainToClass } from "class-transformer";
 
 export interface LoginHash {
   username: string;
   password: string;
 }
+/** The body of a registration Request */
+//"id":1,"first_name":null,"last_name":null,"email":"email@gmail.com","image":null,"phone_number":null,"createdAt":"2020-03-23T15:57:33.044Z","updatedAt":"2020-03-23T15:57:33.044Z"}
+export class UserProfile {
+  id!: number;
+  first_name!: string;
+  last_name!: string;
+  email!: string;
+  image!: string;
+  phone_number!: string;
+  createdAt!: Date;
+  updatedAt!: Date;
+}
+
 const local_token = new LocalStorageVal<string | null>("auth_token");
+const local_user = new LocalStorageVal<UserProfile | null>("user_profile");
 
 type ConnErrorType =
   | "NO_CONNECTION"
@@ -64,6 +80,7 @@ class HeimdallServerModule extends VuexModule {
 
   /** Our currently granted JWT token */
   token: string | null = local_token.get();
+  user_profile: UserProfile | null = local_user.get();
 
   /** Mutation to set above, as well as to update our localstorage */
   @Mutation
@@ -77,6 +94,14 @@ class HeimdallServerModule extends VuexModule {
   @Action
   clear_token() {
     this.set_token(null);
+  }
+
+  /** Mutation to set above, as well as to update our localstorage */
+  @Mutation
+  set_user_profile(new_user: UserProfile | null) {
+    this.user_profile = new_user;
+    console.log("server.ts - set token: " + this.user_profile);
+    local_user.set(new_user);
   }
 
   /** Attempts to login to the server */
@@ -165,21 +190,18 @@ class HeimdallServerModule extends VuexModule {
   profile(): Promise<void> {
     console.log("Getting " + this.connection!.url + "/auth/profile");
     //curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
-    return (
-      //fetch(this.connection!.url + '/auth/profile', {
-      fetch(this.connection!.url + "/auth/profile", {
-        method: "GET",
+    return axios
+      .get(this.connection!.url + "/auth/profile", {
         headers: {
-          "Authorization:": `Bearer ${this.token}`
+          Authorization: `Bearer ${this.token}`
         }
       })
-        //.then(this.check_code)
-        .then(res => res.json())
-        .then((v: any) => {
-          console.log("got profile" + JSON.stringify(v));
-          //return v;
-        })
-    );
+      .then((v: AxiosResponse) => {
+        console.log("user: " + JSON.stringify(v.data));
+        let user = plainToClass(UserProfile, v.data);
+        console.log("user profile: " + user.email);
+        this.set_user_profile(user);
+      });
   }
 
   /** Our supposed role */
