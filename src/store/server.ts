@@ -80,7 +80,7 @@ class HeimdallServerModule extends VuexModule {
 
   /** Our currently granted JWT token */
   token: string | null = local_token.get();
-  user_profile: UserProfile | null = local_user.get();
+  profile: UserProfile | null = local_user.get();
 
   /** Mutation to set above, as well as to update our localstorage */
   @Mutation
@@ -96,12 +96,13 @@ class HeimdallServerModule extends VuexModule {
     this.set_token(null);
   }
 
-  /** Mutation to set above, as well as to update our localstorage */
+  /** Mutation to set user_profile, as well as to update our localstorage */
   @Mutation
-  set_user_profile(new_user: UserProfile | null) {
-    this.user_profile = new_user;
-    console.log("server.ts - set token: " + this.user_profile);
-    local_user.set(new_user);
+  set_user_profile(new_user: string | null) {
+    //let user = plainToClass(UserProfile, v.data);
+    this.profile = plainToClass(UserProfile, new_user);
+    console.log("server.ts - set user: " + this.profile);
+    local_user.set(this.profile);
   }
 
   /** Attempts to login to the server */
@@ -132,6 +133,7 @@ class HeimdallServerModule extends VuexModule {
         if (typeof v === "object") {
           this.set_token(v.access_token);
           console.log("got token" + v.access_token);
+          this.retrieve_profile();
         } else {
           console.error(
             `Something went wrong: Got ${v.access_token} for login response`
@@ -186,8 +188,8 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to login to the server */
-  @Mutation
-  profile(): Promise<void> {
+  @Action
+  async retrieve_profile(): Promise<void> {
     console.log("Getting " + this.connection!.url + "/auth/profile");
     //curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
@@ -196,11 +198,9 @@ class HeimdallServerModule extends VuexModule {
           Authorization: `Bearer ${this.token}`
         }
       })
-      .then((v: AxiosResponse) => {
-        console.log("user: " + JSON.stringify(v.data));
-        let user = plainToClass(UserProfile, v.data);
-        console.log("user profile: " + user.email);
-        this.set_user_profile(user);
+      .then((v: any) => {
+        console.log("any user: " + JSON.stringify(v.data));
+        this.set_user_profile(v.data);
       });
   }
 

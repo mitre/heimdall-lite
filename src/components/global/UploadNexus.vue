@@ -92,7 +92,6 @@ export class UserProfile {
 }
 
 const local_tab = new LocalStorageVal<string>("nexus_curr_tab");
-const local_user = new LocalStorageVal<UserProfile | null>("user_profile");
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -118,39 +117,11 @@ const Props = Vue.extend({
 })
 export default class UploadNexus extends Props {
   active_tab: string = ""; // Set in mounted
-  //user_profile: UserProfile = null;
 
   // Loads the last open tab
   mounted() {
     console.log("mount UploadNexus");
     this.active_tab = local_tab.get_default("uploadtab-local");
-    this.profile();
-    //let user_profile = mod.profile();
-    //console.log("got user_profile" + user_profile.id);
-  }
-
-  async profile(): Promise<void> {
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect("http://localhost:8050")
-      .catch(bad => {
-        console.error("Unable to connect");
-        this.$router.go(0);
-      })
-      .then(() => {
-        return mod.profile();
-      })
-      .catch(bad => {
-        console.error(`bad profile ${bad}`);
-      })
-      .then(() => {
-        if (mod.user_profile) {
-          console.log("Good profile!");
-          console.log(mod.user_profile.id);
-        } else {
-          console.log("No profile!");
-        }
-      });
   }
 
   get is_logged_in(): boolean {
@@ -167,7 +138,12 @@ export default class UploadNexus extends Props {
   }
 
   get user(): string {
-    return "User";
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.profile) {
+      return mod.profile.email || "pending";
+    } else {
+      return "pending";
+    }
   }
 
   // Handles change in tab

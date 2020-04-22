@@ -102,6 +102,7 @@
         </v-tabs>
       </v-col>
     </v-row>
+    <div hidden>{{ watches }}</div>
   </v-container>
 </template>
 
@@ -161,6 +162,17 @@ export default class Auth extends AuthProps {
     this.active_tab = new_tab;
   }
 
+  get watches(): string {
+    let server = getModule(ServerModule, this.$store);
+    if (server.profile) {
+      console.log("server profile: " + server.profile);
+      this.$router.push("/home");
+      return "a";
+    } else {
+      return "b";
+    }
+  }
+
   async login(): Promise<void> {
     // checking if the input is valid
     if ((this.$refs.form as any).validate()) {
@@ -183,11 +195,6 @@ export default class Auth extends AuthProps {
         .catch(bad => {
           console.error(`bad login ${bad}`);
           this.$router.go(0);
-        })
-        .then(() => {
-          console.log("Good!");
-          console.log(mod.token);
-          this.$router.push("/home");
         });
     }
   }
@@ -200,7 +207,6 @@ export default class Auth extends AuthProps {
         username: this.username,
         password: this.password
       };
-      //this.loading = true;
       let mod = getModule(ServerModule, this.$store);
       await mod
         .connect(this.host)
@@ -221,10 +227,6 @@ export default class Auth extends AuthProps {
         })
         .then(() => {
           console.log("Registered!");
-          //this.$toasted.global.success({
-          //  message: "Registered!",
-          //  isDark: this.$vuetify.theme.dark
-          //});
           this.$router.go(0);
         });
     }
