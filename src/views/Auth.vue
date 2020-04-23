@@ -39,12 +39,6 @@
                       maxlength="70"
                       required
                     />
-                    <v-text-field
-                      v-model="host"
-                      label="host"
-                      maxlength="200"
-                      required
-                    />
                   </v-container>
                   <v-btn
                     class="pink white--text"
@@ -79,12 +73,6 @@
                       v-model="password"
                       label="password"
                       maxlength="70"
-                      required
-                    />
-                    <v-text-field
-                      v-model="host"
-                      label="host"
-                      maxlength="200"
                       required
                     />
                   </v-container>
@@ -132,7 +120,7 @@ const AuthProps = Vue.extend({
 export default class Auth extends AuthProps {
   username: string = "";
   password: string = "";
-  host: string = "";
+  //host: string = "";
   active_tab: string = ""; // Set in mounted
 
   // Whether fields are valid
@@ -175,8 +163,9 @@ export default class Auth extends AuthProps {
 
   async login(): Promise<void> {
     // checking if the input is valid
+    const host = process.env.VUE_APP_API_URL;
     if ((this.$refs.form as any).validate()) {
-      console.log("Login to " + this.host);
+      console.log("Login to Backend test");
       let creds: LoginHash = {
         username: this.username,
         password: this.password
@@ -184,9 +173,9 @@ export default class Auth extends AuthProps {
       //this.loading = true;
       let mod = getModule(ServerModule, this.$store);
       await mod
-        .connect(this.host)
+        .connect(host)
         .catch(bad => {
-          console.error("Unable to connect to " + this.host);
+          console.error("Unable to connect to " + host);
           this.$router.go(0);
         })
         .then(() => {
@@ -201,17 +190,19 @@ export default class Auth extends AuthProps {
 
   async register(): Promise<void> {
     // checking if the input is valid
+
+    const host = process.env.VUE_APP_API_URL;
     if ((this.$refs.form as any).validate()) {
-      console.log("Login to " + this.host);
+      console.log("Login to " + host);
       let creds: LoginHash = {
         username: this.username,
         password: this.password
       };
       let mod = getModule(ServerModule, this.$store);
       await mod
-        .connect(this.host)
+        .connect(host)
         .catch(bad => {
-          console.error("Unable to connect to " + this.host);
+          console.error("Unable to connect to " + host);
           this.$router.go(0);
         })
         .then(() => {

@@ -108,9 +108,13 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to login to the server */
   @Action
   async login(creds: LoginHash): Promise<void> {
+    console.log("test");
+    console.log(process.env.VUE_APP_API_URL);
+    const API_URL = process.env.VUE_APP_API_URL;
     console.log(
       "Logging in to " +
-        this.connection!.url +
+        API_URL +
+        // this.connection!.url +
         "/auth/login" +
         " with " +
         creds["username"] +
@@ -120,7 +124,7 @@ class HeimdallServerModule extends VuexModule {
     //this.requires_connection();
     console.log("has connection");
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
-    return fetch(this.connection!.url + "/auth/login", {
+    return fetch(API_URL + "/auth/login", {
       body: `{"username": "${creds["username"]}", "password": "${creds["password"]}"}`,
       headers: {
         "Content-Type": "application/json"
