@@ -71,7 +71,7 @@
                     <v-text-field
                       ref="password"
                       type="password"
-                      v-model="password"
+                      v-model="confirm_password"
                       label="password"
                       v-validate="'required'"
                       :error-messages="errors.collect('password')"
@@ -82,9 +82,9 @@
 
                     <v-text-field
                       type="password"
-                      v-model="confirm_password"
+                      v-model="password"
                       v-validate="'required|confirmed:password'"
-                      :error-messages="errors.collect('confirm password')"
+                      :error-messages="errors.collect('confirm_password')"
                       label="confirm password"
                       maxlength="70"
                       data-vv-name="confirm_password"
