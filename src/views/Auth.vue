@@ -69,10 +69,25 @@
                     />
 
                     <v-text-field
+                      ref="password"
                       type="password"
                       v-model="password"
                       label="password"
+                      v-validate="'required'"
+                      :error-messages="errors.collect('password')"
                       maxlength="70"
+                      data-vv-name="password"
+                      required
+                    />
+
+                    <v-text-field
+                      type="password"
+                      v-model="confirm_password"
+                      v-validate="'required|confirmed:password'"
+                      :error-messages="errors.collect('confirm password')"
+                      label="confirm password"
+                      maxlength="70"
+                      data-vv-name="confirm_password"
                       required
                     />
                   </v-container>
@@ -102,10 +117,14 @@ import { FileID } from "@/store/report_intake";
 import { LocalStorageVal } from "@/utilities/helper_util";
 import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
+import VeeValidate from "vee-validate";
+
+Vue.use(VeeValidate);
 
 export interface LoginHash {
   username: string;
   password: string;
+  confirm_password: string;
 }
 
 // We declare the props separately
@@ -120,7 +139,8 @@ const AuthProps = Vue.extend({
 export default class Auth extends AuthProps {
   username: string = "";
   password: string = "";
-  //host: string = "";
+  confirm_password: string = "";
+  host: string = "";
   active_tab: string = ""; // Set in mounted
 
   // Whether fields are valid
@@ -168,7 +188,8 @@ export default class Auth extends AuthProps {
       console.log("Login to Backend test");
       let creds: LoginHash = {
         username: this.username,
-        password: this.password
+        password: this.password,
+        confirm_password: this.confirm_password
       };
       //this.loading = true;
       let mod = getModule(ServerModule, this.$store);
@@ -194,9 +215,12 @@ export default class Auth extends AuthProps {
     const host = process.env.VUE_APP_API_URL;
     if ((this.$refs.form as any).validate()) {
       console.log("Login to " + host);
+      console.log(this.confirm_password);
+      console.log(this.password);
       let creds: LoginHash = {
         username: this.username,
-        password: this.password
+        password: this.password,
+        confirm_password: this.confirm_password
       };
       let mod = getModule(ServerModule, this.$store);
       await mod
