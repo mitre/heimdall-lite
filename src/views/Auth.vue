@@ -39,6 +39,12 @@
                       maxlength="70"
                       required
                     />
+                    <v-text-field
+                      v-model="host"
+                      label="host"
+                      maxlength="200"
+                      required
+                    />
                   </v-container>
                   <v-btn
                     class="pink white--text"
@@ -69,25 +75,16 @@
                     />
 
                     <v-text-field
-                      ref="password"
-                      type="password"
-                      v-model="confirm_password"
-                      label="password"
-                      v-validate="'required'"
-                      :error-messages="errors.collect('password')"
-                      maxlength="70"
-                      data-vv-name="password"
-                      required
-                    />
-
-                    <v-text-field
                       type="password"
                       v-model="password"
-                      v-validate="'required|confirmed:password'"
-                      :error-messages="errors.collect('confirm_password')"
-                      label="confirm password"
+                      label="password"
                       maxlength="70"
-                      data-vv-name="confirm_password"
+                      required
+                    />
+                    <v-text-field
+                      v-model="host"
+                      label="host"
+                      maxlength="200"
                       required
                     />
                   </v-container>
@@ -117,14 +114,10 @@ import { FileID } from "@/store/report_intake";
 import { LocalStorageVal } from "@/utilities/helper_util";
 import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
-import VeeValidate from "vee-validate";
-
-Vue.use(VeeValidate);
 
 export interface LoginHash {
   username: string;
   password: string;
-  confirm_password: string;
 }
 
 // We declare the props separately
@@ -139,7 +132,6 @@ const AuthProps = Vue.extend({
 export default class Auth extends AuthProps {
   username: string = "";
   password: string = "";
-  confirm_password: string = "";
   host: string = "";
   active_tab: string = ""; // Set in mounted
 
@@ -183,20 +175,18 @@ export default class Auth extends AuthProps {
 
   async login(): Promise<void> {
     // checking if the input is valid
-    const host = process.env.VUE_APP_API_URL;
     if ((this.$refs.form as any).validate()) {
-      console.log("Login to Backend test");
+      console.log("Login to " + this.host);
       let creds: LoginHash = {
         username: this.username,
-        password: this.password,
-        confirm_password: this.confirm_password
+        password: this.password
       };
       //this.loading = true;
       let mod = getModule(ServerModule, this.$store);
       await mod
-        .connect(host)
+        .connect(this.host)
         .catch(bad => {
-          console.error("Unable to connect to " + host);
+          console.error("Unable to connect to " + this.host);
           this.$router.go(0);
         })
         .then(() => {
@@ -211,22 +201,17 @@ export default class Auth extends AuthProps {
 
   async register(): Promise<void> {
     // checking if the input is valid
-
-    const host = process.env.VUE_APP_API_URL;
     if ((this.$refs.form as any).validate()) {
-      console.log("Login to " + host);
-      console.log(this.confirm_password);
-      console.log(this.password);
+      console.log("Login to " + this.host);
       let creds: LoginHash = {
         username: this.username,
-        password: this.password,
-        confirm_password: this.confirm_password
+        password: this.password
       };
       let mod = getModule(ServerModule, this.$store);
       await mod
-        .connect(host)
+        .connect(this.host)
         .catch(bad => {
-          console.error("Unable to connect to " + host);
+          console.error("Unable to connect to " + this.host);
           this.$router.go(0);
         })
         .then(() => {
