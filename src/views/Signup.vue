@@ -99,7 +99,6 @@ import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 import VeeValidate from "vee-validate";
 import VuePassword from "vue-password";
-import VuePasswordAuto from "vue-password";
 import zxcvbn from "zxcvbn";
 
 Vue.use(VeeValidate);
@@ -118,8 +117,7 @@ const SignupProps = Vue.extend({
 
 @Component({
   components: {
-    VuePassword,
-    VuePasswordAuto
+    VuePassword
   }
 })
 export default class Signup extends SignupProps {
@@ -205,11 +203,11 @@ export default class Signup extends SignupProps {
             message: String(bad),
             isDark: this.$vuetify.theme.dark
           });
-          this.$router.go(0);
+          this.$router.push("/login");
         })
         .then(() => {
           console.log("Registered!");
-          this.$router.go(0);
+          this.$router.push("/login");
         });
     }
   }
