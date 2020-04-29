@@ -126,7 +126,7 @@ export default class Signup extends SignupProps {
   confirm_password: string = "";
   host: string = "";
   active_tab: string = "";
-  strength: Int = 0;
+  strength: number = 0;
   // Set in mounted
 
   // Whether fields are valid
