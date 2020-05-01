@@ -46,7 +46,7 @@ export default class Landing extends LandingProps {
   }
 
   get is_logged_in(): boolean {
-    if (this.token) {
+    if (this.checkLoggedIn()) {
       console.log("is_logged_in - token: " + this.token + "end token");
       return true;
     } else {
@@ -60,8 +60,11 @@ export default class Landing extends LandingProps {
   }
 
   checkLoggedIn() {
-    console.log("token: " + this.token + "end token");
-    if (!this.token) {
+    let server = getModule(ServerModule, this.$store);
+    if (server.profile) {
+      console.log("profile: " + JSON.stringify(server.profile));
+      return true;
+    } else {
       console.log("Go to auth");
       this.dialog = false;
       this.$router.push("/login");
