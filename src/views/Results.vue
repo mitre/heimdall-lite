@@ -48,6 +48,7 @@
     <template #sidebar-content-tools>
       <ExportCaat :filter="all_filter"></ExportCaat>
       <ExportNist :filter="all_filter"></ExportNist>
+      <ExportJson></ExportJson>
     </template>
 
     <!-- The main content: cards, etc -->
@@ -165,6 +166,7 @@ import ComplianceChart from "@/components/cards/ComplianceChart.vue";
 import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 import ExportNist from "@/components/global/ExportNist.vue";
+import ExportJson from "@/components/global/ExportJson.vue";
 
 import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -192,7 +194,8 @@ const ResultsProps = Vue.extend({
     ComplianceChart,
     ProfileData,
     ExportCaat,
-    ExportNist
+    ExportNist,
+    ExportJson
   }
 })
 export default class Results extends ResultsProps {
@@ -347,6 +350,7 @@ export default class Results extends ResultsProps {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter);
       if (file) {
+        console.log("file: " + JSON.stringify(file));
         return file.filename;
       }
     }
