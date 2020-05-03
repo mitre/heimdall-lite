@@ -1,123 +1,262 @@
 <template>
-  <v-card style="margin: auto" class="mx-auto" justify-content: center>
-    <v-card-text elevation-0>
-      <v-stepper v-model="e6" class="elevation-0">
-        <v-stepper-step :complete="e6 > 1" step="1">
-          Choose a data source
-          <small>Summarize if needed</small>
-        </v-stepper-step>
-        <v-stepper-content step="1" style="padding-left: 100px">
-          <v-radio-group v-model="picked" column>
-            <v-radio label="Backend Server" value="backend"></v-radio>
-            <v-radio label="S3 Bucket" value="s3"></v-radio>
-            <v-radio label="Splunk" value="splunk"></v-radio>
-            <v-radio label="Upload Profile" value="local_files"></v-radio>
-            <v-radio label="Sample Profiles" value="sample"></v-radio>
-          </v-radio-group>
-          <v-btn
-            v-if="picked != 'local_files'"
-            @click="e6 = 2"
-            :disabled="!picked"
-            color="primary"
-            >Continue</v-btn
+  <div>
+    <div v-if="modal">
+      <Modal
+        :value="value"
+        @input="$emit('input', $event.target.value)"
+        :persistent="persistent"
+      >
+        <v-stepper v-model="e6" class="elevation-0">
+          <v-stepper-step :complete="e6 > 1" step="1">
+            Choose a data source
+            <small>Summarize if needed</small>
+          </v-stepper-step>
+          <v-stepper-content step="1" style="padding-left: 100px">
+            <v-radio-group v-model="picked" column>
+              <v-radio label="Heimdall Database" value="backend"></v-radio>
+              <v-radio label="S3 Bucket" value="s3"></v-radio>
+              <v-radio label="Splunk" value="splunk"></v-radio>
+              <v-radio label="Upload Profile" value="local_files"></v-radio>
+              <v-radio label="Sample Profiles" value="sample"></v-radio>
+            </v-radio-group>
+            <v-btn
+              v-if="picked != 'local_files'"
+              @click="e6 = 2"
+              :disabled="!picked"
+              color="primary"
+              >Continue</v-btn
+            >
+            <FileReader v-if="picked == 'local_files'" @got-files="got_files" />
+            <div hidden>
+              <input
+                ref="real-input"
+                type="file"
+                multiple
+                @change="select_file"
+                accept=".json, application/json"
+              />
+            </div>
+          </v-stepper-content>
+
+          <v-stepper-step
+            :complete="e6 > 2"
+            v-if="(picked == 'backend') | 's3'"
+            step="2"
+            >Connect to Heimdall Database</v-stepper-step
           >
-          <FileReader v-if="picked == 'local_files'" @got-files="got_files" />
-          <div hidden>
-            <input
-              ref="real-input"
-              type="file"
-              multiple
-              @change="select_file"
-              accept=".json, application/json"
-            />
-          </div>
-        </v-stepper-content>
 
-        <v-stepper-step
-          :complete="e6 > 2"
-          v-if="(picked == 'backend') | 's3'"
-          step="2"
-          >Configure to Backend</v-stepper-step
-        >
+          <v-stepper-step :complete="e6 > 2" v-if="picked == 's3'" step="2"
+            >Connect to S3</v-stepper-step
+          >
+          <v-stepper-step :complete="e6 > 2" v-if="picked == 'splunk'" step="2"
+            >Connect to Splunk</v-stepper-step
+          >
+          <v-stepper-step :complete="e6 > 2" v-if="picked == 'sample'" step="2"
+            >Choose sample profile</v-stepper-step
+          >
 
-        <v-stepper-step :complete="e6 > 2" v-if="picked == 's3'" step="2"
-          >Connect to S3</v-stepper-step
-        >
-        <v-stepper-step :complete="e6 > 2" v-if="picked == 'splunk'" step="2"
-          >Connect to Splunk</v-stepper-step
-        >
-        <v-stepper-step :complete="e6 > 2" v-if="picked == 'sample'" step="2"
-          >Choose sample profile</v-stepper-step
-        >
+          <v-stepper-content v-if="picked == 'backend'" step="2">
+            <v-content
+              v-if="!is_logged_in"
+              style="padding-left: 100px; padding-right:100px"
+            >
+              <v-btn
+                @click="signup()"
+                v-if="auth_choice == 'login'"
+                depressed
+                color="blue-grey"
+                >Sign Up</v-btn
+              >
+              <v-btn
+                @click="login()"
+                v-if="auth_choice == 'signup'"
+                depressed
+                color="blue-grey"
+                >Login</v-btn
+              >
+              <Login v-if="auth_choice == 'login'" />
+              <Signup v-if="auth_choice == 'signup'" />
+              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+            </v-content>
+            <v-content v-if="is_logged_in">
+              Logged in as {{ user }}
+              <v-btn @click="logout()" style="float: right;">Logout</v-btn>
+              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+            </v-content>
+          </v-stepper-content>
 
-        <v-stepper-content v-if="picked == 'backend'" step="2">
-          <v-content
-            v-if="!is_logged_in"
+          <v-stepper-content
+            v-if="picked == 's3'"
+            step="2"
             style="padding-left: 100px; padding-right:100px"
           >
-            <v-btn
-              @click="signup()"
-              v-if="auth_choice == 'login'"
-              depressed
-              color="blue-grey"
-              >Sign Up</v-btn
-            >
-            <v-btn
-              @click="login()"
-              v-if="auth_choice == 'signup'"
-              depressed
-              color="blue-grey"
-              >Login</v-btn
-            >
-            <Login v-if="auth_choice == 'login'" />
-            <Signup v-if="auth_choice == 'signup'" />
+            <S3Reader @got-files="got_files" />
+            <v-btn @click="e6 = 1" text style="float: right;">Go Back</v-btn>
+          </v-stepper-content>
+
+          <v-stepper-content
+            v-if="picked == 'splunk'"
+            step="2"
+            style="padding-left: 100px; padding-right:100px"
+          >
+            <SplunkReader @got-files="got_files" />
             <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-          </v-content>
-          <v-content v-if="is_logged_in">
-            Logged in as {{ user }}
-            <v-btn @click="logout()" style="float: right;">Logout</v-btn>
+          </v-stepper-content>
+
+          <v-stepper-content
+            v-if="picked == 'local_files'"
+            step="2"
+            style="padding-left: 100px; padding-right:100px"
+          >
+            <FileReader @got-files="got_files" />
             <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-          </v-content>
-        </v-stepper-content>
+          </v-stepper-content>
+          <v-stepper-content
+            v-if="picked == 'sample'"
+            step="2"
+            style="padding-left: 100px; padding-right:100px"
+          >
+            <SampleList @got-files="got_files" />
+            <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+          </v-stepper-content>
+        </v-stepper>
+      </Modal>
+    </div>
+    <div v-else>
+      <v-card>
+        <v-card-text>
+          <Header />
+          <v-stepper v-model="e6" class="elevation-0">
+            <v-stepper-step :complete="e6 > 1" step="1">
+              Choose a data source
+              <small>Summarize if needed</small>
+            </v-stepper-step>
+            <v-stepper-content step="1" style="padding-left: 100px">
+              <v-radio-group v-model="picked" column>
+                <v-radio label="Heimdall Database" value="backend"></v-radio>
+                <v-radio label="S3 Bucket" value="s3"></v-radio>
+                <v-radio label="Splunk" value="splunk"></v-radio>
+                <v-radio label="Upload Profile" value="local_files"></v-radio>
+                <v-radio label="Sample Profiles" value="sample"></v-radio>
+              </v-radio-group>
+              <v-btn
+                v-if="picked != 'local_files'"
+                @click="e6 = 2"
+                :disabled="!picked"
+                color="primary"
+                >Continue</v-btn
+              >
+              <FileReader
+                v-if="picked == 'local_files'"
+                @got-files="got_files"
+              />
+              <div hidden>
+                <input
+                  ref="real-input"
+                  type="file"
+                  multiple
+                  @change="select_file"
+                  accept=".json, application/json"
+                />
+              </div>
+            </v-stepper-content>
 
-        <v-stepper-content
-          v-if="picked == 's3'"
-          step="2"
-          style="padding-left: 100px; padding-right:100px"
-        >
-          <S3Reader @got-files="got_files" />
-          <v-btn @click="e6 = 1" text style="float: right;">Go Back</v-btn>
-        </v-stepper-content>
+            <v-stepper-step
+              :complete="e6 > 2"
+              v-if="(picked == 'backend') | 's3'"
+              step="2"
+              >Connect to Heimdall Database</v-stepper-step
+            >
 
-        <v-stepper-content
-          v-if="picked == 'splunk'"
-          step="2"
-          style="padding-left: 100px; padding-right:100px"
-        >
-          <SplunkReader @got-files="got_files" />
-          <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-        </v-stepper-content>
+            <v-stepper-step :complete="e6 > 2" v-if="picked == 's3'" step="2"
+              >Connect to S3</v-stepper-step
+            >
+            <v-stepper-step
+              :complete="e6 > 2"
+              v-if="picked == 'splunk'"
+              step="2"
+              >Connect to Splunk</v-stepper-step
+            >
+            <v-stepper-step
+              :complete="e6 > 2"
+              v-if="picked == 'sample'"
+              step="2"
+              >Choose sample profile</v-stepper-step
+            >
 
-        <v-stepper-content
-          v-if="picked == 'local_files'"
-          step="2"
-          style="padding-left: 100px; padding-right:100px"
-        >
-          <FileReader @got-files="got_files" />
-          <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-        </v-stepper-content>
-        <v-stepper-content
-          v-if="picked == 'sample'"
-          step="2"
-          style="padding-left: 100px; padding-right:100px"
-        >
-          <SampleList @got-files="got_files" />
-          <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-        </v-stepper-content>
-      </v-stepper>
-    </v-card-text>
-    <v-card-actions> </v-card-actions>
-  </v-card>
+            <v-stepper-content v-if="picked == 'backend'" step="2">
+              <v-content
+                v-if="!is_logged_in"
+                style="padding-left: 100px; padding-right:100px"
+              >
+                <v-btn
+                  @click="signup()"
+                  v-if="auth_choice == 'login'"
+                  depressed
+                  color="blue-grey"
+                  >Sign Up</v-btn
+                >
+                <v-btn
+                  @click="login()"
+                  v-if="auth_choice == 'signup'"
+                  depressed
+                  color="blue-grey"
+                  >Login</v-btn
+                >
+                <Login v-if="auth_choice == 'login'" />
+                <Signup v-if="auth_choice == 'signup'" />
+                <v-btn @click="e6 = 1" style="float: right;" text
+                  >Go Back</v-btn
+                >
+              </v-content>
+              <v-content v-if="is_logged_in">
+                Logged in as {{ user }}
+                <v-btn @click="logout()" style="float: right;">Logout</v-btn>
+                <v-btn @click="e6 = 1" style="float: right;" text
+                  >Go Back</v-btn
+                >
+              </v-content>
+            </v-stepper-content>
+
+            <v-stepper-content
+              v-if="picked == 's3'"
+              step="2"
+              style="padding-left: 100px; padding-right:100px"
+            >
+              <S3Reader @got-files="got_files" />
+              <v-btn @click="e6 = 1" text style="float: right;">Go Back</v-btn>
+            </v-stepper-content>
+
+            <v-stepper-content
+              v-if="picked == 'splunk'"
+              step="2"
+              style="padding-left: 100px; padding-right:100px"
+            >
+              <SplunkReader @got-files="got_files" />
+              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+            </v-stepper-content>
+
+            <v-stepper-content
+              v-if="picked == 'local_files'"
+              step="2"
+              style="padding-left: 100px; padding-right:100px"
+            >
+              <FileReader @got-files="got_files" />
+              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+            </v-stepper-content>
+            <v-stepper-content
+              v-if="picked == 'sample'"
+              step="2"
+              style="padding-left: 100px; padding-right:100px"
+            >
+              <SampleList @got-files="got_files" />
+              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
+            </v-stepper-content>
+          </v-stepper>
+        </v-card-text>
+      </v-card>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -155,7 +294,8 @@ const local_tab = new LocalStorageVal<string>("nexus_curr_tab");
 const Props = Vue.extend({
   props: {
     value: Boolean, // Whether it is open. Modelable
-    persistent: Boolean // Whether clicking outside closes
+    persistent: Boolean, // Whether clicking outside closes
+    modal: Boolean
   }
 });
 
@@ -185,6 +325,7 @@ export default class UploadNexusNew extends Props {
   // Loads the last open tab
   mounted() {
     console.log("mount UploadNexus");
+    console.log(this.modal);
     this.active_tab = local_tab.get_default("uploadtab-local");
   }
 

@@ -1,9 +1,8 @@
 <template>
   <v-container>
     <v-row>
-      <v-col center xl="8" md="8" sm="12" xs="12">
-        <UploadNexus
-          v-if="is_logged_in"
+      <v-col style="margin: auto" center xl="8" md="8" sm="12" xs="12">
+        <UploadNexusNew
           :value="dialog"
           @got-files="on_got_files"
           :persistent="true"
@@ -17,8 +16,10 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import UploadNexus from "@/components/global/UploadNexus.vue";
+import UploadNexusNew from "@/components/global/UploadNexusNew.vue";
 import ServerModule from "@/store/server";
 import { getModule } from "vuex-module-decorators";
+import HelpFooter from "@/components/global/upload_tabs/HelpFooter.vue";
 
 import { Filter } from "@/store/data_filters";
 import { FileID } from "@/store/report_intake";
@@ -31,7 +32,9 @@ const LandingProps = Vue.extend({
 
 @Component({
   components: {
-    UploadNexus
+    UploadNexusNew,
+    UploadNexus,
+    HelpFooter
   }
 })
 export default class Landing extends LandingProps {
@@ -42,7 +45,7 @@ export default class Landing extends LandingProps {
    * no file uploaded
    */
   mounted() {
-    this.checkLoggedIn();
+    //this.checkLoggedIn();
   }
 
   get is_logged_in(): boolean {

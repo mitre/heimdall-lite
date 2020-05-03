@@ -119,7 +119,7 @@ export default class Login extends LoginProps {
           this.$router.go(0);
         })
         .then(() => {
-          this.$router.push("/home");
+          //this.$router.push("/home");
         });
     }
   }

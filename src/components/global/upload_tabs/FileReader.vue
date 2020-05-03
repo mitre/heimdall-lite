@@ -1,44 +1,5 @@
 <template>
-  <v-card>
-    <v-card-subtitle
-      >Easily load any supported Heimdall Data Format file</v-card-subtitle
-    >
-    <v-container>
-      <v-row>
-        <v-col cols="12" align="center">
-          <!-- Use inline style to emulate v-img props -->
-          <img
-            src="@/assets/logo-orange-tsp.svg"
-            svg-inline
-            style="max-width: 164px; max-height: 164px;"
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" align="center">
-          <div class="d-flex flex-column justify-center">
-            <span :class="title_class">Heimdall</span>
-            <span :class="title_class">Lite</span>
-          </div>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-spacer />
-        <v-col align="center" cols="4">
-          <UploadButton @files-selected="commit_files" />
-        </v-col>
-        <v-col align="right" cols="4">
-          <a
-            href="https://mitre.github.io/heimdall-lite-1.0/"
-            target="_blank"
-            class="mr-2"
-          >
-            Looking for 1.0?
-          </a>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-card>
+  <UploadButton @files-selected="commit_files" />
 </template>
 
 <script lang="ts">

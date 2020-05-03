@@ -14,7 +14,7 @@
       ></v-text-field>
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
         <span class="d-none d-md-inline pr-2">
-          Upload
+          Uploads
         </span>
         <v-icon>
           mdi-cloud-upload
@@ -131,7 +131,12 @@
     </template>
 
     <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
+
+    <UploadNexusNew
+      v-bind:modal="true"
+      v-model="dialog"
+      @got-files="on_got_files"
+    />
 
     <!-- Everything-is-filtered snackbar -->
     <v-snackbar
@@ -154,7 +159,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import BaseView from "@/views/BaseView.vue";
-import UploadNexus from "@/components/global/UploadNexus.vue";
+import UploadNexusNew from "@/components/global/UploadNexusNew.vue";
 
 import StatusCardRow from "@/components/cards/StatusCardRow.vue";
 import ControlTable from "@/components/cards/controltable/ControlTable.vue";
@@ -183,7 +188,7 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus,
+    UploadNexusNew,
     StatusCardRow,
     Treemap,
     ControlTable,

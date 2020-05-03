@@ -1,34 +1,14 @@
 <template>
   <v-container class="bar">
     <v-row justify="space-around" no-gutters>
-      <AboutModal>
-        <template v-slot:clickable="{ on }">
-          <v-btn v-on="on" text small>
-            <v-icon small>mdi-information</v-icon>
-            <span class="d-none d-sm-inline pl-3">About</span>
-          </v-btn>
-        </template>
-      </AboutModal>
-      <HelpModal>
-        <template v-slot:clickable="{ on }">
-          <v-btn v-on="on" text small>
-            <v-icon small>mdi-help-circle</v-icon>
-            <span class="d-none d-sm-inline pl-3">Help</span>
-          </v-btn>
-        </template>
-      </HelpModal>
-      <v-btn :href="repository" target="_blank" text small>
-        <v-icon small>mdi-github-circle</v-icon>
-        <span class="d-none d-sm-inline pl-3">Gsithub</span>
-      </v-btn>
-      <v-btn :href="repository" target="_blank" text small>
-        <v-icon small>mdi-library-books</v-icon>
-        <span class="d-none d-sm-inline pl-3">Docs</span>
-      </v-btn>
-      <v-btn :href="repository + branch + changelog" target="_blank" text small>
-        <v-icon small>mdi-alpha-v-circle</v-icon>
-        <span class="d-sm-inline pl-3 text-center">{{ version }}</span>
-      </v-btn>
+      <div :href="repository" target="_blank" text small>
+        <img
+          src="@/assets/logo-orange-tsp.svg"
+          svg-inline
+          style="max-width: 60px; max-height: 60px;"
+        />
+        <h1 class="d-none d-sm-inline pl-3">Heimdall Lite</h1>
+      </div>
     </v-row>
   </v-container>
 </template>
@@ -55,7 +35,7 @@ const Props = Vue.extend({
     HelpModal
   }
 })
-export default class HelpFooter extends Props {
+export default class Header extends Props {
   get version(): string {
     return getModule(AppInfoModule, this.$store).version;
   }
