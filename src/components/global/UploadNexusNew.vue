@@ -187,7 +187,7 @@
             <v-stepper-content v-if="picked == 'backend'" step="2">
               <v-content
                 v-if="!is_logged_in"
-                style="padding-left: 100px; padding-right:100px"
+                style="padding-left: 10%; padding-right:10%"
               >
                 <v-btn
                   @click="signup()"
@@ -219,38 +219,17 @@
             </v-stepper-content>
 
             <v-stepper-content
-              v-if="picked == 's3'"
               step="2"
-              style="padding-left: 100px; padding-right:100px"
+              style="padding-left: 10%; padding-right:10%"
             >
-              <S3Reader @got-files="got_files" />
+              <S3Reader v-if="picked == 's3'" @got-files="got_files" />
+              <SplunkReader v-if="picked == 'splunk'" @got-files="got_files" />
+              <FileReader
+                v-if="picked == 'local_files'"
+                @got-files="got_files"
+              />
+              <SampleList v-if="picked == 'sample'" @got-files="got_files" />
               <v-btn @click="e6 = 1" text style="float: right;">Go Back</v-btn>
-            </v-stepper-content>
-
-            <v-stepper-content
-              v-if="picked == 'splunk'"
-              step="2"
-              style="padding-left: 100px; padding-right:100px"
-            >
-              <SplunkReader @got-files="got_files" />
-              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-            </v-stepper-content>
-
-            <v-stepper-content
-              v-if="picked == 'local_files'"
-              step="2"
-              style="padding-left: 100px; padding-right:100px"
-            >
-              <FileReader @got-files="got_files" />
-              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
-            </v-stepper-content>
-            <v-stepper-content
-              v-if="picked == 'sample'"
-              step="2"
-              style="padding-left: 100px; padding-right:100px"
-            >
-              <SampleList @got-files="got_files" />
-              <v-btn @click="e6 = 1" style="float: right;" text>Go Back</v-btn>
             </v-stepper-content>
           </v-stepper>
         </v-card-text>
