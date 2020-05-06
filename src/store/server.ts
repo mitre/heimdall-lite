@@ -9,7 +9,7 @@ import Store from "@/store/store";
 import { LocalStorageVal } from "@/utilities/helper_util";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { plainToClass } from "class-transformer";
-import { ExecutionFile, ProfileFile } from "@/store/report_intake";
+import { ExecutionFile, ProfileFile, FileID } from "@/store/report_intake";
 
 export interface LoginHash {
   username: string;
@@ -33,6 +33,7 @@ const local_user = new LocalStorageVal<UserProfile | null>("user_profile");
 const local_user_evaluations = new LocalStorageVal<string | null>(
   "user_evaluations"
 );
+const local_evaluation = new LocalStorageVal<string | null>("evaluation");
 
 type ConnErrorType =
   | "NO_CONNECTION"
@@ -86,6 +87,7 @@ class HeimdallServerModule extends VuexModule {
   token: string | null = local_token.get();
   profile: UserProfile | null = local_user.get();
   user_evaluations: string | null = local_user_evaluations.get();
+  evaluation: string | null = local_evaluation.get();
 
   /** Mutation to set above, as well as to update our localstorage */
   @Mutation
@@ -93,6 +95,14 @@ class HeimdallServerModule extends VuexModule {
     this.token = new_token;
     console.log("server.ts - set token: " + this.token);
     local_token.set(new_token);
+  }
+
+  /** Mutation to set above, as well as to update our localstorage */
+  @Mutation
+  set_evaluation(evaluation: string | null) {
+    this.evaluation = evaluation;
+    console.log("server.ts - set evaluation: " + this.evaluation);
+    local_evaluation.set(evaluation);
   }
 
   /* Actions to authorize and set token */
@@ -260,6 +270,25 @@ class HeimdallServerModule extends VuexModule {
       .then((v: any) => {
         console.log("personal evals: " + JSON.stringify(v.data));
         this.set_user_evaluations(v.data);
+      });
+  }
+
+  /** Attempts to retrieve a list of personal evaluations */
+  @Action
+  async retrieve_evaluation(file_id: FileID): Promise<void> {
+    console.log(
+      "Getting " + this.connection!.url + "/executions/fetch/" + file_id
+    );
+    //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
+    return axios
+      .get(this.connection!.url + "/executions/fetch/" + file_id, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((v: any) => {
+        console.log("got evaluation: " + JSON.stringify(v.data));
+        this.set_evaluation(v.data);
       });
   }
 

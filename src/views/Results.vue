@@ -241,6 +241,7 @@ export default class Results extends ResultsProps {
    */
   get file_filter(): FileID | null {
     let id_string: string = this.$route.params.id;
+    console.log("file_filter: " + id_string);
     let as_int = parseInt(id_string);
     let result: FileID | null;
     if (isNaN(as_int)) {
@@ -248,12 +249,14 @@ export default class Results extends ResultsProps {
     } else {
       result = as_int as FileID;
     }
+    console.log("file_filter result: " + result);
 
     // Route if necessary
     let redir = need_redirect_file(
       result,
       getModule(InspecDataModule, this.$store)
     );
+    console.log("redir: " + redir);
     if (redir !== "ok") {
       if (redir === "root") {
         this.$router.push("/home");

@@ -30,6 +30,10 @@ import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 import AppInfoModule from "@/store/app_info";
 import { plainToClass } from "class-transformer";
+import InspecIntakeModule, {
+  FileID,
+  next_free_file_ID
+} from "@/store/report_intake";
 
 export class Evaluation {
   id!: number;
@@ -65,8 +69,46 @@ export default class DatabaseReader extends Props {
     }
   }
 
-  load_this_evaluation(evaluation: Evaluation) {
+  async load_this_evaluation(evaluation: Evaluation): Promise<void> {
     console.log("load this file: " + evaluation.id);
+    const host = process.env.VUE_APP_API_URL!;
+    // Generate an id
+    let unique_id = next_free_file_ID();
+
+    // TODO
+    let filename = "evaluation";
+
+    // Get intake module
+    let intake_module = getModule(InspecIntakeModule, this.$store);
+    let mod = getModule(ServerModule, this.$store);
+    await mod
+      .connect(host)
+      .catch(bad => {
+        console.error("Unable to connect to " + host);
+      })
+      .then(() => {
+        console.log("here");
+        return mod.retrieve_evaluation(evaluation.id);
+      })
+      .catch(bad => {
+        console.error(`bad login ${bad}`);
+      })
+      .then(() => {
+        console.log("here2");
+        if (mod.evaluation) {
+          console.log("here3");
+          let upload = `{"unique_id": ${unique_id},"filename": "${filename}","execution":${JSON.stringify(
+            mod.evaluation
+          )}}`;
+          intake_module.loadText({
+            text: upload,
+            unique_id: unique_id,
+            filename: filename
+          });
+          console.log("Loaded " + unique_id);
+          this.$emit("got-files", [unique_id]);
+        }
+      });
   }
 }
 </script>
