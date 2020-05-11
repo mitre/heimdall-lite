@@ -3,6 +3,7 @@
     <v-row>
       <v-col center xl="8" md="8" sm="12" xs="12">
         <UploadNexus
+          v-if="is_logged_in"
           :value="dialog"
           @got-files="on_got_files"
           :persistent="true"
