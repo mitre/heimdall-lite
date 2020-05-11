@@ -5,6 +5,9 @@
       @input="$emit('input', $event.target.value)"
       :persistent="persistent"
     >
+      <div v-if="is_logged_in" style="padding: 8px;float: right; width:100px">
+        <v-btn @click="logout()" color="normal">Logout</v-btn>
+      </div>
       <v-tabs
         :vertical="$vuetify.breakpoint.mdAndUp"
         active
@@ -34,7 +37,6 @@
         </v-tab-item>
 
         <v-tab-item value="uploadtab-database">
-          <v-btn @click="logout()" color="primary">Logout</v-btn>
           <DatabaseReader @got-files="got_files" />
         </v-tab-item>
 

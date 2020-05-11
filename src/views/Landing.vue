@@ -53,11 +53,16 @@ export default class Landing extends LandingProps {
   }
 
   get is_logged_in(): boolean {
-    if (this.token) {
-      console.log("is_logged_in - token: " + this.token + "end token");
+    this.servermode = isServerMode();
+    if (!this.servermode) {
       return true;
     } else {
-      return false;
+      if (this.token) {
+        console.log("is_logged_in - token: " + this.token + "end token");
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
