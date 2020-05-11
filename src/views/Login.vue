@@ -57,6 +57,7 @@ import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 import VeeValidate from "vee-validate";
 import VuePassword from "vue-password";
+import { isServerMode } from "@/utilities/helper_util";
 
 Vue.use(VeeValidate);
 
@@ -103,12 +104,32 @@ export default class Login extends LoginProps {
   // Loads the last open tab
   mounted() {
     console.log("mount UploadNexus");
-    this.active_tab = "login-tab";
+    this.checkLoggedIn();
+    // this.$router.push("/home");
   }
 
   // Handles change in tab
   selected_tab(new_tab: string) {
     this.active_tab = new_tab;
+  }
+
+  get is_logged_in(): boolean {
+    if (this.token) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  checkLoggedIn() {
+    console.log("token: " + this.token + "end token");
+    if (this.token) {
+      console.log("Go to auth");
+      this.$router.push("/home");
+    }
+  }
+  get token(): string {
+    let mod = getModule(ServerModule, this.$store);
+    return mod.token || "";
   }
 
   get watches(): string {

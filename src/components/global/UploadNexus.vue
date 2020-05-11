@@ -34,6 +34,7 @@
         </v-tab-item>
 
         <v-tab-item value="uploadtab-database">
+          <v-btn @click="logout()" color="primary">Logout</v-btn>
           <DatabaseReader @got-files="got_files" />
         </v-tab-item>
 
@@ -68,6 +69,7 @@ import SplunkReader from "@/components/global/upload_tabs/splunk/SplunkReader.vu
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
 import ServerModule from "@/store/server";
 import { LocalStorageVal } from "@/utilities/helper_util";
+import { isServerMode } from "@/utilities/helper_util";
 
 export class UserProfile {
   id?: number;
@@ -115,8 +117,13 @@ export default class UploadNexus extends Props {
   }
 
   get is_logged_in(): boolean {
-    if (this.token) {
-      return true;
+    const mode = isServerMode();
+    if (mode) {
+      if (this.token) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
@@ -136,6 +143,12 @@ export default class UploadNexus extends Props {
     }
   }
 
+  //logout from backend
+  logout() {
+    console.log("logout");
+    getModule(ServerModule, this.$store).clear_token();
+    this.$router.push("/login");
+  }
   // Handles change in tab
   selected_tab(new_tab: string) {
     this.active_tab = new_tab;

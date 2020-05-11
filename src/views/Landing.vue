@@ -21,6 +21,7 @@ import { getModule } from "vuex-module-decorators";
 
 import { Filter } from "@/store/data_filters";
 import { FileID } from "@/store/report_intake";
+import { isServerMode } from "@/utilities/helper_util";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -36,12 +37,18 @@ const LandingProps = Vue.extend({
 export default class Landing extends LandingProps {
   /** Whether or not the model is showing */
   dialog: boolean = true;
+  servermode: boolean = true;
 
   /* This is supposed to cause the dialog to automatically appear if there is
    * no file uploaded
    */
   mounted() {
-    this.checkLoggedIn();
+    this.servermode = isServerMode();
+    if (this.servermode) {
+      this.checkLoggedIn();
+    }
+
+    console.log(this.servermode);
   }
 
   get is_logged_in(): boolean {
@@ -60,11 +67,11 @@ export default class Landing extends LandingProps {
 
   checkLoggedIn() {
     console.log("token: " + this.token + "end token");
-    /*  if (!this.token) {
+    if (!this.token) {
       console.log("Go to auth");
-      this.dialog = false;
-     // this.$router.push("/login");
-    }*/
+      //  this.dialog = false;
+      this.$router.push("/login");
+    }
   }
 
   /**

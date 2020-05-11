@@ -162,3 +162,14 @@ export function to_uri_params(params: Hash<string | number | boolean>) {
 export function basic_auth(username: string, password: string): string {
   return "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
 }
+
+export function isServerMode(): boolean {
+  const host = process.env.VUE_APP_API_URL;
+  console.log("environment variable");
+  console.log(host);
+  if (host) {
+    return true;
+  } else {
+    return false;
+  }
+}
