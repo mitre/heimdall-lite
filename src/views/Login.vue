@@ -123,7 +123,6 @@ export default class Login extends LoginProps {
   checkLoggedIn() {
     console.log("token: " + this.token + "end token");
     if (this.token) {
-      console.log("Go to auth");
       this.$router.push("/home");
     }
   }
@@ -166,7 +165,6 @@ export default class Login extends LoginProps {
           this.$router.go(0);
         })
         .then(() => {
-          console.log("here");
           return mod.login(creds);
         })
         .catch(bad => {
@@ -174,7 +172,6 @@ export default class Login extends LoginProps {
           this.$router.go(0);
         })
         .then(() => {
-          console.log("here2");
           this.$router.push("/home");
         });
     }
