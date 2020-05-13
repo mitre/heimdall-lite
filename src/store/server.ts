@@ -239,7 +239,9 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to save evaluation to the database */
   @Action
   async save_evaluation(evaluation: ExecutionFile): Promise<void> {
-    console.log("Saving execution to " + this.connection!.url + "/executions");
+    console.log(
+      "Saving execution to " + this.connection!.url + "/executions/upload"
+    );
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -247,7 +249,7 @@ class HeimdallServerModule extends VuexModule {
     };
     return axios
       .post(
-        this.connection!.url + "/executions",
+        this.connection!.url + "/executions/upload",
         {
           evaluation: evaluation.execution,
           filename: evaluation.filename
