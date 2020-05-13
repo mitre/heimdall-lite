@@ -60,12 +60,12 @@ export default class Landing extends LandingProps {
   }
 
   checkLoggedIn() {
-    let server = getModule(ServerModule, this.$store);
-    if (server.profile) {
-      console.log("profile: " + JSON.stringify(server.profile));
+    //let server = getModule(ServerModule, this.$store);
+    if (this.token) {
+      //console.log("profile: " + JSON.stringify(server.profile));
       return true;
     } else {
-      console.log("Go to auth");
+      console.log("Go to login");
       this.dialog = false;
       this.$router.push("/login");
     }

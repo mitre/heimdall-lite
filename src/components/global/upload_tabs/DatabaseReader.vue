@@ -10,7 +10,7 @@
           :key="index"
         >
           <v-list-item-content>
-            <v-list-item-title v-text="evaluation.version" />
+            <v-list-item-title v-text="evaluation_label(evaluation)" />
           </v-list-item-content>
           <v-list-item-action>
             <v-btn icon @click="load_this_evaluation(evaluation)">
@@ -35,9 +35,22 @@ import InspecIntakeModule, {
   next_free_file_ID
 } from "@/store/report_intake";
 
+export class Content {
+  name!: string;
+  value!: string;
+}
 export class Evaluation {
   id!: number;
   version!: string;
+  createdAt!: Date;
+  updatedAt!: Date;
+  tags!: Tag[];
+}
+export class Tag {
+  id!: number;
+  tagger_id!: number;
+  tagger_type!: string;
+  content!: Content;
   createdAt!: Date;
   updatedAt!: Date;
 }
@@ -69,6 +82,19 @@ export default class DatabaseReader extends Props {
     }
   }
 
+  evaluation_label(evaluation: Evaluation): string {
+    let label = evaluation.version;
+    if (evaluation.tags) {
+      evaluation.tags.forEach(tag => {
+        console.log("tag " + tag.content.name + ": " + tag.content.value);
+        if (tag.content.name == "filename") {
+          label = tag.content.value;
+        }
+      });
+    }
+    return label;
+  }
+
   async load_this_evaluation(evaluation: Evaluation): Promise<void> {
     console.log("load this file: " + evaluation.id);
     const host = process.env.VUE_APP_API_URL!;
@@ -97,11 +123,11 @@ export default class DatabaseReader extends Props {
         console.log("here2");
         if (mod.evaluation) {
           console.log("here3");
-          let upload = `{"unique_id": ${unique_id},"filename": "${filename}","execution":${JSON.stringify(
-            mod.evaluation
-          )}}`;
+          //let upload = `{"unique_id": ${unique_id},"filename": "${filename}","execution":${JSON.stringify(
+          //  mod.evaluation
+          //)}}`;
           intake_module.loadText({
-            text: upload,
+            text: JSON.stringify(mod.evaluation),
             unique_id: unique_id,
             filename: filename
           });

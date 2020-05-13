@@ -94,6 +94,9 @@ class InspecIntakeModule extends VuexModule {
     try {
       result = parse.convertFile(options.text);
     } catch (e) {
+      console.log(
+        `Failed to convert file ${options.filename} due to error "${e}".`
+      );
       return new Error(
         `Failed to convert file ${options.filename} due to error "${e}".`
       );
@@ -110,6 +113,7 @@ class InspecIntakeModule extends VuexModule {
         filename: options.filename,
         execution
       };
+      console.log("addExecution");
       data.addExecution(reportFile);
     } else if (result["1_0_ProfileJson"]) {
       // Handle as profile
@@ -120,6 +124,7 @@ class InspecIntakeModule extends VuexModule {
         filename: options.filename,
         profile
       };
+      console.log("addProfile");
       data.addProfile(profileFile);
     } else {
       console.log("is Nothing");

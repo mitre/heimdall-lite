@@ -248,7 +248,10 @@ class HeimdallServerModule extends VuexModule {
     return axios
       .post(
         this.connection!.url + "/executions",
-        { evaluation: evaluation.execution },
+        {
+          evaluation: evaluation.execution,
+          filename: evaluation.filename
+        },
         options
       )
       .then((v: any) => {
