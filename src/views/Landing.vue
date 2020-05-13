@@ -3,7 +3,6 @@
     <v-row>
       <v-col center xl="8" md="8" sm="12" xs="12">
         <UploadNexus
-          v-if="is_logged_in"
           :value="dialog"
           @got-files="on_got_files"
           :persistent="true"
@@ -67,8 +66,8 @@ export default class Landing extends LandingProps {
     } else {
       console.log("Go to login");
       this.dialog = false;
-      this.$router.push("/login");
-    }
+     // this.$router.push("/login");
+    }*/
   }
 
   /**

@@ -33,7 +33,7 @@ import ServerModule from "@/store/server";
 // We declare the props separately to make props types inferable.
 const FileItemProps = Vue.extend({
   props: {
-    file: Object // Of type ExecutionFile or ProfileFile
+    file: Object // Of type EvaluationFile or ProfileFile
   }
 });
 
