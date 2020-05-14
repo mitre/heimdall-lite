@@ -67,7 +67,7 @@ export class HSConnectionConfig {
 class HeimdallServerModule extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
-  serverMode: Boolean | null = isServerMode();
+  serverMode: boolean = isServerMode();
 
   @Mutation
   set_connection(new_url: string) {
