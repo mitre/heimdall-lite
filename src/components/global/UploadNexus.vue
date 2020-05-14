@@ -119,8 +119,9 @@ export default class UploadNexus extends Props {
   }
 
   get is_logged_in(): boolean {
-    const mode = isServerMode();
-    if (mode) {
+    let mod = getModule(ServerModule, this.$store);
+
+    if (mod.serverMode) {
       if (this.token) {
         return true;
       } else {

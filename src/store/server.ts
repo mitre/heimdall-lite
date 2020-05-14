@@ -6,7 +6,7 @@ import {
   Action
 } from "vuex-module-decorators";
 import Store from "@/store/store";
-import { LocalStorageVal } from "@/utilities/helper_util";
+import { LocalStorageVal, isServerMode } from "@/utilities/helper_util";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { plainToClass } from "class-transformer";
 
@@ -67,6 +67,7 @@ export class HSConnectionConfig {
 class HeimdallServerModule extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
+  serverMode: Boolean | null = isServerMode();
 
   @Mutation
   set_connection(new_url: string) {

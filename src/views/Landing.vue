@@ -44,17 +44,16 @@ export default class Landing extends LandingProps {
    * no file uploaded
    */
   mounted() {
-    this.servermode = isServerMode();
-    if (this.servermode) {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode) {
       this.checkLoggedIn();
     }
-
-    console.log(this.servermode);
+    console.log("servermode: " + mod.serverMode);
   }
 
   get is_logged_in(): boolean {
-    this.servermode = isServerMode();
-    if (!this.servermode) {
+    let mod = getModule(ServerModule, this.$store);
+    if (!mod.serverMode) {
       return true;
     } else {
       if (this.token) {
