@@ -7,7 +7,6 @@ import { mount, createLocalVue } from "@vue/test-utils";
 const localVue = createLocalVue();
 
 const vuetify = new Vuetify();
-
 describe("MyComponent.vue:", () => {
   it("1. Mounts properly", () => {
     const wrapper = mount(UploadNexus, {
@@ -27,7 +26,6 @@ describe("MyComponent.vue:", () => {
       }
     });
     console.log(wrapper);
-
     expect(wrapper.find(".v-btn").exists()).toBe(true);
   });
   it("Find the button", () => {
@@ -40,6 +38,7 @@ describe("MyComponent.vue:", () => {
       }
     });
     console.log(wrapper);
+    process.env.VUE_APP_API_URL = "test";
     wrapper.setData({ is_logged_in: true });
     expect(wrapper.find("#test").exists()).toBe(true);
   });
