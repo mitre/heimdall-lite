@@ -2,29 +2,50 @@ import "jest";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import UploadNexus from "../src/components/global/UploadNexus.vue";
+import { getModule } from "vuex-module-decorators";
 
-import { mount, createLocalVue } from "@vue/test-utils";
-const localVue = createLocalVue();
+import { mount, shallowMount, Wrapper } from "@vue/test-utils";
+import ServerModule from "@/store/server";
 
 const vuetify = new Vuetify();
-describe("MyComponent.vue:", () => {
-  beforeAll(() => {
-    localStorage.setItem("auth_token", JSON.stringify("dummy-token"));
-    console.log(localStorage.getItem("auth_token"));
-  });
-  it("Find the button", () => {
-    const wrapper = mount(UploadNexus, {
-      vuetify,
-      localVue,
-      propsData: {
-        persistent: true,
-        value: true
-      }
-    });
-    console.log(wrapper);
-    process.env.VUE_APP_API_URL = "test";
-    expect(true).toBe(true);
+let wrapper: Wrapper<Vue>;
+let mod = getModule(ServerModule);
 
+beforeEach(() => {
+  localStorage.setItem("auth_token", JSON.stringify("dummy-token"));
+
+  wrapper = shallowMount(UploadNexus, {
+    vuetify,
+    propsData: {
+      persistent: true,
+      value: true
+    }
+  });
+});
+
+describe("UploadNexus.vue", () => {
+  it("Set token module works", () => {
+    mod.set_token("dummy-token");
+    expect(mod.token).toBe("dummy-token");
+  });
+
+  it("Server mode module check", () => {
+    process.env.VUE_APP_API_URL = "testurl";
+    mod.set_server_mode();
+    expect(mod.serverMode).toBe(true);
+  });
+
+  it("Logout button exist when logged in", async () => {
+    process.env.VUE_APP_API_URL = "test";
+    //await wrapper.vm.$nextTick()
     expect(wrapper.find("#logout").exists()).toBe(true);
+
+    mod.clear_token();
+  });
+
+  it("Logout button doesn't exist when logged out", async () => {
+    process.env.VUE_APP_API_URL = "test";
+    //await wrapper.vm.$nextTick()
+    expect(wrapper.find("#logout").exists()).toBe(false);
   });
 });

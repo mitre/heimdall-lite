@@ -91,6 +91,11 @@ class HeimdallServerModule extends VuexModule {
     local_token.set(new_token);
   }
 
+  @Mutation
+  set_server_mode() {
+    this.serverMode = isServerMode();
+  }
+
   /* Actions to authorize and set token */
   @Action
   clear_token() {
