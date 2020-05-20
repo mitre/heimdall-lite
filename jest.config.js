@@ -1,6 +1,6 @@
 module.exports = {
   rootDir: ".",
-  //  setupFiles: ["<rootDir>/tests/browserMocks.js"],
+  setupFiles: ["<rootDir>/tests/browserMocks.js"],
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   testMatch: ["<rootDir>/tests/*.spec.ts"],
   testPathIgnorePatterns: ["<rootDir>/src/__mocks__/*"],

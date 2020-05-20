@@ -8,25 +8,9 @@ const localVue = createLocalVue();
 
 const vuetify = new Vuetify();
 describe("MyComponent.vue:", () => {
-  it("1. Mounts properly", () => {
-    const wrapper = mount(UploadNexus, {
-      localVue,
-      vuetify
-    });
-    expect(wrapper.isVueInstance()).toBe(true);
-  });
-
-  it("Find the button", () => {
-    const wrapper = mount(UploadNexus, {
-      vuetify,
-      localVue,
-      propsData: {
-        persistent: true,
-        value: true
-      }
-    });
-    console.log(wrapper);
-    expect(wrapper.find(".v-btn").exists()).toBe(true);
+  beforeAll(() => {
+    localStorage.setItem("auth_token", JSON.stringify("dummy-token"));
+    console.log(localStorage.getItem("auth_token"));
   });
   it("Find the button", () => {
     const wrapper = mount(UploadNexus, {
@@ -39,7 +23,8 @@ describe("MyComponent.vue:", () => {
     });
     console.log(wrapper);
     process.env.VUE_APP_API_URL = "test";
-    wrapper.setData({ is_logged_in: true });
-    expect(wrapper.find("#test").exists()).toBe(true);
+    expect(true).toBe(true);
+
+    expect(wrapper.find("#logout").exists()).toBe(true);
   });
 });
