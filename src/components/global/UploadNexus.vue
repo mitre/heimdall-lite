@@ -6,7 +6,7 @@
       :persistent="persistent"
     >
       <div v-if="is_logged_in" style="padding: 8px;float: right; width:100px">
-        <v-btn @click="logout()" color="normal">Logout</v-btn>
+        <v-btn id="logout" @click="logout()" color="normal">Logout</v-btn>
       </div>
       <v-tabs
         :vertical="$vuetify.breakpoint.mdAndUp"
