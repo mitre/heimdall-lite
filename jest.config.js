@@ -1,8 +1,7 @@
 module.exports = {
   rootDir: ".",
-  setupFiles: ["<rootDir>/tests/browserMocks.js"],
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
-  testMatch: ["<rootDir>/tests/*.spec.ts"],
+  testMatch: ["<rootDir>/tests/unit/*.spec.ts"],
   testPathIgnorePatterns: ["<rootDir>/src/__mocks__/*"],
   moduleFileExtensions: ["vue", "ts", "tsx", "js", "jsx"],
   testEnvironment: "jsdom",

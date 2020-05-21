@@ -1,7 +1,7 @@
 import "jest";
 import Vue from "vue";
 import Vuetify from "vuetify";
-import UploadNexus from "../src/components/global/UploadNexus.vue";
+import UploadNexus from "@/components/global/UploadNexus.vue";
 import { getModule } from "vuex-module-decorators";
 
 import { mount, shallowMount, Wrapper } from "@vue/test-utils";
