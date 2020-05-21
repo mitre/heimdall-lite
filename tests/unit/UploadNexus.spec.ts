@@ -39,13 +39,12 @@ describe("UploadNexus.vue", () => {
     process.env.VUE_APP_API_URL = "test";
     //await wrapper.vm.$nextTick()
     expect(wrapper.find("#logout").exists()).toBe(true);
-
-    mod.clear_token();
   });
 
   it("Logout button doesn't exist when logged out", async () => {
+    mod.clear_token();
     process.env.VUE_APP_API_URL = "test";
-    //await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick();
     expect(wrapper.find("#logout").exists()).toBe(false);
   });
 });
