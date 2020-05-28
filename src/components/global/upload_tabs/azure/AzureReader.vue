@@ -116,7 +116,7 @@ export default class AzureReader extends Props {
     (v || "").trim().length > 0 || "Field is Required";
 
   /** State of all globally relevant fields */
-  auth_method: Object = {};
+  auth_method: string = "";
   connection_string: string = "";
   account_name: string = "";
   shared_access_signature: string = "";
@@ -141,32 +141,29 @@ export default class AzureReader extends Props {
   handle_basic() {
     // If we need another error, it will be set shortly. If not, the old one is probably not relevant
     this.error = null;
-    let storage_client: BlobServiceClient;
 
     try {
-      if (this.auth_method.value == "sas") {
-        storage_client = get_storage_client(
+      if (this.auth_method == "sas") {
+        this.storage_client = get_storage_client(
           null,
           this.account_name,
           this.shared_access_signature,
           this.account_suffix
         );
-      } else if (this.auth_method.value == "conn_string") {
-        storage_client = get_storage_client(
+      } else if (this.auth_method == "conn_string") {
+        this.storage_client = get_storage_client(
           this.connection_string,
           null,
           null,
           null
         );
       } else {
-        this.handle_error("Unknown auth method " + this.auth_method.value);
+        this.handle_error("Unknown auth method " + this.auth_method);
       }
     } catch (error) {
       this.handle_error(error);
       return;
     }
-
-    this.storage_client = storage_client;
 
     if (this.container_name != "") {
       this.step = 3;

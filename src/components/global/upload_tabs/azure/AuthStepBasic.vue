@@ -86,6 +86,11 @@ import { LocalStorageVal } from "../../../../utilities/helper_util";
 import { get_blob_account_url } from "../../../../utilities/azure_util";
 import { Dictionary } from "vue-router/types/router";
 
+type MultipleSelectObject = {
+  value: string;
+  text: string;
+};
+
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
@@ -99,7 +104,9 @@ const Props = Vue.extend({
 });
 
 /** Localstorage keys */
-const local_auth_method = new LocalStorageVal<object>("azure_auth_method");
+const local_auth_method = new LocalStorageVal<MultipleSelectObject>(
+  "azure_auth_method"
+);
 const local_account_name = new LocalStorageVal<string>("azure_account_name");
 const local_connection_string = new LocalStorageVal<string>(
   "azure_connection_string"
@@ -126,7 +133,7 @@ export default class AuthStepBasic extends Props {
   valid: boolean = false;
   valid_conn_string: boolean = false;
   show_secret: boolean = false;
-  auth_methods: Array<object> = [
+  auth_methods: Array<MultipleSelectObject> = [
     {
       text: "SAS Token",
       value: "sas"
@@ -136,7 +143,7 @@ export default class AuthStepBasic extends Props {
       value: "conn_string"
     }
   ];
-  auth_method_model: object = null;
+  auth_method_model: MultipleSelectObject | null = null;
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
@@ -164,10 +171,10 @@ export default class AuthStepBasic extends Props {
    *   update:local_auth_method emmitted with the new_value
    *   local_auth_method is set to new_value
    */
-  change_auth_method(new_value: object) {
+  change_auth_method(new_value: MultipleSelectObject) {
     this.auth_method_model = new_value;
     local_auth_method.set(new_value);
-    this.$emit("update:auth_method", new_value);
+    this.$emit("update:auth_method", new_value.value);
   }
 
   /**

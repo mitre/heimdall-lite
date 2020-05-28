@@ -59,10 +59,10 @@ export function get_blob_account_url(
  * @return {BlobServiceClient} The initiailized blob service client.
  */
 export function get_storage_client(
-  connection_string: string,
-  account_name: string,
-  shared_access_signature: string,
-  account_suffix: string
+  connection_string: string | null,
+  account_name: string | null,
+  shared_access_signature: string | null,
+  account_suffix: string | null
 ): BlobServiceClient {
   let pipelineOptions = {
     retryOptions: { maxTries: 4 }, // Retry options
@@ -80,7 +80,11 @@ export function get_storage_client(
     return blobServiceClient;
 
     // get client by account name, suffix, and sas token
-  } else {
+  } else if (
+    account_name != null &&
+    account_suffix != null &&
+    shared_access_signature != null
+  ) {
     const blobServiceClient = new BlobServiceClient(
       // When using AnonymousCredential, following url should include a valid SAS or support public access
       get_blob_account_url(
@@ -91,6 +95,10 @@ export function get_storage_client(
       pipeline
     );
 
+    return blobServiceClient;
+    // parameters are not set correctly
+  } else {
+    const blobServiceClient = new BlobServiceClient("", pipeline);
     return blobServiceClient;
   }
 }
