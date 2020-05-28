@@ -6,7 +6,7 @@ import {
   Action
 } from "vuex-module-decorators";
 import Store from "@/store/store";
-import { LocalStorageVal, isServerMode } from "@/utilities/helper_util";
+import { LocalStorageVal } from "@/utilities/helper_util";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { plainToClass } from "class-transformer";
 
@@ -67,8 +67,8 @@ export class HSConnectionConfig {
 class HeimdallServerModule extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
-  serverMode: boolean = isServerMode();
-
+  serverMode: boolean | null = null;
+  serverUrl: string = "";
   @Mutation
   set_connection(new_url: string) {
     this.connection = new HSConnectionConfig(new_url);
@@ -76,6 +76,7 @@ class HeimdallServerModule extends VuexModule {
 
   @Action
   async connect(new_url: string): Promise<void> {
+    console.log("connected :" + new_url);
     this.set_connection(new_url);
   }
 
@@ -93,7 +94,33 @@ class HeimdallServerModule extends VuexModule {
 
   @Mutation
   set_server_mode() {
-    this.serverMode = isServerMode();
+    let url = "http://localhost:8050"; //window.location.href + "api"
+    console.log(url);
+    /*This will check if api is available */
+    axios
+      .get(url)
+      .then(res => {
+        if (res.status == 200) {
+          this.serverUrl = url; //window.location.href;
+          this.serverMode = true;
+        } else {
+          this.serverMode = false;
+        }
+      })
+      .catch(error => {
+        console.log("caught error");
+        if (process.env.VUE_APP_API_URL) {
+          this.serverUrl = process.env.VUE_APP_API_URL;
+          this.serverMode = true;
+        } else {
+          this.serverMode = false;
+        }
+      });
+  }
+
+  @Mutation
+  set_server_url(url: string) {
+    this.serverUrl = url;
   }
 
   /* Actions to authorize and set token */

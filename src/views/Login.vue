@@ -57,7 +57,6 @@ import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 import VeeValidate from "vee-validate";
 import VuePassword from "vue-password";
-import { isServerMode } from "@/utilities/helper_util";
 
 Vue.use(VeeValidate);
 
@@ -105,6 +104,10 @@ export default class Login extends LoginProps {
   mounted() {
     console.log("mount UploadNexus");
     this.checkLoggedIn();
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.set_server_mode();
+    }
     // this.$router.push("/home");
   }
 
@@ -148,7 +151,11 @@ export default class Login extends LoginProps {
 
   async login(): Promise<void> {
     // checking if the input is valid
-    const host = process.env.VUE_APP_API_URL!;
+    let mod = getModule(ServerModule, this.$store);
+
+    const host = mod.serverUrl;
+
+    console.log(host);
     if ((this.$refs.form as any).validate()) {
       console.log("Login to Backend test");
       let creds: LoginHash = {
@@ -157,7 +164,6 @@ export default class Login extends LoginProps {
         confirm_password: this.confirm_password
       };
       //this.loading = true;
-      let mod = getModule(ServerModule, this.$store);
       await mod
         .connect(host)
         .catch(bad => {

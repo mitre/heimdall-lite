@@ -232,7 +232,7 @@ export default class Results extends ResultsProps {
     if (this.file_filter) this.dialog = false;
   }
 
-  get is_server_mode(): boolean {
+  get is_server_mode(): boolean | null {
     let mod = getModule(ServerModule, this.$store);
     return mod.serverMode;
   }

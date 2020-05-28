@@ -22,7 +22,6 @@ import { getModule } from "vuex-module-decorators";
 
 import { Filter } from "@/store/data_filters";
 import { FileID } from "@/store/report_intake";
-import { isServerMode } from "@/utilities/helper_util";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -45,27 +44,34 @@ export default class Landing extends LandingProps {
    */
   mounted() {
     let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.set_server_mode();
+    }
+
     if (mod.serverMode) {
       this.checkLoggedIn();
     }
-    console.log("servermode: " + mod.serverMode);
   }
 
   get is_logged_in(): boolean {
     let mod = getModule(ServerModule, this.$store);
-    if (!mod.serverMode) {
+    if (mod.serverMode == undefined) {
+      return false;
+    } else if (mod.serverMode == false) {
       return true;
     } else {
       if (this.token) {
         console.log("is_logged_in - token: " + this.token + "end token");
         return true;
       } else {
+        this.$router.push("/login");
         return false;
       }
     }
   }
 
   get token(): string {
+    console.log("token");
     let mod = getModule(ServerModule, this.$store);
     return mod.token || "";
   }

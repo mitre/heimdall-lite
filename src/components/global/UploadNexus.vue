@@ -71,7 +71,6 @@ import SplunkReader from "@/components/global/upload_tabs/splunk/SplunkReader.vu
 import SampleList from "@/components/global/upload_tabs/SampleList.vue";
 import ServerModule from "@/store/server";
 import { LocalStorageVal } from "@/utilities/helper_util";
-import { isServerMode } from "@/utilities/helper_util";
 
 export class UserProfile {
   id?: number;
