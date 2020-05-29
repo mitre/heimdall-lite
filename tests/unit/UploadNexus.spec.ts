@@ -37,6 +37,7 @@ describe("UploadNexus.vue", () => {
 
   it("Logout button exist when logged in", async () => {
     process.env.VUE_APP_API_URL = "test";
+    mod.set_server_mode();
     //await wrapper.vm.$nextTick()
     expect(wrapper.find("#logout").exists()).toBe(true);
   });

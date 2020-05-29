@@ -91,31 +91,45 @@ class HeimdallServerModule extends VuexModule {
     console.log("server.ts - set token: " + this.token);
     local_token.set(new_token);
   }
+  @Mutation
+  mod_server_url(value: string) {
+    this.serverUrl = value;
+  }
 
   @Mutation
+  mod_server_mode(value: boolean) {
+    this.serverMode = value;
+  }
+
+  @Action
   set_server_mode() {
-    let url = "http://localhost:8050"; //window.location.href + "api"
+    let url = window.location.origin + "/api";
     console.log(url);
     /*This will check if api is available */
-    axios
-      .get(url)
-      .then(res => {
-        if (res.status == 200) {
-          this.serverUrl = url; //window.location.href;
-          this.serverMode = true;
-        } else {
-          this.serverMode = false;
-        }
-      })
-      .catch(error => {
-        console.log("caught error");
-        if (process.env.VUE_APP_API_URL) {
-          this.serverUrl = process.env.VUE_APP_API_URL;
-          this.serverMode = true;
-        } else {
-          this.serverMode = false;
-        }
-      });
+    if (process.env.VUE_APP_API_URL) {
+      this.mod_server_url(process.env.VUE_APP_API_URL); // this.serverUrl = process.env.VUE_APP_API_URL;
+      this.mod_server_mode(true);
+    } else {
+      axios
+        .get(url, {
+          validateStatus: function(status) {
+            return status < 500; // Reject only if the status code is greater than or equal to 500
+          }
+        })
+        .then(res => {
+          console.log("test");
+          if (res.status == 200) {
+            this.mod_server_mode(true); //window.location.href;
+            this.mod_server_url(url); // = true;
+          } else {
+            this.mod_server_mode(false);
+          }
+        })
+        .catch(error => {
+          console.log("caught error");
+          this.mod_server_mode(false);
+        });
+    }
   }
 
   @Mutation
