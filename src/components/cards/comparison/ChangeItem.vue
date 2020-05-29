@@ -2,12 +2,12 @@
 <template>
   <v-row>
     <v-col class="pa-0" cols="1">
-      <v-card class="pa-2" outlined tile>
+      <v-card class="pa-2">
         <slot name="name" />
       </v-card>
     </v-col>
     <v-col class="pa-0" cols="5">
-      <v-card class="pa-2" outlined tile>
+      <v-card class="pa-2" :color="colorOld">
         <slot name="old" />
       </v-card>
     </v-col>
@@ -15,7 +15,7 @@
       <v-icon> arrow_forward </v-icon>
     </v-col>
     <v-col class="pa-0" cols="5">
-      <v-card class="pa-2" outlined tile>
+      <v-card class="pa-2" :color="colorNew">
         <slot name="new" />
       </v-card>
     </v-col>
@@ -24,5 +24,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-export default Vue.extend({});
+export default Vue.extend({
+  props: {
+    colorNew: String,
+    colorOld: String
+  }
+});
 </script>

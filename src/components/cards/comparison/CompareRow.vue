@@ -1,25 +1,30 @@
 <template>
-  <v-card>
+  <div>
     <v-row>
       <!-- Control ID -->
-      <v-col cols="2" class="pt-0">
-        <v-card class="fill-height" color="info">
-          <v-card-title> {{ hdf_controls[0].wraps.id }} </v-card-title>
-        </v-card>
+      <v-col cols="1" class="pt-0">
+        <div style="text-align: center; padding: 19px;">
+          {{ hdf_controls[0].wraps.id }}
+        </div>
       </v-col>
 
       <!-- Various Statuses -->
-      <v-col cols="10">
-        <v-chip-group multiple max="2" v-model="selection">
-          <v-chip
-            v-for="(control, index) in hdf_controls"
-            filter
-            :key="index"
-            :value="index"
-          >
-            {{ control.status }}
-          </v-chip>
-        </v-chip-group>
+      <v-col
+        cols="1"
+        v-for="(control, index) in hdf_controls"
+        filter
+        :key="index"
+        :value="index"
+      >
+        <v-btn
+          :color="`status${control.status.replace(' ', '')}`"
+          centered
+          @click="view(index)"
+          :depressed="selection[index]"
+          :outlined="selection[index]"
+        >
+          {{ control.status.replace(" ", "\n") }}
+        </v-btn>
       </v-col>
 
       <!-- Depending on selection, more details -->
@@ -27,12 +32,13 @@
       <v-col cols="12" v-if="delta" key="delta">
         <DeltaView :delta="delta" />
       </v-col>
-      <v-col cols="12" v-if="details" key="detail">
-        Details goes here
+      <v-col cols="12" v-if="num_selected == 1" key="detail">
+        <ControlRowDetails :control="detail_control" />
       </v-col>
       <!-- </transition-group> -->
     </v-row>
-  </v-card>
+    <v-divider dark></v-divider>
+  </div>
 </template>
 
 <script lang="ts">
@@ -42,6 +48,7 @@ import { context } from "inspecjs";
 import { HDFControl } from "inspecjs";
 import { ControlDelta } from "@/utilities/delta_util";
 import DeltaView from "@/components/cards/comparison/DeltaView.vue";
+import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -52,29 +59,43 @@ const Props = Vue.extend({
 
 @Component({
   components: {
-    DeltaView
+    DeltaView,
+    ControlRowDetails
   }
 })
 export default class CompareRow extends Props {
   /** Models the currently selected chips. If it's a number */
-  selection: number[] = [];
+  selection: boolean[] = [];
 
   /** Initialize our selection */
   mounted() {
     // Pick the first and last control, or as close as we can get to that
     if (this._controls.length === 0) {
-      this.selection = [];
+      this.selection.splice(0);
     } else if (this._controls.length === 1) {
-      this.selection = [0];
+      this.selection.push(false);
     } else {
-      this.selection = [0, this._controls.length - 1];
+      this.selection = [];
+      var x;
+      for (x in this._controls) {
+        this.selection.push(false);
+      }
     }
   }
 
   /** Provides actual data about which controls we have selected */
   get selected_controls(): context.ContextualizedControl[] {
     // Multiple selected
-    return this.selection.map(i => this._controls[i]);
+    var selected = [];
+    var i;
+    for (i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        console.log("here");
+        selected.push(this._controls[i]);
+      }
+    }
+    console.log(selected);
+    return selected;
   }
 
   /** Typed getter on controls */
@@ -89,23 +110,77 @@ export default class CompareRow extends Props {
 
   /** If exactly two controls selected, provides a delta. Elsewise gives null */
   get delta(): ControlDelta | null {
-    if (this.selected_controls.length === 2) {
+    var selected = [];
+    for (let i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        selected.push(i);
+      }
+    }
+    if (this.num_selected === 2) {
       return new ControlDelta(
-        this.selected_controls[0],
-        this.selected_controls[1]
+        this.selected_controls[selected[0]],
+        this.selected_controls[selected[1]]
       );
     }
     return null;
   }
 
   /** Returns the HDF control that we want to show details for iff it is the only selected control */
-  get details(): HDFControl | null {
-    if (this.selected_controls.length === 1) {
-      return this.selected_controls[0].root.hdf;
+  get details(): boolean {
+    var selected = 0;
+    var i;
+    for (i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        if (selected == 1) {
+          return false;
+        }
+        selected += 1;
+      }
+    }
+    console.log(selected);
+    if (selected == 1) {
+      return true; //this.selected_controls[0].root.hdf;
+    }
+    return false;
+  }
+
+  view(index: number) {
+    Vue.set(this.selection, index, !this.selection[index]);
+    console.log(this.selection);
+  }
+
+  get num_selected(): number {
+    var selected = 0;
+    var i;
+    for (i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        selected += 1;
+      }
+    }
+    console.log(selected);
+    return selected;
+  }
+
+  get profile_watch(): String {
+    return "do nothing";
+  }
+
+  color(status: String) {
+    if (status == "Passed") {
+      return "green";
+    } else if (status == "Failed") {
+      return "red";
+    }
+  }
+
+  get detail_control(): context.ContextualizedControl | null {
+    for (let i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        return this._controls[i];
+      }
     }
     return null;
   }
-
   /** If more than one row selected */
 }
 </script>
