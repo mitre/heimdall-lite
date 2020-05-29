@@ -45,7 +45,7 @@ export default class Landing extends LandingProps {
   mounted() {
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode == undefined) {
-      mod.set_server_mode();
+      mod.server_mode();
     }
 
     if (mod.serverMode) {

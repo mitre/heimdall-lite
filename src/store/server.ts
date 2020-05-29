@@ -102,7 +102,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   @Action
-  set_server_mode() {
+  server_mode() {
     let url = window.location.origin + "/api";
     console.log(url);
     /*This will check if api is available */

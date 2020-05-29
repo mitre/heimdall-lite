@@ -31,13 +31,13 @@ describe("UploadNexus.vue", () => {
 
   it("Server mode module check", () => {
     process.env.VUE_APP_API_URL = "testurl";
-    mod.set_server_mode();
+    mod.server_mode();
     expect(mod.serverMode).toBe(true);
   });
 
   it("Logout button exist when logged in", async () => {
     process.env.VUE_APP_API_URL = "test";
-    mod.set_server_mode();
+    mod.server_mode();
     //await wrapper.vm.$nextTick()
     expect(wrapper.find("#logout").exists()).toBe(true);
   });

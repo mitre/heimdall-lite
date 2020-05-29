@@ -106,7 +106,7 @@ export default class Login extends LoginProps {
     this.checkLoggedIn();
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode == undefined) {
-      mod.set_server_mode();
+      mod.server_mode();
     }
     // this.$router.push("/home");
   }
