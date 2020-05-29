@@ -239,21 +239,23 @@ function extract_top_level_controls(
   let top = all_controls.filter(control => control.extended_by.length === 0);
   return top;
 }
+/** An array of contextualized controls with the same ID, sorted by time */
+export type ControlSeries = context.ContextualizedControl[];
 
 /** Matches ControlID keys to Arrays of Controls, sorted by time */
-type MatchedControls = { [key: string]: Array<context.ContextualizedControl> };
+export type ControlSeriesLookup = { [key: string]: ControlSeries };
 
 /** Helps manage comparing change(s) between one or more profile executions */
 export class ComparisonContext {
   /** A list of old-new control pairings */
-  pairings: MatchedControls;
+  pairings: ControlSeriesLookup;
 
   constructor(executions: readonly context.ContextualizedEvaluation[]) {
     // Get all of the "top level" controls from each execution, IE those that actually ran
     let all_controls = executions.flatMap(extract_top_level_controls);
 
     // Organize them by ID
-    let matched: MatchedControls = {};
+    let matched: ControlSeriesLookup = {};
     all_controls.forEach(ctrl => {
       let id = ctrl.data.id;
 

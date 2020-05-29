@@ -92,7 +92,11 @@ import CompareRow from "@/components/cards/comparison/CompareRow.vue";
 import { Filter } from "@/store/data_filters";
 import { ControlStatus, Severity, context } from "inspecjs";
 import { FileID } from "@/store/report_intake";
-import { ComparisonContext, ControlDelta } from "../utilities/delta_util";
+import {
+  ComparisonContext,
+  ControlDelta,
+  ControlSeries
+} from "../utilities/delta_util";
 import DeltaView from "@/components/cards/comparison/DeltaView.vue";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
@@ -172,11 +176,11 @@ export default class Compare extends Props {
   }
 
   /** Yields the control pairings in a more easily consumable list form */
-  get control_sets(): context.ContextualizedControl[][] {
+  get control_sets(): ControlSeries[] {
     return Object.values(this.curr_delta.pairings);
   }
 
-  get delta_sets(): context.ContextualizedControl[][] {
+  get delta_sets(): ControlSeries[] {
     var delt = [];
     var i;
     var curr_con;
@@ -192,7 +196,7 @@ export default class Compare extends Props {
     return Object.values(delt);
   }
 
-  get show_set(): context.ContextualizedControl[][] {
+  get show_set(): ControlSeries[] {
     if (this.checkbox) {
       return this.delta_sets;
     }
