@@ -181,19 +181,18 @@ export default class Compare extends Props {
   }
 
   get delta_sets(): ControlSeries[] {
-    var delt = [];
-    var i;
-    var curr_con;
-    for (i in this.curr_delta.pairings) {
-      curr_con = this.curr_delta.pairings[i];
-      if (curr_con[1] == undefined) {
-        continue;
+    return this.control_sets.filter(series => {
+      // Get the first status. If no change, all should equal this
+      let first = series[0].hdf.status;
+
+      for (let i = 1; i < series.length; i++) {
+        // Check if the status has changed. If so, keep
+        if (series[i].hdf.status !== first) {
+          return true;
+        }
       }
-      if (curr_con[0].root.hdf.status != curr_con[1].root.hdf.status) {
-        delt.push(curr_con);
-      }
-    }
-    return Object.values(delt);
+      return false;
+    });
   }
 
   get show_set(): ControlSeries[] {
