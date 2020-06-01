@@ -3,11 +3,11 @@
  */
 
 import { Module, VuexModule, getModule } from "vuex-module-decorators";
-import DataModule, {
+import {
   SourcedContextualizedProfile,
-  SourcedContextualizedEvaluation,
-  isFromProfileFile
-} from "@/store/data_store";
+  SourcedContextualizedEvaluation
+} from "@/store/report_intake";
+import DataModule, { isFromProfileFile } from "@/store/data_store";
 import { ControlStatus, Severity } from "inspecjs";
 import { FileID } from "@/store/report_intake";
 import Store from "@/store/store";

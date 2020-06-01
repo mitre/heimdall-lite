@@ -2,7 +2,7 @@
  * Reads and parses inspec files
  */
 
-import { parse } from "inspecjs";
+import { parse, context } from "inspecjs";
 import { Module, VuexModule, getModule, Action } from "vuex-module-decorators";
 import DataModule from "@/store/data_store";
 import Store from "@/store/store";
@@ -25,10 +25,26 @@ export type InspecFile = {
   filename: string;
 };
 
+/** Modify our contextual types to sort of have back-linking to sourced from files */
+export interface SourcedContextualizedEvaluation
+  extends context.ContextualizedEvaluation {
+  from_file: EvaluationFile;
+}
+
+export interface SourcedContextualizedProfile
+  extends context.ContextualizedProfile {
+  from_file: ProfileFile;
+}
+
 /** Represents a file containing an Inspec Execution output */
-export type EvaluationFile = InspecFile & { execution: parse.AnyExec };
+export type EvaluationFile = InspecFile & {
+  evaluation: SourcedContextualizedEvaluation;
+};
+
 /** Represents a file containing an Inspec Profile (not run) */
-export type ProfileFile = InspecFile & { profile: parse.AnyProfile };
+export type ProfileFile = InspecFile & {
+  profile: SourcedContextualizedProfile;
+};
 
 export type FileLoadOptions = {
   /** The file to load */
@@ -100,27 +116,41 @@ class InspecIntakeModule extends VuexModule {
 
     // Determine what sort of file we (hopefully) have, then add it
     if (result["1_0_ExecJson"]) {
-      // Handle as exec
-      console.log("is Execution");
-      let execution = result["1_0_ExecJson"];
-      execution = Object.freeze(execution);
-      let reportFile = {
+      // A bit of chicken and egg here
+      let evalFile = {
         unique_id: options.unique_id,
-        filename: options.filename,
-        execution
-      };
-      console.log("addExecution");
-      data.addExecution(reportFile);
+        filename: options.filename
+        // evaluation
+      } as EvaluationFile;
+
+      // Fixup the evaluation to be Sourced from a file
+      let evaluation = (context.contextualizeEvaluation(
+        result["1_0_ExecJson"]
+      ) as unknown) as SourcedContextualizedEvaluation;
+      evaluation.from_file = evalFile;
+
+      // Patch its profiles to point to this new object
+
+      // Set and freeze
+      evalFile.evaluation = evaluation;
+      Object.freeze(evaluation);
+      data.addExecution(evalFile);
     } else if (result["1_0_ProfileJson"]) {
       // Handle as profile
-      console.log("is Profile");
-      let profile = result["1_0_ProfileJson"];
       let profileFile = {
         unique_id: options.unique_id,
-        filename: options.filename,
-        profile
+        filename: options.filename
+      } as ProfileFile;
+
+      let profile: SourcedContextualizedProfile = {
+        ...context.contextualizeProfile(result["1_0_ProfileJson"]),
+        from_file: profileFile
       };
-      console.log("addProfile");
+
+      // Srt and freeze
+      profileFile.profile = profile;
+      Object.freeze(profile);
+
       data.addProfile(profileFile);
     } else {
       console.log("is Nothing");

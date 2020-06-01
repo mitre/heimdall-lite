@@ -42,7 +42,7 @@ export default class ExportJSON extends Props {
     let store = getModule(InspecDataModule, this.$store);
     let file = store.allFiles.find(f => f.unique_id === file_id);
     if (file) {
-      if (file.hasOwnProperty("execution")) {
+      if (file.hasOwnProperty("evaluation")) {
         this.export_execution(file as EvaluationFile);
       } else {
         this.export_profile(file as ProfileFile);
@@ -52,7 +52,7 @@ export default class ExportJSON extends Props {
 
   export_execution(file?: EvaluationFile) {
     if (file) {
-      let blob = new Blob([JSON.stringify(file.execution)], {
+      let blob = new Blob([JSON.stringify(file.evaluation.data)], {
         type: "application/json"
       });
       if (blob) {
@@ -63,7 +63,7 @@ export default class ExportJSON extends Props {
 
   export_profile(file?: ProfileFile) {
     if (file) {
-      let blob = new Blob([JSON.stringify(file.profile)], {
+      let blob = new Blob([JSON.stringify(file.profile.data)], {
         type: "application/json"
       });
       if (blob) {

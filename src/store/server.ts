@@ -251,7 +251,7 @@ class HeimdallServerModule extends VuexModule {
       .post(
         this.connection!.url + "/executions/upload",
         {
-          evaluation: evaluation.execution,
+          evaluation: evaluation.evaluation,
           filename: evaluation.filename
         },
         options

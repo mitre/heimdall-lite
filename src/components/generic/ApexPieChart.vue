@@ -131,7 +131,7 @@ export default class ApexPieChart extends ApexPieChartProps {
               show: true,
               value: { color: "#FFFFFF" },
               total: {
-                show: this.center_label && this.center_value,
+                show: !!(this.center_label && this.center_value),
                 label: this.center_label,
                 showAlways: true,
                 color: "#FFFFFF",

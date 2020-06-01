@@ -61,11 +61,11 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import InspecDataModule, {
+import InspecDataModule, { isFromProfileFile } from "@/store/data_store";
+import {
   SourcedContextualizedProfile,
-  SourcedContextualizedEvaluation,
-  isFromProfileFile
-} from "@/store/data_store";
+  SourcedContextualizedEvaluation
+} from "@/store/report_intake";
 import StatusCountModule from "@/store/status_counts";
 import { getModule } from "vuex-module-decorators";
 import FilteredDataModule, { Filter } from "../../store/data_filters";
@@ -150,6 +150,7 @@ export default class ProfileData extends Props {
     return selected_profile;
   }
 
+  /** Produces the actual info data that is shown in the right box, based on the selected item */
   get selected_info(): InfoItem[] {
     if (this.selected === undefined) {
       return [];

@@ -2,7 +2,7 @@
  * Provides utlities for comparing executions
  */
 
-import { SourcedContextualizedEvaluation } from "@/store/data_store";
+import { SourcedContextualizedEvaluation } from "@/store/report_intake";
 import { HDFControlSegment, context } from "inspecjs";
 import {
   structuredPatch,
