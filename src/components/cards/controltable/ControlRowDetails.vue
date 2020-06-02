@@ -223,7 +223,10 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
   }
 
   zebra(ix: number): string {
-    return ix % 2 ? "" : "zebra-table";
+    if (ix % 2 == 0) {
+      return "zebra-table";
+    }
+    return "non-zebra-table";
   }
 }
 </script>
@@ -249,9 +252,24 @@ pre {
 }
 .theme--dark .zebra-table {
   background-color: var(--v-secondary-lighten2);
+  max-width: 99.9%;
+  margin: auto;
 }
+
+.theme--dark .non-zebra-table {
+  max-width: 99.9%;
+  margin: auto;
+}
+
 .theme--light .zebra-table {
   background-color: var(--v-secondary-lighten1);
+  max-width: 99.9%;
+  margin: auto;
+}
+
+.theme--light .non-zebra-table {
+  max-width: 99.9%;
+  margin: auto;
 }
 /*
 .v-application code {

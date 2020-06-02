@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12" sm="12" md="12" lg="1" xl="1">
+    <v-col cols="12" sm="12" md="12" lg="2" xl="2">
       <v-layout class="pl-2" fill-height justify-center align-center>
         <v-btn :color="status_color" block depressed>
           <h3>{{ result.status.toUpperCase() }}</h3>
@@ -9,8 +9,8 @@
     </v-col>
     <v-col
       v-if="!result.message"
-      lg="11"
-      xl="11"
+      lg="10"
+      xl="10"
       cols="12"
       sm="12"
       md="12"
@@ -35,7 +35,7 @@
         </template>
       </v-clamp>
     </v-col>
-    <v-col v-else lg="6" xl="6" sm="6" md="6" cols="12" class="left">
+    <v-col v-else lg="5" xl="5" sm="6" md="6" cols="12" class="left">
       <h3 class="pa-2">Test</h3>
       <v-divider></v-divider>
       <v-clamp
