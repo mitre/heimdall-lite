@@ -118,6 +118,7 @@ import StatusCountModule from "@/store/status_counts";
 import ProfileRow from "@/components/cards/comparison/ProfileRow.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import { EvaluationFile } from "@/store/report_intake";
+import SourcedContextualizedEvaluation from "@/store/report_intake";
 import ServerModule from "@/store/server";
 
 // We declare the props separately
@@ -221,9 +222,11 @@ export default class Compare extends Props {
   }
 
   get files(): EvaluationFile[] {
-    //var fileArr = []
-    //for (let i = 0; i < this.control_sets[i].length; i++) {
-    //  fileArr.push(this.control_sets[0][i].sourced_from.sourced_from)
+    var fileArr = [];
+    var x;
+    //for (let i = 0; i < this.control_sets[0].length; i++) {
+    //x = this.control_sets[0][i].sourced_from.sourced_from! as SourcedContextualizedEvaluation;
+    //fileArr.push(x)
     //}
     let data_store = getModule(InspecDataModule, this.$store);
     return data_store.executionFiles;
