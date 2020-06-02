@@ -90,11 +90,9 @@ export default class CompareRow extends Props {
     var i;
     for (i = 0; i < this.selection.length; i++) {
       if (this.selection[i]) {
-        console.log("here");
         selected.push(this._controls[i]);
       }
     }
-    console.log(selected);
     return selected;
   }
 
@@ -110,16 +108,10 @@ export default class CompareRow extends Props {
 
   /** If exactly two controls selected, provides a delta. Elsewise gives null */
   get delta(): ControlDelta | null {
-    var selected = [];
-    for (let i = 0; i < this.selection.length; i++) {
-      if (this.selection[i]) {
-        selected.push(i);
-      }
-    }
     if (this.num_selected === 2) {
       return new ControlDelta(
-        this.selected_controls[selected[0]],
-        this.selected_controls[selected[1]]
+        this.selected_controls[0],
+        this.selected_controls[1]
       );
     }
     return null;
@@ -137,7 +129,6 @@ export default class CompareRow extends Props {
         selected += 1;
       }
     }
-    console.log(selected);
     if (selected == 1) {
       return true; //this.selected_controls[0].root.hdf;
     }
@@ -146,7 +137,6 @@ export default class CompareRow extends Props {
 
   view(index: number) {
     Vue.set(this.selection, index, !this.selection[index]);
-    console.log(this.selection);
   }
 
   get num_selected(): number {
@@ -157,7 +147,6 @@ export default class CompareRow extends Props {
         selected += 1;
       }
     }
-    console.log(selected);
     return selected;
   }
 

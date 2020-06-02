@@ -2,7 +2,34 @@
   <BaseView>
     <!-- Topbar config - give it a search bar -->
     <template #topbar-content>
-      Topbar stuff
+      <!-- Search field
+      <v-text-field
+        flat
+        solo
+        solo-inverted
+        hide-details
+        prepend-inner-icon="mdi-magnify"
+        label="Search"
+        v-model="search_term"
+        clearable
+      ></v-text-field>
+      -->
+      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
+        <span class="d-none d-md-inline pr-2">
+          Upload
+        </span>
+        <v-icon>
+          mdi-cloud-upload
+        </v-icon>
+      </v-btn>
+      <v-btn @click="log_out" class="mx-2">
+        <span class="d-none d-md-inline pr-2">
+          Logout
+        </span>
+        <v-icon>
+          mdi-logout
+        </v-icon>
+      </v-btn>
     </template>
 
     <!-- The main content: comparisons of each set of controls in control_sets, etc -->
@@ -25,7 +52,7 @@
             ></v-checkbox>
           </v-col>
         </v-row>
-        <v-row justify="space-around">
+        <v-row justify="space-around" v-if="files.length < 5">
           <v-col xs="4" :cols="statusCols" v-for="(file, i) in files" :key="i">
             <v-card class="fill-height">
               <v-card-title class="justify-center">{{
@@ -62,20 +89,6 @@
       </v-container>
     </template>
 
-    <!-- File select modal toggle -->
-    <v-btn
-      bottom
-      color="teal"
-      dark
-      fab
-      fixed
-      right
-      @click="dialog = !dialog"
-      :hidden="dialog"
-    >
-      <v-icon>add</v-icon>
-    </v-btn>
-
     <!-- File select modal -->
     <UploadNexus v-model="dialog" @got-files="dialog = false" />
   </BaseView>
@@ -105,6 +118,7 @@ import StatusCountModule from "@/store/status_counts";
 import ProfileRow from "@/components/cards/comparison/ProfileRow.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import { EvaluationFile } from "@/store/report_intake";
+import ServerModule from "@/store/server";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -180,20 +194,19 @@ export default class Compare extends Props {
     return Object.values(this.curr_delta.pairings);
   }
 
+  /** Yields the control pairings that have changed*/
   get delta_sets(): ControlSeries[] {
-    var delt = [];
-    var i;
-    var curr_con;
-    for (i in this.curr_delta.pairings) {
-      curr_con = this.curr_delta.pairings[i];
-      if (curr_con[1] == undefined) {
-        continue;
+    return this.control_sets.filter(series => {
+      // Get the first status. If no change, all should equal this
+      let first = series[0].hdf.status;
+      for (let i = 1; i < series.length; i++) {
+        // Check if the status has changed. If so, keep
+        if (series[i].hdf.status !== first) {
+          return true;
+        }
       }
-      if (curr_con[0].root.hdf.status != curr_con[1].root.hdf.status) {
-        delt.push(curr_con);
-      }
-    }
-    return Object.values(delt);
+      return false;
+    });
   }
 
   get show_set(): ControlSeries[] {
@@ -208,8 +221,18 @@ export default class Compare extends Props {
   }
 
   get files(): EvaluationFile[] {
+    //var fileArr = []
+    //for (let i = 0; i < this.control_sets[i].length; i++) {
+    //  fileArr.push(this.control_sets[0][i].sourced_from.sourced_from)
+    //}
     let data_store = getModule(InspecDataModule, this.$store);
     return data_store.executionFiles;
+  }
+
+  log_out() {
+    getModule(ServerModule, this.$store).clear_token();
+    this.dialog;
+    this.$router.push("/");
   }
 }
 </script>
