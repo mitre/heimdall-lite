@@ -129,12 +129,12 @@ export default class ApexPieChart extends ApexPieChartProps {
           donut: {
             labels: {
               show: true,
-              value: { color: "#FFFFFF" },
+              value: { color: "#99a2ac" },
               total: {
                 show: !!(this.center_label && this.center_value),
                 label: this.center_label,
                 showAlways: true,
-                color: "#FFFFFF",
+                color: "#008FFB",
                 formatter: () => this.center_value
               }
             }
