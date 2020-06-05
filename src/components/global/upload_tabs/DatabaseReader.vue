@@ -40,10 +40,13 @@ import { getModule } from "vuex-module-decorators";
 import ServerModule from "@/store/server";
 import AppInfoModule from "@/store/app_info";
 import { plainToClass } from "class-transformer";
+import { LocalStorageVal } from "@/utilities/helper_util";
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
 } from "@/store/report_intake";
+
+const local_evaluation_id = new LocalStorageVal<number | null>("evaluation_id");
 
 export class Content {
   name!: string;
@@ -120,6 +123,7 @@ export default class DatabaseReader extends Props {
       return [new Evaluation()];
     }
   }
+
   get personal_evaluations(): Evaluation[] {
     let mod = getModule(ServerModule, this.$store);
     if (mod.user_evaluations) {
@@ -166,6 +170,7 @@ export default class DatabaseReader extends Props {
       })
       .then(() => {
         console.log("here");
+        mod.set_tags(null);
         return mod.retrieve_evaluation(evaluation.id);
       })
       .catch(bad => {
@@ -184,6 +189,7 @@ export default class DatabaseReader extends Props {
             filename: filename
           });
           console.log("Loaded " + unique_id);
+          local_evaluation_id.set(evaluation.id);
           this.$emit("got-files", [unique_id]);
         }
       });
