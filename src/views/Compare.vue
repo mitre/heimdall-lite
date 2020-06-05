@@ -68,6 +68,39 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row v-if="files.length > 4">
+          <v-col cols="12">
+            <v-card class="fill-height">
+              <v-tabs fixed-tabs>
+                <v-tab> % Compliance </v-tab>
+                <v-tab> Failed Tests by Severity </v-tab>
+                <v-tab-item>
+                  <v-col cols="12">
+                    <ApexLineChart
+                      :series="compliance_series"
+                      :categories="fileTimes"
+                      :upper_range="100"
+                      :title="'Total Compliance'"
+                      :y_title="'% Compliance'"
+                    ></ApexLineChart>
+                  </v-col>
+                </v-tab-item>
+                <v-tab-item>
+                  <v-col cols="12">
+                    <ApexLineChart
+                      :series="line_sev_series"
+                      :categories="fileTimes"
+                      :upper_range="total_failed + 1"
+                      :sev_chart="true"
+                      :title="'Failed Tests by Severity'"
+                      :y_title="'Tests Failed'"
+                    ></ApexLineChart>
+                  </v-col>
+                </v-tab-item>
+              </v-tabs>
+            </v-card>
+          </v-col>
+        </v-row>
         <v-card>
           <v-card-title>Test Evaluations</v-card-title>
           <hr />
@@ -102,8 +135,9 @@ import Modal from "@/components/global/Modal.vue";
 import UploadNexus from "@/components/global/UploadNexus.vue";
 import CompareRow from "@/components/cards/comparison/CompareRow.vue";
 
-import { Filter } from "@/store/data_filters";
+import FilteredDataModule, { Filter } from "@/store/data_filters";
 import { ControlStatus, Severity, context } from "inspecjs";
+import SeverityCountModule from "@/store/severity_counts";
 import { FileID } from "@/store/report_intake";
 import {
   ComparisonContext,
@@ -121,6 +155,7 @@ import { EvaluationFile } from "@/store/report_intake";
 import { SourcedContextualizedEvaluation } from "@/store/report_intake";
 import ServerModule from "@/store/server";
 import { isFromProfileFile } from "@/store/data_store";
+import ApexLineChart from "@/components/generic/ApexLineChart.vue";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -137,7 +172,8 @@ const Props = Vue.extend({
     ApexPieChart,
     ProfileRow,
     StatusChart,
-    DeltaView
+    DeltaView,
+    ApexLineChart
   }
 })
 export default class Compare extends Props {
@@ -239,6 +275,93 @@ export default class Compare extends Props {
     }
     //let data_store = getModule(InspecDataModule, this.$store);
     return fileArr;
+  }
+
+  get sev_series(): number[][] {
+    var series = [];
+    var lowCounts = [];
+    var medCounts = [];
+    var highCounts = [];
+    var critCounts = [];
+    let totalSevCounts: SeverityCountModule = getModule(
+      SeverityCountModule,
+      this.$store
+    );
+    for (let file of this.files) {
+      lowCounts.push(
+        totalSevCounts.low({ fromFile: file.unique_id, status: "Failed" })
+      );
+      medCounts.push(
+        totalSevCounts.medium({ fromFile: file.unique_id, status: "Failed" })
+      );
+      highCounts.push(
+        totalSevCounts.high({ fromFile: file.unique_id, status: "Failed" })
+      );
+      critCounts.push(
+        totalSevCounts.critical({ fromFile: file.unique_id, status: "Failed" })
+      );
+    }
+    series.push(lowCounts);
+    series.push(medCounts);
+    series.push(highCounts);
+    series.push(critCounts);
+    return series;
+  }
+
+  get line_sev_series(): object[] {
+    var series = [];
+    var low = { name: "Failed Low Severity", data: this.sev_series[0] };
+    var med = { name: "Failed Medium Severity", data: this.sev_series[1] };
+    var high = { name: "Failed High Severity", data: this.sev_series[2] };
+    var crit = { name: "Failed Critical Severity", data: this.sev_series[3] };
+    series.push(low);
+    series.push(med);
+    series.push(high);
+    series.push(crit);
+    return series;
+  }
+
+  get compliance_series(): object[] {
+    var series = [];
+    for (let file of this.files) {
+      let filter = { fromFile: file.unique_id };
+      let counts = getModule(StatusCountModule, this.$store);
+      let passed = counts.passed(filter);
+      let total =
+        passed +
+        counts.failed(filter) +
+        counts.profileError(filter) +
+        counts.notReviewed(filter);
+      if (total == 0) {
+        series.push(0);
+      } else {
+        series.push(Math.round((100.0 * passed) / total));
+      }
+    }
+    return [{ name: "Compliance", data: series }];
+  }
+
+  get fileTimes(): (string | undefined)[] {
+    let data_store = getModule(FilteredDataModule, this.$store);
+    var names = [];
+    for (let file of this.files) {
+      let time = data_store.controls({ fromFile: file.unique_id })[0].root.hdf
+        .start_time;
+      names.push(time);
+    }
+    //console.log(typeof names[0]);
+    return names;
+  }
+
+  get total_failed(): number {
+    if (this.files.length < 1) {
+      return 0;
+    }
+    let file = this.files[0];
+    let filter = { fromFile: file.unique_id };
+    let counts = getModule(StatusCountModule, this.$store);
+    let failed = counts.failed(filter);
+    return failed;
   }
 
   log_out() {
