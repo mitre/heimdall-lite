@@ -81,7 +81,7 @@ class InspecIntakeModule extends VuexModule {
    */
   @Action
   async loadText(options: TextLoadOptions): Promise<Error | null> {
-    console.log("Load Text: " + options.text);
+    //console.log("Load Text: " + options.text);
     // Fetch our data store
     const data = getModule(DataModule, Store);
 
