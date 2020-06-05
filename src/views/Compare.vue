@@ -52,7 +52,7 @@
             ></v-checkbox>
           </v-col>
         </v-row>
-        <v-row justify="space-around" v-if="files.length < 5">
+        <v-row justify="space-around" v-if="files.length < 3">
           <v-col xs="4" :cols="statusCols" v-for="(file, i) in files" :key="i">
             <v-card class="fill-height">
               <v-card-title class="justify-center">{{
@@ -68,14 +68,17 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row v-if="files.length > 4">
+        <v-row v-else>
           <v-col cols="12">
             <v-card class="fill-height">
-              <v-tabs fixed-tabs>
-                <v-tab> % Compliance </v-tab>
-                <v-tab> Failed Tests by Severity </v-tab>
-                <v-tab-item>
-                  <v-col cols="12">
+              <v-tabs fixed-tabs v-model="tab">
+                <v-tab key="compliance"> % Compliance </v-tab>
+                <v-tab key="severity"> Failed Tests by Severity </v-tab>
+              </v-tabs>
+              <transition>
+                <keep-alive>
+                  <v-col v-if="tab == 0" cols="12">
+                    Hello
                     <ApexLineChart
                       :series="compliance_series"
                       :categories="fileTimes"
@@ -84,9 +87,8 @@
                       :y_title="'% Compliance'"
                     ></ApexLineChart>
                   </v-col>
-                </v-tab-item>
-                <v-tab-item>
-                  <v-col cols="12">
+                  <v-col v-else cols="12">
+                    World
                     <ApexLineChart
                       :series="line_sev_series"
                       :categories="fileTimes"
@@ -96,8 +98,8 @@
                       :y_title="'Tests Failed'"
                     ></ApexLineChart>
                   </v-col>
-                </v-tab-item>
-              </v-tabs>
+                </keep-alive>
+              </transition>
             </v-card>
           </v-col>
         </v-row>
@@ -155,7 +157,9 @@ import { EvaluationFile } from "@/store/report_intake";
 import { SourcedContextualizedEvaluation } from "@/store/report_intake";
 import ServerModule from "@/store/server";
 import { isFromProfileFile } from "@/store/data_store";
-import ApexLineChart from "@/components/generic/ApexLineChart.vue";
+import ApexLineChart, {
+  SeriesItem
+} from "@/components/generic/ApexLineChart.vue";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -219,6 +223,7 @@ export default class Compare extends Props {
   /** Whether or not the model is showing */
   dialog: boolean = false;
   checkbox: boolean = false;
+  tab: number = 0;
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
@@ -308,7 +313,7 @@ export default class Compare extends Props {
     return series;
   }
 
-  get line_sev_series(): object[] {
+  get line_sev_series(): SeriesItem[] {
     var series = [];
     var low = { name: "Failed Low Severity", data: this.sev_series[0] };
     var med = { name: "Failed Medium Severity", data: this.sev_series[1] };
@@ -321,7 +326,7 @@ export default class Compare extends Props {
     return series;
   }
 
-  get compliance_series(): object[] {
+  get compliance_series(): SeriesItem[] {
     var series = [];
     for (let file of this.files) {
       let filter = { fromFile: file.unique_id };

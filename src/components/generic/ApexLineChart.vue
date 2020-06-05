@@ -36,6 +36,11 @@ function next_id(): number {
   return id_counter;
 }
 
+export interface SeriesItem {
+  name: string;
+  data: number[];
+}
+
 /**
  * Emits "category-selected" with payload of type Category whenever a category is selected.
  */
@@ -71,21 +76,21 @@ export default class ApexLineChart extends ApexLineChartProps {
   /**
    * Provide a type-checked accessor to our series property
    */
-  get _series(): object[] {
+  get _series(): SeriesItem[] {
     // Ensure it's an array
     if (!(this.series instanceof Array)) {
       throw new Error("series must be an array of objects");
     }
 
     // Ensure all of its elements are numbers
-    this.series.forEach(element => {
+    for (let element of this.series) {
       if (typeof element !== "object") {
         throw new Error(`Invalid series item ${element}`);
       }
-    });
+    }
 
     // We now know the type is definitely number[]
-    let final = this.series as object[];
+    let final = this.series as SeriesItem[];
 
     // If we have any non-zero data, just returngive 0.01 of all
     console.log(final);
