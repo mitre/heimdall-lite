@@ -228,18 +228,15 @@ export default class Results extends ResultsProps {
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
 
-  /* This is supposed to cause the dialog to automatically appear if there is
-   * no file uploaded
-   */
-  mounted() {
-    if (this.file_filter) this.dialog = false;
-  }
-
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
    */
-  get file_filter(): FileID | null {
+
+  get file_filter(): FileID[] {
+    let data_module = getModule(FilteredDataModule, this.$store);
+    return data_module.selected_file_ids;
+    /*
     let id_string: string = this.$route.params.id;
     console.log("file_filter: " + id_string);
     let as_int = parseInt(id_string);
@@ -267,6 +264,7 @@ export default class Results extends ResultsProps {
     }
 
     return result;
+    */
   }
 
   /**
@@ -276,7 +274,7 @@ export default class Results extends ResultsProps {
     return {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
-      fromFile: this.file_filter || undefined,
+      fromFile: this.file_filter,
       tree_filters: this.tree_filters,
       search_term: this.search_term,
       omit_overlayed_controls: true,
@@ -291,7 +289,7 @@ export default class Results extends ResultsProps {
     return {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
-      fromFile: this.file_filter || undefined,
+      fromFile: this.file_filter,
       search_term: this.search_term,
       omit_overlayed_controls: true
     };
@@ -348,34 +346,34 @@ export default class Results extends ResultsProps {
   /**
    * The title to override with
    */
-  get curr_title(): String | undefined {
-    if (this.file_filter !== null) {
+  get curr_title(): string | undefined {
+    if (this.file_filter.length == 1) {
       let store = getModule(InspecDataModule, this.$store);
-      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+      let file = store.allFiles.find(f => f.unique_id === this.file_filter[0]);
       if (file) {
         //console.log("file: " + JSON.stringify(file));
         return file.filename;
       }
     }
-    return undefined;
+    if (this.file_filter.length > 1) {
+      return this.file_filter.length + " files selected";
+    } else {
+      return "No files selected";
+    }
   }
 
   /**
    * Invoked when file(s) are loaded.
    */
   on_got_files(ids: FileID[]) {
+    console.log("on_got_files");
     // Close the dialog
     this.dialog = false;
 
-    // If just one file, focus it
-    if (ids.length === 1) {
-      this.$router.push(`/results/${ids[0]}`);
-    }
-
-    // If more than one, focus all.
-    // TODO: Provide support for focusing a subset of files
-    else if (ids.length > 1) {
-      this.$router.push(`/results/all`);
+    //enable all uploaded files
+    let filter_module = getModule(FilteredDataModule, this.$store);
+    for (let i of ids) {
+      filter_module.set_toggle_file_on(i);
     }
   }
 }

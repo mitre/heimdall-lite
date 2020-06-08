@@ -2,7 +2,13 @@
  * Tracks uploaded files, and their parsed contents
  */
 
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import {
+  Module,
+  VuexModule,
+  Mutation,
+  Action,
+  getModule
+} from "vuex-module-decorators";
 import {
   HDFControl,
   parse,
@@ -20,6 +26,7 @@ import {
   SourcedContextualizedEvaluation
 } from "@/store/report_intake";
 import Store from "@/store/store";
+import FilteredDataModule from "./data_filters";
 
 /** We make some new variant types of the Contextual types, to include their files*/
 export function isFromProfileFile(
@@ -132,6 +139,8 @@ class InspecDataModule extends VuexModule {
     this.executionFiles = this.executionFiles.filter(
       ef => ef.unique_id !== file_id
     );
+    let filtered_module = getModule(FilteredDataModule, Store);
+    filtered_module.set_toggle_file_off(file_id);
   }
 
   /**

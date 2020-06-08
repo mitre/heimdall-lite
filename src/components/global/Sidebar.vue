@@ -13,7 +13,7 @@
     <v-list dense class="px-2" subheader>
       <v-subheader>Files</v-subheader>
       <FileItem v-for="(file, i) in visible_files" :key="i" :file="file" />
-      <v-list-item to="/results/all" title="Show all files' controls">
+      <v-list-item @click="toggle_all" title="Show all files' controls">
         <v-list-item-avatar>
           <v-icon small>mdi-format-list-bulleted</v-icon>
         </v-list-item-avatar>
@@ -64,6 +64,7 @@ import FileItem from "@/components/global/sidebaritems/SidebarFile.vue";
 import LinkItem from "@/components/global/sidebaritems/SidebarLink.vue";
 import AboutModal from "@/components/global/AboutModal.vue";
 import HelpModal from "@/components/global/HelpModal.vue";
+import FilteredDataModule from "../../store/data_filters";
 
 // We declare the props separately to make props types inferable.
 const SidebarProps = Vue.extend({
@@ -81,6 +82,22 @@ const SidebarProps = Vue.extend({
   }
 })
 export default class Sidebar extends SidebarProps {
+  toggle_all(): void {
+    let filtered_module = getModule(FilteredDataModule, this.$store);
+    let data_module = getModule(InspecDataModule, this.$store);
+
+    if (
+      data_module.allFiles.length == filtered_module.selected_file_ids.length
+    ) {
+      for (let i of data_module.allFiles) {
+        filtered_module.set_toggle_file_off(i.unique_id);
+      }
+    } else {
+      for (let i of data_module.allFiles) {
+        filtered_module.set_toggle_file_on(i.unique_id);
+      }
+    }
+  }
   /** Generates files for all */
   get visible_files(): Array<ProfileFile | EvaluationFile> {
     let data_store = getModule(InspecDataModule, this.$store);

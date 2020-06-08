@@ -116,16 +116,8 @@ export default class ProfileData extends Props {
 
   /** Flat representation of all profiles that ought to be visible  */
   get visible_profiles(): Readonly<context.ContextualizedProfile[]> {
-    // Get all profiles
-    let store = getModule(InspecDataModule, this.$store);
-    let profiles: Readonly<context.ContextualizedProfile[]> =
-      store.contextualProfiles;
-    let filter = this.filter as Filter;
-    if (filter.fromFile !== undefined) {
-      let filtered = getModule(FilteredDataModule, this.$store);
-      profiles = filtered.profiles(filter.fromFile);
-    }
-    return profiles;
+    let filtered = getModule(FilteredDataModule, this.$store);
+    return filtered.profiles(this.filter.fromFile);
   }
 
   /** Strips visible profiles down to those that are not extended from any others. The "Top" profiles */

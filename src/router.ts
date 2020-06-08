@@ -13,7 +13,7 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/results/:id",
+      path: "/results",
       name: "results",
       component: Results
     },

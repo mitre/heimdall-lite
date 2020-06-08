@@ -52,7 +52,7 @@ export default class FileItem extends FileItemProps {
     evt.stopPropagation();
     evt.preventDefault();
     let data_store = getModule(FilteredDataModule, this.$store);
-    if (!data_store.selected_file_ids.has(this.file.unique_id)) {
+    if (!data_store.selected_file_ids.includes(this.file.unique_id)) {
       data_store.set_toggle_file_on(this.file.unique_id);
     } else {
       data_store.set_toggle_file_off(this.file.unique_id);
@@ -62,8 +62,8 @@ export default class FileItem extends FileItemProps {
 
   get selected(): boolean {
     let data_store = getModule(FilteredDataModule, this.$store);
-    console.log(data_store.selected_file_ids.has(this.file.unique_id));
-    return data_store.selected_file_ids.has(this.file.unique_id);
+    console.log(data_store.selected_file_ids.includes(this.file.unique_id));
+    return data_store.selected_file_ids.includes(this.file.unique_id);
   }
 
   close_this_file(evt: Event) {

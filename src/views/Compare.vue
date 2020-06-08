@@ -60,7 +60,7 @@
               }}</v-card-title>
               <v-card-actions class="justify-center">
                 <StatusChart
-                  :filter="{ fromFile: file.unique_id }"
+                  :filter="{ fromFile: [file.unique_id] }"
                   :value="null"
                   :show_compliance="true"
                 />
@@ -112,7 +112,7 @@
                           }}</v-card-title>
                           <v-card-actions class="justify-center">
                             <StatusChart
-                              :filter="{ fromFile: file.unique_id }"
+                              :filter="{ fromFile: [file.unique_id] }"
                               :value="null"
                               :show_compliance="true"
                             />
@@ -232,17 +232,6 @@ export default class Compare extends Props {
     }
   ];
 
-  get series(): number[] {
-    let counts: StatusCountModule = getModule(StatusCountModule, this.$store);
-    return [
-      counts.passed({}),
-      counts.failed({}),
-      counts.notApplicable({}),
-      counts.notReviewed({}),
-      counts.profileError({})
-    ];
-  }
-
   /** Whether or not the model is showing */
   dialog: boolean = false;
   checkbox: boolean = false;
@@ -255,7 +244,7 @@ export default class Compare extends Props {
     let filter_store = getModule(FilteredDataModule, this.$store);
     const all_executions = data_store.contextualExecutions;
     for (let ex of all_executions) {
-      if (filter_store.selected_file_ids.has(ex.from_file.unique_id)) {
+      if (filter_store.selected_file_ids.includes(ex.from_file.unique_id)) {
         selected_data.push(ex);
       }
     }
@@ -324,16 +313,19 @@ export default class Compare extends Props {
     );
     for (let file of this.files) {
       lowCounts.push(
-        totalSevCounts.low({ fromFile: file.unique_id, status: "Failed" })
+        totalSevCounts.low({ fromFile: [file.unique_id], status: "Failed" })
       );
       medCounts.push(
-        totalSevCounts.medium({ fromFile: file.unique_id, status: "Failed" })
+        totalSevCounts.medium({ fromFile: [file.unique_id], status: "Failed" })
       );
       highCounts.push(
-        totalSevCounts.high({ fromFile: file.unique_id, status: "Failed" })
+        totalSevCounts.high({ fromFile: [file.unique_id], status: "Failed" })
       );
       critCounts.push(
-        totalSevCounts.critical({ fromFile: file.unique_id, status: "Failed" })
+        totalSevCounts.critical({
+          fromFile: [file.unique_id],
+          status: "Failed"
+        })
       );
     }
     series.push(lowCounts);
@@ -359,7 +351,7 @@ export default class Compare extends Props {
   get compliance_series(): SeriesItem[] {
     var series = [];
     for (let file of this.files) {
-      let filter = { fromFile: file.unique_id };
+      let filter = { fromFile: [file.unique_id] };
       let counts = getModule(StatusCountModule, this.$store);
       let passed = counts.passed(filter);
       let total =
@@ -380,7 +372,7 @@ export default class Compare extends Props {
     let data_store = getModule(FilteredDataModule, this.$store);
     var names = [];
     for (let file of this.files) {
-      let time = data_store.controls({ fromFile: file.unique_id })[0].root.hdf
+      let time = data_store.controls({ fromFile: [file.unique_id] })[0].root.hdf
         .start_time;
       names.push(time);
     }
@@ -393,7 +385,7 @@ export default class Compare extends Props {
       return 0;
     }
     let file = this.files[0];
-    let filter = { fromFile: file.unique_id };
+    let filter = { fromFile: [file.unique_id] };
     let counts = getModule(StatusCountModule, this.$store);
     let failed = counts.failed(filter);
     return failed;
