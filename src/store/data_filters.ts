@@ -2,7 +2,12 @@
  * This module provides a cached, reusable method for filtering data from data_store.
  */
 
-import { Module, VuexModule, getModule } from "vuex-module-decorators";
+import {
+  Module,
+  VuexModule,
+  getModule,
+  Mutation
+} from "vuex-module-decorators";
 import {
   SourcedContextualizedProfile,
   SourcedContextualizedEvaluation
@@ -84,6 +89,16 @@ function contains_term(
 })
 class FilteredDataModule extends VuexModule {
   selected_file_ids: Set<FileID> = new Set();
+
+  @Mutation
+  set_toggle_file_on(file: FileID): void {
+    this.selected_file_ids.add(file);
+  }
+
+  @Mutation
+  set_toggle_file_off(file: FileID): void {
+    this.selected_file_ids.delete(file);
+  }
 
   private get dataStore(): DataModule {
     return getModule(DataModule, Store);
