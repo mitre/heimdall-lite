@@ -22,7 +22,18 @@
           <v-list-item-title>All reports</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/compare" title="Compare all files' controls">
+
+      <v-subheader>Views</v-subheader>
+      <v-list-item to="/results" title="View controls' results">
+        <v-list-item-avatar>
+          <v-icon small>mdi-television-guide</v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title>Results</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/compare" title="Compare evaluations' controls">
         <v-list-item-avatar>
           <v-icon small>mdi-triangle-outline</v-icon>
         </v-list-item-avatar>
