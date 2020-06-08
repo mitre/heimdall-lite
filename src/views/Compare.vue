@@ -239,15 +239,10 @@ export default class Compare extends Props {
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
-    let selected_data = [];
-    let data_store = getModule(InspecDataModule, this.$store);
     let filter_store = getModule(FilteredDataModule, this.$store);
-    const all_executions = data_store.contextualExecutions;
-    for (let ex of all_executions) {
-      if (filter_store.selected_file_ids.includes(ex.from_file.unique_id)) {
-        selected_data.push(ex);
-      }
-    }
+    let selected_data = filter_store.evaluations(
+      filter_store.selected_file_ids
+    );
     return new ComparisonContext(selected_data);
   }
 

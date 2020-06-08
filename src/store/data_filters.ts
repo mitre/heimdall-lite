@@ -107,13 +107,33 @@ class FilteredDataModule extends VuexModule {
     }
   }
 
+  // Just override the whole list
+  @Mutation
+  set_toggled_files(files: FileID[]): void {
+    this.selected_file_ids.splice(0, this.selected_file_ids.length, ...files);
+  }
+
   private get dataStore(): DataModule {
     return getModule(DataModule, Store);
   }
 
   /**
    * Parameterized getter.
-   * Get all profiles from the specified file id.
+   * Get all evaluations from the specified file ids
+   */
+  get evaluations(): (
+    files: FileID[]
+  ) => readonly SourcedContextualizedEvaluation[] {
+    return (files: FileID[]) => {
+      return this.dataStore.contextualExecutions.filter(e =>
+        files.includes(e.from_file.unique_id)
+      );
+    };
+  }
+
+  /**
+   * Parameterized getter.
+   * Get all profiles from the specified file ids.
    * Filters only based on the file ID
    */
   get profiles(): (
@@ -124,7 +144,7 @@ class FilteredDataModule extends VuexModule {
       let profiles: context.ContextualizedProfile[] = [];
 
       // Filter to those that match our filter. In this case that just means come from the right file id
-      this.dataStore.contextualProfiles.forEach(prof => {
+      for (let prof of this.dataStore.contextualProfiles) {
         if (isFromProfileFile(prof)) {
           if (files.includes(prof.from_file.unique_id)) {
             profiles.push(prof);
@@ -136,7 +156,7 @@ class FilteredDataModule extends VuexModule {
             profiles.push(prof);
           }
         }
-      });
+      }
 
       return profiles;
     };

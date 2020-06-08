@@ -1,7 +1,7 @@
 <template>
-  <v-list-item :to="`/results/${file.unique_id}`" :title="file.filename">
+  <v-list-item @click="select_file_exclusive" :title="file.filename">
     <v-list-item-action @click="select_file">
-      <v-checkbox :value="selected" color="blue" />
+      <v-checkbox :input-value="selected" color="blue" />
     </v-list-item-action>
 
     <v-list-item-avatar>
@@ -52,17 +52,24 @@ export default class FileItem extends FileItemProps {
     evt.stopPropagation();
     evt.preventDefault();
     let data_store = getModule(FilteredDataModule, this.$store);
-    if (!data_store.selected_file_ids.includes(this.file.unique_id)) {
+    if (!this.selected) {
       data_store.set_toggle_file_on(this.file.unique_id);
     } else {
       data_store.set_toggle_file_off(this.file.unique_id);
     }
-    console.log(data_store.selected_file_ids);
+  }
+
+  select_file_exclusive(evt: Event) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    let data_store = getModule(FilteredDataModule, this.$store);
+
+    // Clear all except this one
+    data_store.set_toggled_files([this.file.unique_id]);
   }
 
   get selected(): boolean {
     let data_store = getModule(FilteredDataModule, this.$store);
-    console.log(data_store.selected_file_ids.includes(this.file.unique_id));
     return data_store.selected_file_ids.includes(this.file.unique_id);
   }
 

@@ -100,13 +100,11 @@ export default class Sidebar extends SidebarProps {
     if (
       data_module.allFiles.length == filtered_module.selected_file_ids.length
     ) {
-      for (let i of data_module.allFiles) {
-        filtered_module.set_toggle_file_off(i.unique_id);
-      }
+      filtered_module.set_toggled_files([]);
     } else {
-      for (let i of data_module.allFiles) {
-        filtered_module.set_toggle_file_on(i.unique_id);
-      }
+      filtered_module.set_toggled_files(
+        data_module.allFiles.map(v => v.unique_id)
+      );
     }
   }
   /** Generates files for all */

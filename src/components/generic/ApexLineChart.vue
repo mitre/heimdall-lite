@@ -69,7 +69,6 @@ export default class ApexLineChart extends ApexLineChartProps {
     let final = this.categories as string[];
 
     // If we have any non-zero data, just returngive 0.01 of all
-    console.log(final);
     return final;
   }
 
@@ -93,7 +92,6 @@ export default class ApexLineChart extends ApexLineChartProps {
     let final = this.series as SeriesItem[];
 
     // If we have any non-zero data, just returngive 0.01 of all
-    console.log(final);
     return final;
   }
 

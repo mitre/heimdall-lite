@@ -353,7 +353,6 @@ export default class Results extends ResultsProps {
    * Invoked when file(s) are loaded.
    */
   on_got_files(ids: FileID[]) {
-    console.log("on_got_files");
     // Close the dialog
     this.dialog = false;
 

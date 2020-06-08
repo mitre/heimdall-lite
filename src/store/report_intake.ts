@@ -117,41 +117,39 @@ class InspecIntakeModule extends VuexModule {
     // Determine what sort of file we (hopefully) have, then add it
     if (result["1_0_ExecJson"]) {
       // A bit of chicken and egg here
-      let evalFile = {
+      let eval_file = {
         unique_id: options.unique_id,
         filename: options.filename
         // evaluation
       } as EvaluationFile;
 
-      // Fixup the evaluation to be Sourced from a file
+      // Fixup the evaluation to be Sourced from a file. Requires a temporary type break
       let evaluation = (context.contextualizeEvaluation(
         result["1_0_ExecJson"]
       ) as unknown) as SourcedContextualizedEvaluation;
-      evaluation.from_file = evalFile;
-
-      // Patch its profiles to point to this new object
+      evaluation.from_file = eval_file;
 
       // Set and freeze
-      evalFile.evaluation = evaluation;
+      eval_file.evaluation = evaluation;
       Object.freeze(evaluation);
-      data.addExecution(evalFile);
+      data.addExecution(eval_file);
     } else if (result["1_0_ProfileJson"]) {
       // Handle as profile
-      let profileFile = {
+      let profile_file = {
         unique_id: options.unique_id,
         filename: options.filename
       } as ProfileFile;
 
-      let profile: SourcedContextualizedProfile = {
-        ...context.contextualizeProfile(result["1_0_ProfileJson"]),
-        from_file: profileFile
-      };
+      // Fixup the evaluation to be Sourced from a file. Requires a temporary type break
+      let profile = (context.contextualizeProfile(
+        result["1_0_ProfileJson"]
+      ) as unknown) as SourcedContextualizedProfile;
+      profile.from_file = profile_file;
 
-      // Srt and freeze
-      profileFile.profile = profile;
+      // Set and freeze
+      profile_file.profile = profile;
       Object.freeze(profile);
-
-      data.addProfile(profileFile);
+      data.addProfile(profile_file);
     } else {
       console.log("is Nothing");
       return new Error("Couldn't parse data");
