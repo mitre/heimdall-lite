@@ -1,7 +1,7 @@
 <template>
   <v-list-item :to="`/results/${file.unique_id}`" :title="file.filename">
     <v-list-item-action @click="select_file">
-      <v-checkbox color="blue" />
+      <v-checkbox :value="selected" color="blue" />
     </v-list-item-action>
 
     <v-list-item-avatar>
@@ -53,9 +53,9 @@ export default class FileItem extends FileItemProps {
     evt.preventDefault();
     let data_store = getModule(FilteredDataModule, this.$store);
     if (!data_store.selected_file_ids.has(this.file.unique_id)) {
-      data_store.selected_file_ids.add(this.file.unique_id);
+      data_store.set_toggle_file_on(this.file.unique_id);
     } else {
-      data_store.selected_file_ids.delete(this.file.unique_id);
+      data_store.set_toggle_file_off(this.file.unique_id);
     }
     console.log(data_store.selected_file_ids);
   }
