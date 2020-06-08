@@ -53,7 +53,7 @@
           </v-col>
         </v-row>
         <v-row justify="space-around" v-if="files.length < 3">
-          <v-col xs="4" :cols="statusCols" v-for="(file, i) in files" :key="i">
+          <v-col :cols="statusCols" v-for="(file, i) in files" :key="i">
             <v-card class="fill-height">
               <v-card-title class="justify-center">{{
                 file.filename
@@ -74,11 +74,13 @@
               <v-tabs fixed-tabs v-model="tab">
                 <v-tab key="compliance"> % Compliance </v-tab>
                 <v-tab key="severity"> Failed Tests by Severity </v-tab>
+                <v-tab v-if="files.length < 5" key="status">
+                  Status Data by File
+                </v-tab>
               </v-tabs>
               <transition>
                 <keep-alive>
                   <v-col v-if="tab == 0" cols="12">
-                    Hello
                     <ApexLineChart
                       :series="compliance_series"
                       :categories="fileTimes"
@@ -87,8 +89,7 @@
                       :y_title="'% Compliance'"
                     ></ApexLineChart>
                   </v-col>
-                  <v-col v-else cols="12">
-                    World
+                  <v-col v-else-if="tab == 1" cols="12">
                     <ApexLineChart
                       :series="line_sev_series"
                       :categories="fileTimes"
@@ -97,6 +98,28 @@
                       :title="'Failed Tests by Severity'"
                       :y_title="'Tests Failed'"
                     ></ApexLineChart>
+                  </v-col>
+                  <v-col v-else-if="files.length < 5" cols="12">
+                    <v-row>
+                      <v-col
+                        :cols="statusCols"
+                        v-for="(file, i) in files"
+                        :key="i"
+                      >
+                        <v-card class="fill-height">
+                          <v-card-title class="justify-center">{{
+                            file.filename
+                          }}</v-card-title>
+                          <v-card-actions class="justify-center">
+                            <StatusChart
+                              :filter="{ fromFile: file.unique_id }"
+                              :value="null"
+                              :show_compliance="true"
+                            />
+                          </v-card-actions>
+                        </v-card>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </keep-alive>
               </transition>
@@ -227,9 +250,16 @@ export default class Compare extends Props {
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
+    let selected_data = [];
     let data_store = getModule(InspecDataModule, this.$store);
+    let filter_store = getModule(FilteredDataModule, this.$store);
     const all_executions = data_store.contextualExecutions;
-    return new ComparisonContext(all_executions);
+    for (let ex of all_executions) {
+      if (filter_store.selected_file_ids.has(ex.from_file.unique_id)) {
+        selected_data.push(ex);
+      }
+    }
+    return new ComparisonContext(selected_data);
   }
 
   /** Yields the control pairings in a more easily consumable list form */

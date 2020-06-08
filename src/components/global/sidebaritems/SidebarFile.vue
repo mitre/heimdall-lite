@@ -1,5 +1,9 @@
 <template>
   <v-list-item :to="`/results/${file.unique_id}`" :title="file.filename">
+    <v-list-item-action @click="select_file">
+      <v-checkbox color="blue" />
+    </v-list-item-action>
+
     <v-list-item-avatar>
       <v-icon v-text="icon" small />
     </v-list-item-avatar>
@@ -27,7 +31,8 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "@/store/data_store";
-import { EvaluationFile, ProfileFile } from "@/store/report_intake";
+import FilteredDataModule from "@/store/data_filters";
+import { EvaluationFile, ProfileFile, FileID } from "@/store/report_intake";
 import ServerModule from "@/store/server";
 
 // We declare the props separately to make props types inferable.
@@ -42,6 +47,24 @@ const FileItemProps = Vue.extend({
 })
 export default class FileItem extends FileItemProps {
   host: string = "http://localhost:8050";
+
+  select_file(evt: Event) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    let data_store = getModule(FilteredDataModule, this.$store);
+    if (!data_store.selected_file_ids.has(this.file.unique_id)) {
+      data_store.selected_file_ids.add(this.file.unique_id);
+    } else {
+      data_store.selected_file_ids.delete(this.file.unique_id);
+    }
+    console.log(data_store.selected_file_ids);
+  }
+
+  get selected(): boolean {
+    let data_store = getModule(FilteredDataModule, this.$store);
+    console.log(data_store.selected_file_ids.has(this.file.unique_id));
+    return data_store.selected_file_ids.has(this.file.unique_id);
+  }
 
   close_this_file(evt: Event) {
     evt.stopPropagation();

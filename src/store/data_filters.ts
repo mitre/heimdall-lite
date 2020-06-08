@@ -83,6 +83,8 @@ function contains_term(
   name: "filteredData"
 })
 class FilteredDataModule extends VuexModule {
+  selected_file_ids: Set<FileID> = new Set();
+
   private get dataStore(): DataModule {
     return getModule(DataModule, Store);
   }
