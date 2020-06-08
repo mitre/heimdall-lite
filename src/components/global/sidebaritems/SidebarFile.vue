@@ -112,8 +112,10 @@ export default class FileItem extends FileItemProps {
   }
 
   save_profile(file?: ProfileFile) {
+    // Strip the file
     if (file) {
-      let blob = new Blob([JSON.stringify(file.profile)], {
+      let decontextualized = file.profile.data;
+      let blob = new Blob([JSON.stringify(decontextualized)], {
         type: "application/json"
       });
     }

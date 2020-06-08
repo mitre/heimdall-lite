@@ -239,6 +239,7 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to save evaluation to the database */
   @Action
   async save_evaluation(evaluation: EvaluationFile): Promise<void> {
+    let decontextualized = evaluation.evaluation.data;
     console.log(
       "Saving execution to " + this.connection!.url + "/executions/upload"
     );
@@ -251,7 +252,7 @@ class HeimdallServerModule extends VuexModule {
       .post(
         this.connection!.url + "/executions/upload",
         {
-          evaluation: evaluation.evaluation,
+          evaluation: decontextualized,
           filename: evaluation.filename
         },
         options
