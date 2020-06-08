@@ -138,15 +138,26 @@
     <v-snackbar
       style="margin-top: 44px;"
       v-model="filter_snackbar"
-      :timeout="10000"
+      :timeout="10000000"
       color="warning"
       top
     >
-      <span class="subtitle-2"
-        >All results are filtered out. Use the
+      <span class="subtitle-2" v-if="file_filter.length">
+        All results are filtered out. Use the
         <v-icon>mdi-filter-remove</v-icon> button in the top right to clear
-        filters and show all.</span
-      >
+        filters and show all.
+      </span>
+      <span class="subtitle-2" v-else-if="no_files">
+        No files are currently loaded. Press the <strong>UPLOAD</strong>
+        <v-icon class="mx-1"> mdi-cloud-upload</v-icon> button above to load
+        some.
+      </span>
+      <span class="subtitle-2" v-else>
+        No files are currently enabled for viewing. Open the
+        <v-icon class="mx-1">mdi-menu</v-icon> sidebar menu, and ensure that the
+        file(s) you wish to view have are
+        <v-icon class="mx-1">mdi-checkbox-marked</v-icon> checked.
+      </span>
     </v-snackbar>
   </BaseView>
 </template>
@@ -236,35 +247,11 @@ export default class Results extends ResultsProps {
   get file_filter(): FileID[] {
     let data_module = getModule(FilteredDataModule, this.$store);
     return data_module.selected_file_ids;
-    /*
-    let id_string: string = this.$route.params.id;
-    console.log("file_filter: " + id_string);
-    let as_int = parseInt(id_string);
-    let result: FileID | null;
-    if (isNaN(as_int)) {
-      result = null;
-    } else {
-      result = as_int as FileID;
-    }
-    console.log("file_filter result: " + result);
+  }
 
-    // Route if necessary
-    let redir = need_redirect_file(
-      result,
-      getModule(InspecDataModule, this.$store)
-    );
-    console.log("redir: " + redir);
-    if (redir !== "ok") {
-      if (redir === "root") {
-        this.$router.push("/home");
-      } else {
-        this.$router.push(`/results/${redir}`);
-        result = redir;
-      }
-    }
-
-    return result;
-    */
+  // Returns true if no files are uploaded
+  get no_files(): boolean {
+    return getModule(InspecDataModule, this.$store).allFiles.length === 0;
   }
 
   /**
