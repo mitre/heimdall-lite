@@ -19,7 +19,10 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title>All reports</v-list-item-title>
+          <v-list-item-title
+            ><div v-if="all_toggled">Deselect all reports</div>
+            <div v-else>Select all reports</div></v-list-item-title
+          >
         </v-list-item-content>
       </v-list-item>
 
@@ -97,9 +100,7 @@ export default class Sidebar extends SidebarProps {
     let filtered_module = getModule(FilteredDataModule, this.$store);
     let data_module = getModule(InspecDataModule, this.$store);
 
-    if (
-      data_module.allFiles.length == filtered_module.selected_file_ids.length
-    ) {
+    if (this.all_toggled) {
       filtered_module.set_toggled_files([]);
     } else {
       filtered_module.set_toggled_files(
@@ -107,6 +108,19 @@ export default class Sidebar extends SidebarProps {
       );
     }
   }
+
+  get all_toggled(): boolean {
+    let filtered_module = getModule(FilteredDataModule, this.$store);
+    let data_module = getModule(InspecDataModule, this.$store);
+
+    if (
+      data_module.allFiles.length == filtered_module.selected_file_ids.length
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   /** Generates files for all */
   get visible_files(): Array<ProfileFile | EvaluationFile> {
     let data_store = getModule(InspecDataModule, this.$store);
