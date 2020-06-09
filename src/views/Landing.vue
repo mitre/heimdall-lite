@@ -89,11 +89,13 @@ export default class Landing extends LandingProps {
    * Invoked when file(s) are loaded.
    */
   on_got_files(ids: FileID[]) {
+    console.log("on_got_files");
     // Close the dialog
     this.dialog = false;
 
     // If just one file, focus it
     if (ids.length === 1) {
+      console.log("one file: " + ids[0]);
       this.$router.push(`/results/${ids[0]}`);
     }
 
