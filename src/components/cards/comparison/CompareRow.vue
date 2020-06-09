@@ -137,6 +137,13 @@ export default class CompareRow extends Props {
 
   view(index: number) {
     Vue.set(this.selection, index, !this.selection[index]);
+    if (this.selection.length == 2) {
+      Vue.set(
+        this.selection,
+        Math.abs(index - 1),
+        !this.selection[Math.abs(index - 1)]
+      );
+    }
   }
 
   get num_selected(): number {
