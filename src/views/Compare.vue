@@ -266,6 +266,22 @@ export default class Compare extends Props {
     });
   }
 
+  get profile_diff(): boolean {
+    let data_store = getModule(InspecDataModule, this.$store);
+    let filtered_module = getModule(FilteredDataModule, this.$store);
+    let file_ids = [];
+    for (let file of this.files) {
+      file_ids.push(file.unique_id);
+    }
+    let profiles = filtered_module.profiles(file_ids);
+    for (let i = 0; i < profiles.length - 1; i++) {
+      if (profiles[i].data.name != profiles[i + 1].data.name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   get show_set(): ControlSeries[] {
     if (this.checkbox) {
       return this.delta_sets;
@@ -278,21 +294,25 @@ export default class Compare extends Props {
   }
 
   get files(): EvaluationFile[] {
-    if (this.control_sets.length == 0) {
-      return [];
+    let filter_module = getModule(FilteredDataModule, this.$store);
+    let fileArr = [];
+    let fileList = filter_module.evaluations(filter_module.selected_file_ids);
+    for (let i = 0; i < fileList.length; i++) {
+      fileArr.push(fileList[i].from_file);
     }
-    var fileArr = [];
-    let prof;
-    for (let ctrl of this.control_sets[0]) {
-      prof = ctrl.sourced_from;
-      if (isFromProfileFile(prof)) {
-        //fileArr.push(prof.from_file);
-      } else {
-        let evaluation = prof.sourced_from! as SourcedContextualizedEvaluation;
-        fileArr.push(evaluation.from_file);
-      }
-    }
-    //let data_store = getModule(InspecDataModule, this.$store);
+
+    fileArr = fileArr.sort((a, b) => {
+      let a_date = new Date(
+        filter_module.controls({ fromFile: [a.unique_id] })[0].root.hdf
+          .start_time || 0
+      );
+      let b_date = new Date(
+        filter_module.controls({ fromFile: [b.unique_id] })[0].root.hdf
+          .start_time || 0
+      );
+      return a_date.valueOf() - b_date.valueOf();
+    });
+    console.log(fileArr);
     return fileArr;
   }
 
