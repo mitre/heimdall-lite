@@ -1,0 +1,180 @@
+352685bbfdebafee24dfe0debfaa6c8a
+;(function(){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Tag = exports.Evaluation = exports.Content = undefined;
+
+var _tslib = require("tslib");
+
+var _vue = require("vue");
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _vueClassComponent = require("vue-class-component");
+
+var _vueClassComponent2 = _interopRequireDefault(_vueClassComponent);
+
+var _vuexModuleDecorators = require("vuex-module-decorators");
+
+var _server = require("@/store/server");
+
+var _server2 = _interopRequireDefault(_server);
+
+var _classTransformer = require("class-transformer");
+
+var _report_intake = require("@/store/report_intake");
+
+var _report_intake2 = _interopRequireDefault(_report_intake);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Content {}
+
+exports.Content = Content;
+
+class Evaluation {}
+
+exports.Evaluation = Evaluation;
+
+class Tag {}
+
+exports.Tag = Tag; // We declare the props separately to make props types inferable.
+
+const Props = _vue2.default.extend({
+  props: {}
+});
+/**
+ * File reader component for taking in inspec JSON data.
+ * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
+ * Emits "got-files" with a list of the unique_ids of the loaded files.
+ */
+
+
+let DatabaseReader = class DatabaseReader extends Props {
+  get headers() {
+    return [{
+      text: "Filename",
+      align: "start",
+      sortable: true,
+      value: "filename"
+    }, {
+      text: "Version",
+      sortable: true,
+      value: "version"
+    }, {
+      text: "Select",
+      value: "select"
+    }];
+  }
+
+  get search() {
+    return "";
+  }
+
+  get hideHeaders() {
+    return false;
+  }
+
+  get showSelect() {
+    return false;
+  }
+
+  get isLoading() {
+    return false;
+  }
+
+  get items() {
+    let mod = (0, _vuexModuleDecorators.getModule)(_server2.default, this.$store);
+
+    if (mod.user_evaluations) {
+      let eval_obj = Array.from(mod.user_evaluations) || [];
+      const evals = eval_obj.map(x => (0, _classTransformer.plainToClass)(Evaluation, x));
+      console.log("evals: " + evals.length);
+      evals.forEach(eva => {
+        eva.filename = this.evaluation_label(eva);
+      });
+      return evals;
+    } else {
+      return [new Evaluation()];
+    }
+  }
+
+  get personal_evaluations() {
+    let mod = (0, _vuexModuleDecorators.getModule)(_server2.default, this.$store);
+
+    if (mod.user_evaluations) {
+      let eval_obj = Array.from(mod.user_evaluations) || [];
+      const evals = eval_obj.map(x => (0, _classTransformer.plainToClass)(Evaluation, x));
+      console.log("evals: " + evals.length);
+      return evals;
+    } else {
+      return [new Evaluation()];
+    }
+  }
+
+  evaluation_label(evaluation) {
+    let label = evaluation.version;
+
+    if (evaluation.tags) {
+      evaluation.tags.forEach(tag => {
+        console.log("tag " + tag.content.name + ": " + tag.content.value);
+
+        if (tag.content.name == "filename") {
+          label = tag.content.value;
+        }
+      });
+    }
+
+    return label;
+  }
+
+  async load_this_evaluation(evaluation) {
+    console.log("load this file: " + evaluation.id);
+    const host = process.env.VUE_APP_API_URL; // Generate an id
+
+    let unique_id = (0, _report_intake.next_free_file_ID)(); // TODO
+
+    let filename = "evaluation"; // Get intake module
+
+    let intake_module = (0, _vuexModuleDecorators.getModule)(_report_intake2.default, this.$store);
+    let mod = (0, _vuexModuleDecorators.getModule)(_server2.default, this.$store);
+    await mod.connect(host).catch(bad => {
+      console.error("Unable to connect to " + host);
+    }).then(() => {
+      console.log("here");
+      return mod.retrieve_evaluation(evaluation.id);
+    }).catch(bad => {
+      console.error(`bad login ${bad}`);
+    }).then(() => {
+      console.log("here2");
+
+      if (mod.evaluation) {
+        console.log("here3"); //let upload = `{"unique_id": ${unique_id},"filename": "${filename}","execution":${JSON.stringify(
+        //  mod.evaluation
+        //)}}`;
+
+        intake_module.loadText({
+          text: JSON.stringify(mod.evaluation),
+          unique_id: unique_id,
+          filename: filename
+        });
+        console.log("Loaded " + unique_id);
+        this.$emit("got-files", [unique_id]);
+      }
+    });
+  }
+
+};
+DatabaseReader = (0, _tslib.__decorate)([(0, _vueClassComponent2.default)({
+  components: {}
+})], DatabaseReader);
+exports.default = DatabaseReader; //# sourceMappingURL=module.jsx.map
+})()
+var defaultExport = (module.exports.__esModule) ? module.exports.default : module.exports;var __vue__options__ = (typeof defaultExport === "function"? defaultExport.options: defaultExport)
+__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('v-card',{staticClass:"elevation-0"},[_c('v-card-subtitle',[_vm._v("Easily load any supported Heimdall Data Format file")]),_vm._v(" "),_c('v-container',[_c('v-data-table',{staticClass:"elevation-1",attrs:{"dense":"","headers":_vm.headers,"items":_vm.items,"search":_vm.search,"hide-default-header":_vm.hideHeaders,"show-select":_vm.showSelect,"loading":_vm.isLoading,"item-key":"name"},scopedSlots:_vm._u([{key:"body",fn:function(ref){
+var items = ref.items;
+return [_c('tbody',_vm._l((items),function(item){return _c('tr',{key:item.name},[_c('td',[_vm._v(_vm._s(item.filename))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(item.version))]),_vm._v(" "),_c('td',[_c('v-btn',{attrs:{"icon":""},on:{"click":function($event){return _vm.load_this_evaluation(item)}}},[_c('v-icon',[_vm._v("mdi-plus-circle")])],1)],1)])}),0)]}}])})],1)],1)}
+__vue__options__.staticRenderFns = []

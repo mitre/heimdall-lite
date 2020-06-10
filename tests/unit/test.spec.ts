@@ -21,4 +21,10 @@ describe("Google", () => {
     let text = await page.evaluate(() => document.body.textContent);
     expect(text).toContain("heimdall-lite");
   });
+
+  it('should display "google" text on page', async () => {
+    let text = await page.evaluate(() => document.body.textContent);
+    await expect(page).toClick("a", { text: "S3 Bucket" });
+    await page.waitForNavigation();
+  });
 });

@@ -40,7 +40,7 @@
           <DatabaseReader @got-files="got_files" />
         </v-tab-item>
 
-        <v-tab-item value="uploadtab-samples">
+        <v-tab-item data-test="button-display" value="uploadtab-samples">
           <SampleList @got-files="got_files" />
         </v-tab-item>
 

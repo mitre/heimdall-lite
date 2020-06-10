@@ -1,0 +1,78 @@
+890001b0118981e29e17974e0230d80a
+;(function(){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _tslib = require("tslib");
+
+var _vue = require("vue");
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _vueClassComponent = require("vue-class-component");
+
+var _vueClassComponent2 = _interopRequireDefault(_vueClassComponent);
+
+var _vuexModuleDecorators = require("vuex-module-decorators");
+
+var _HelpModal = require("@/components/global/HelpModal.vue");
+
+var _HelpModal2 = _interopRequireDefault(_HelpModal);
+
+var _AboutModal = require("@/components/global/AboutModal.vue");
+
+var _AboutModal2 = _interopRequireDefault(_AboutModal);
+
+var _app_info = require("@/store/app_info");
+
+var _app_info2 = _interopRequireDefault(_app_info);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// We declare the props separately to make props types inferable.
+const Props = _vue2.default.extend({
+  props: {}
+});
+/**
+ * File reader component for taking in inspec JSON data.
+ * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
+ * Emits "got-files" with a list of the unique_ids of the loaded files.
+ */
+
+
+let HelpFooter = class HelpFooter extends Props {
+  get version() {
+    return (0, _vuexModuleDecorators.getModule)(_app_info2.default, this.$store).version;
+  }
+
+  get changelog() {
+    return (0, _vuexModuleDecorators.getModule)(_app_info2.default, this.$store).changelog;
+  }
+
+  get repository() {
+    return (0, _vuexModuleDecorators.getModule)(_app_info2.default, this.$store).repository;
+  }
+
+  get branch() {
+    return (0, _vuexModuleDecorators.getModule)(_app_info2.default, this.$store).branch;
+  }
+
+};
+HelpFooter = (0, _tslib.__decorate)([(0, _vueClassComponent2.default)({
+  components: {
+    AboutModal: _AboutModal2.default,
+    HelpModal: _HelpModal2.default
+  }
+})], HelpFooter);
+exports.default = HelpFooter; //# sourceMappingURL=module.jsx.map
+})()
+var defaultExport = (module.exports.__esModule) ? module.exports.default : module.exports;var __vue__options__ = (typeof defaultExport === "function"? defaultExport.options: defaultExport)
+__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('v-card',[_c('v-container',{staticClass:"bar lighten-2"},[_c('v-row',{attrs:{"justify":"space-around","no-gutters":""}},[_c('AboutModal',{scopedSlots:_vm._u([{key:"clickable",fn:function(ref){
+var on = ref.on;
+return [_c('v-btn',_vm._g({attrs:{"text":"","small":""}},on),[_c('v-icon',{attrs:{"small":""}},[_vm._v("mdi-information")]),_vm._v(" "),_c('span',{staticClass:"d-none d-sm-inline pl-3"},[_vm._v("About")])],1)]}}])}),_vm._v(" "),_c('HelpModal',{scopedSlots:_vm._u([{key:"clickable",fn:function(ref){
+var on = ref.on;
+return [_c('v-btn',_vm._g({attrs:{"text":"","small":""}},on),[_c('v-icon',{attrs:{"small":""}},[_vm._v("mdi-help-circle")]),_vm._v(" "),_c('span',{staticClass:"d-none d-sm-inline pl-3"},[_vm._v("Help")])],1)]}}])}),_vm._v(" "),_c('v-btn',{attrs:{"href":_vm.repository,"target":"_blank","text":"","small":""}},[_c('v-icon',{attrs:{"small":""}},[_vm._v("mdi-github-circle")]),_vm._v(" "),_c('span',{staticClass:"d-none d-sm-inline pl-3"},[_vm._v("Github")])],1),_vm._v(" "),_c('v-btn',{attrs:{"href":_vm.repository,"target":"_blank","text":"","small":""}},[_c('v-icon',{attrs:{"small":""}},[_vm._v("mdi-library-books")]),_vm._v(" "),_c('span',{staticClass:"d-none d-sm-inline pl-3"},[_vm._v("Docs")])],1),_vm._v(" "),_c('v-btn',{attrs:{"href":_vm.repository + _vm.branch + _vm.changelog,"target":"_blank","text":"","small":""}},[_c('v-icon',{attrs:{"small":""}},[_vm._v("mdi-alpha-v-circle")]),_vm._v(" "),_c('span',{staticClass:"d-sm-inline pl-3 text-center"},[_vm._v(_vm._s(_vm.version))])],1)],1)],1)],1)}
+__vue__options__.staticRenderFns = []

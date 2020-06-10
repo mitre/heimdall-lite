@@ -72,14 +72,14 @@ export class HSConnectionConfig {
 class HeimdallServerModule extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
-  serverMode: boolean | null = null;
-  serverUrl: string = "";
+  serverMode: boolean | null = true;
+  serverUrl: string = "http://localhost:8050";
   @Mutation
   set_connection(new_url: string) {
     this.connection = new HSConnectionConfig(new_url);
   }
 
-  @Action
+  @Action({ rawError: true })
   async connect(new_url: string): Promise<void> {
     console.log("connected :" + new_url);
     this.set_connection(new_url);
@@ -108,35 +108,9 @@ class HeimdallServerModule extends VuexModule {
     this.serverMode = value;
   }
 
-  @Action
+  @Action({ rawError: true })
   server_mode() {
-    let url = window.location.origin + "/api";
-    console.log(url);
-    /*This will check if api is available */
-    if (process.env.VUE_APP_API_URL) {
-      this.mod_server_url(process.env.VUE_APP_API_URL); // this.serverUrl = process.env.VUE_APP_API_URL;
-      this.mod_server_mode(true);
-    } else {
-      axios
-        .get(url, {
-          validateStatus: function(status) {
-            return status < 500; // Reject only if the status code is greater than or equal to 500
-          }
-        })
-        .then(res => {
-          console.log("test");
-          if (res.status == 200) {
-            this.mod_server_mode(true); //window.location.href;
-            this.mod_server_url(url); // = true;
-          } else {
-            this.mod_server_mode(false);
-          }
-        })
-        .catch(error => {
-          console.log("caught error");
-          this.mod_server_mode(false);
-        });
-    }
+    console.log("here");
   }
 
   @Mutation
@@ -153,7 +127,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /* Actions to authorize and set token */
-  @Action
+  @Action({ rawError: true })
   clear_token() {
     this.set_token(null);
     this.set_user_profile(null);
@@ -185,7 +159,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to login to the server */
-  @Action
+  @Action({ rawError: true })
   async login(creds: LoginHash): Promise<void> {
     console.log(
       "Logging in to " +
@@ -227,7 +201,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to login to the server */
-  @Action
+  @Action({ rawError: true })
   async register(creds: LoginHash): Promise<void> {
     console.log(
       "Registering to " +
@@ -268,7 +242,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to login to the server */
-  @Action
+  @Action({ rawError: true })
   async retrieve_profile(): Promise<void> {
     console.log("Getting " + this.connection!.url + "/auth/profile");
     //curl http://localhost:8050/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
@@ -284,7 +258,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to save evaluation to the database */
-  @Action
+  @Action({ rawError: true })
   async save_evaluation(evaluation: EvaluationFile): Promise<void> {
     console.log(
       "Saving execution to " + this.connection!.url + "/executions/upload"
@@ -309,7 +283,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to retrieve a list of personal evaluations */
-  @Action
+  @Action({ rawError: true })
   async retrieve_personal_evaluations(): Promise<void> {
     console.log("Getting " + this.connection!.url + "/executions/personal");
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
@@ -326,7 +300,7 @@ class HeimdallServerModule extends VuexModule {
   }
 
   /** Attempts to retrieve a list of personal evaluations */
-  @Action
+  @Action({ rawError: true })
   async retrieve_evaluation(file_id: FileID): Promise<void> {
     console.log(
       "Getting " + this.connection!.url + "/executions/fetch/" + file_id
