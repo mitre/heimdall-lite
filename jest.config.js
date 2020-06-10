@@ -1,10 +1,11 @@
 module.exports = {
   rootDir: ".",
+  preset: "./Preset.js",
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   testMatch: ["<rootDir>/tests/unit/*.spec.ts"],
   testPathIgnorePatterns: ["<rootDir>/src/__mocks__/*"],
   moduleFileExtensions: ["vue", "ts", "tsx", "js", "jsx"],
-  testEnvironment: "jsdom",
+  //testEnvironment: "jsdom",
   cacheDirectory: "<rootDir>/.cache/unit",
   transform: {
     ".*\\.(vue)$": "vue-jest",
