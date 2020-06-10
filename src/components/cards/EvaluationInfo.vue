@@ -29,7 +29,7 @@
           </v-list>
           <v-list dense class="px-2" subheader>
             <v-subheader>Add Tag</v-subheader>
-            <v-form>
+            <v-form ref="form">
               <v-combobox
                 :items="tag_list"
                 v-model="tag_name"
@@ -63,33 +63,15 @@ import { InspecFile, EvaluationFile } from "../../store/report_intake";
 import { context } from "inspecjs";
 import { plainToClass } from "class-transformer";
 import { LocalStorageVal } from "@/utilities/helper_util";
+import { Evaluation, Tag, Tags } from "@/types/models.ts";
+import VeeValidate from "vee-validate";
+import VuePassword from "vue-password";
+
+Vue.use(VeeValidate);
 
 const local_evaluation_id = new LocalStorageVal<number | null>("evaluation_id");
 const local_tags = new LocalStorageVal<string | null>("evaluation_tags");
 
-export class Content {
-  name!: string;
-  value!: string;
-}
-export class Evaluation {
-  id!: number;
-  filename!: string;
-  version!: string;
-  createdAt!: Date;
-  updatedAt!: Date;
-  tags!: Tag[];
-}
-export class Tag {
-  id!: number;
-  tagger_id!: number;
-  tagger_type!: string;
-  content!: Content;
-  createdAt!: Date;
-  updatedAt!: Date;
-}
-export class Tags {
-  tags!: Tag[];
-}
 export interface TagIdsHash {
   id: number;
   tagger_id: number;
@@ -122,6 +104,7 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   edit_tags: boolean = false;
   tag_name: string | null = null;
   tag_value: string | null = null;
+  database_id: number | null = null;
 
   created() {
     console.log("created");
@@ -139,8 +122,13 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       this.platform_name = eva.execution.platform.name;
       this.platform_release = eva.execution.platform.release;
       this.duration = eva.execution.statistics.duration;
+      this.database_id = eva.database_id || null;
     }
   }
+
+  //reset() {
+  //  (this.$refs.form as any).reset();
+  //}
 
   mounted() {
     console.log("mounted");
@@ -159,11 +147,11 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     if (file) {
       let eva = file as EvaluationFile;
       console.log("filename 1: " + eva.filename);
-      let file_id: number | null = local_evaluation_id.get();
-      if (file_id === null) {
-        console.log("no file id");
+      if (eva.database_id === null) {
+        console.log("no database id");
       } else {
-        this.load_tags(file_id);
+        this.database_id = eva.database_id || null;
+        this.load_tags(this.database_id);
       }
       return eva.filename;
     } else {
@@ -183,16 +171,17 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       this.platform_name = eva.execution.platform.name;
       this.platform_release = eva.execution.platform.release;
       this.duration = eva.execution.statistics.duration;
-      let file_id: number | null = local_evaluation_id.get();
-      if (file_id === null) {
+      if (eva.database_id === null) {
         console.log("null file");
       } else {
-        this.load_tags(file_id);
+        this.database_id = eva.database_id || null;
+        this.load_tags(this.database_id);
       }
     }
   }
 
   open_tag_edit() {
+    //(this.$refs.form as any).reset();
     this.show_tags = false;
     this.edit_tags = true;
   }
@@ -211,14 +200,15 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     const host = process.env.VUE_APP_API_URL!;
 
     // Get server module
-    let file_id: number | null = local_evaluation_id.get();
+    let file_id: number | null = this.database_id;
     if (file_id && this.tag_name && this.tag_value) {
       let tag_hash: TagHash = {
         tagger_id: file_id,
         name: this.tag_name,
         value: this.tag_value
       };
-      this.load_tags(file_id);
+      (this.$refs.form as any).reset();
+      //this.load_tags(file_id);
       let mod = getModule(ServerModule, this.$store);
       await mod
         .connect(host)
@@ -301,29 +291,31 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     }
   }
 
-  async load_tags(file_id: number): Promise<void> {
+  async load_tags(file_id: number | null): Promise<void> {
     console.log("load_tags for " + file_id);
-    const host = process.env.VUE_APP_API_URL!;
+    if (file_id) {
+      const host = process.env.VUE_APP_API_URL!;
 
-    // Get server module
-    let mod = getModule(ServerModule, this.$store);
-    //let eva = plainToClass(Evaluation, mod.evaluation);
-    await mod
-      .connect(host)
-      .catch(bad => {
-        console.error("Unable to connect to " + host);
-      })
-      .then(() => {
-        console.log("here");
-        return mod.retrieve_tags(file_id);
-      })
-      .catch(bad => {
-        console.error(`bad retrieve ${bad}`);
-      })
-      .then(() => {
-        console.log("here2");
-        this.update_tags();
-      });
+      // Get server module
+      let mod = getModule(ServerModule, this.$store);
+      //let eva = plainToClass(Evaluation, mod.evaluation);
+      await mod
+        .connect(host)
+        .catch(bad => {
+          console.error("Unable to connect to " + host);
+        })
+        .then(() => {
+          console.log("here");
+          return mod.retrieve_tags(file_id);
+        })
+        .catch(bad => {
+          console.error(`bad retrieve ${bad}`);
+        })
+        .then(() => {
+          console.log("here2");
+          this.update_tags();
+        });
+    }
   }
 }
 </script>

@@ -45,29 +45,14 @@ import InspecIntakeModule, {
   FileID,
   next_free_file_ID
 } from "@/store/report_intake";
+import { Evaluation } from "@/types/models.ts";
+
+export interface RetrieveHash {
+  unique_id: number;
+  eva: Evaluation;
+}
 
 const local_evaluation_id = new LocalStorageVal<number | null>("evaluation_id");
-
-export class Content {
-  name!: string;
-  value!: string;
-}
-export class Evaluation {
-  id!: number;
-  filename!: string;
-  version!: string;
-  createdAt!: Date;
-  updatedAt!: Date;
-  tags!: Tag[];
-}
-export class Tag {
-  id!: number;
-  tagger_id!: number;
-  tagger_type!: string;
-  content!: Content;
-  createdAt!: Date;
-  updatedAt!: Date;
-}
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -157,11 +142,6 @@ export default class DatabaseReader extends Props {
     // Generate an id
     let unique_id = next_free_file_ID();
 
-    // TODO
-    let filename = "evaluation";
-
-    // Get intake module
-    let intake_module = getModule(InspecIntakeModule, this.$store);
     let mod = getModule(ServerModule, this.$store);
     await mod
       .connect(host)
@@ -170,28 +150,18 @@ export default class DatabaseReader extends Props {
       })
       .then(() => {
         console.log("here");
-        mod.set_tags(null);
-        return mod.retrieve_evaluation(evaluation.id);
+        let eva_hash: RetrieveHash = {
+          unique_id: unique_id,
+          eva: evaluation
+        };
+        return mod.retrieve_evaluation(eva_hash);
       })
       .catch(bad => {
         console.error(`bad login ${bad}`);
       })
       .then(() => {
-        console.log("here2");
-        if (mod.evaluation) {
-          console.log("here3");
-          //let upload = `{"unique_id": ${unique_id},"filename": "${filename}","execution":${JSON.stringify(
-          //  mod.evaluation
-          //)}}`;
-          intake_module.loadText({
-            text: JSON.stringify(mod.evaluation),
-            unique_id: unique_id,
-            filename: filename
-          });
-          console.log("Loaded " + unique_id);
-          local_evaluation_id.set(evaluation.id);
-          this.$emit("got-files", [unique_id]);
-        }
+        console.log("Loaded " + unique_id);
+        this.$emit("got-files", [unique_id]);
       });
   }
 }

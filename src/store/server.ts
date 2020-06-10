@@ -9,7 +9,13 @@ import Store from "@/store/store";
 import { LocalStorageVal } from "@/utilities/helper_util";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { plainToClass } from "class-transformer";
-import { EvaluationFile, ProfileFile, FileID } from "@/store/report_intake";
+import InspecIntakeModule, {
+  EvaluationFile,
+  ProfileFile,
+  FileID,
+  next_free_file_ID
+} from "@/store/report_intake";
+import { Evaluation } from "@/types/models.ts";
 
 export interface LoginHash {
   username: string;
@@ -24,6 +30,11 @@ export interface TagHash {
   name: string;
   value: string;
 }
+export interface RetrieveHash {
+  unique_id: number;
+  eva: Evaluation;
+}
+
 /** The body of a registration Request */
 //"id":1,"first_name":null,"last_name":null,"email":"email@gmail.com","image":null,"phone_number":null,"createdAt":"2020-03-23T15:57:33.044Z","updatedAt":"2020-03-23T15:57:33.044Z"}
 export class UserProfile {
@@ -346,21 +357,34 @@ class HeimdallServerModule extends VuexModule {
 
   /** Attempts to retrieve an evaluations */
   @Action
-  async retrieve_evaluation(file_id: FileID): Promise<void> {
+  async retrieve_evaluation(eval_hash: RetrieveHash): Promise<void> {
     console.log(
-      "Getting " + this.connection!.url + "/executions/fetch/" + file_id
+      "Getting " +
+        this.connection!.url +
+        "/executions/fetch/" +
+        eval_hash.eva.id
     );
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
-      .get(this.connection!.url + "/executions/fetch/" + file_id, {
+      .get(this.connection!.url + "/executions/fetch/" + eval_hash.eva.id, {
         headers: {
           Authorization: `Bearer ${this.token}`
         }
       })
       .then((v: any) => {
-        //console.log("got evaluation: " + JSON.stringify(v.data));
-        this.set_evaluation(v.data);
-        this.set_tags(null);
+        console.log("got evaluation: " + JSON.stringify(v.data));
+        let intake_module = getModule(InspecIntakeModule, Store);
+        intake_module.loadText({
+          text: JSON.stringify(v.data),
+          unique_id: eval_hash.unique_id,
+          filename: eval_hash.eva.filename,
+          database_id: eval_hash.eva.id,
+          createdAt: eval_hash.eva.createdAt,
+          updatedAt: eval_hash.eva.updatedAt,
+          tags: eval_hash.eva.tags
+        });
+        //this.set_evaluation(v.data);
+        //this.set_tags(null);
       });
   }
 
