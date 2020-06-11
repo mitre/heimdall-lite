@@ -74,9 +74,7 @@
               <v-tabs fixed-tabs v-model="tab">
                 <v-tab key="compliance"> % Compliance </v-tab>
                 <v-tab key="severity"> Failed Tests by Severity </v-tab>
-                <v-tab v-if="files.length < 5" key="status">
-                  Status Data by File
-                </v-tab>
+                <v-tab key="status"> Status Data by File </v-tab>
               </v-tabs>
               <transition>
                 <keep-alive>
@@ -99,26 +97,29 @@
                       :y_title="'Tests Failed'"
                     ></ApexLineChart>
                   </v-col>
-                  <v-col v-else-if="files.length < 5" cols="12">
+                  <v-col v-else cols="12">
                     <v-row>
-                      <v-col
-                        :cols="statusCols"
-                        v-for="(file, i) in files"
-                        :key="i"
-                      >
-                        <v-card class="fill-height">
-                          <v-card-title class="justify-center">{{
-                            file.filename
-                          }}</v-card-title>
-                          <v-card-actions class="justify-center">
-                            <StatusChart
-                              :filter="{ fromFile: [file.unique_id] }"
-                              :value="null"
-                              :show_compliance="true"
-                            />
-                          </v-card-actions>
-                        </v-card>
-                      </v-col>
+                      <v-sheet class="mx-auto" elevation="8" max-width="100%">
+                        <v-slide-group :show-arrows="true">
+                          <v-slide-item v-for="(file, i) in files" :key="i">
+                            <v-card class="fill-height">
+                              <v-card-title class="justify-center">
+                                <div style="text-align:center;">
+                                  <i>{{ i + 1 }}</i> <br />
+                                  {{ file.filename }}
+                                </div>
+                              </v-card-title>
+                              <v-card-actions class="justify-center">
+                                <StatusChart
+                                  :filter="{ fromFile: [file.unique_id] }"
+                                  :value="null"
+                                  :show_compliance="true"
+                                />
+                              </v-card-actions>
+                            </v-card>
+                          </v-slide-item>
+                        </v-slide-group>
+                      </v-sheet>
                     </v-row>
                   </v-col>
                 </keep-alive>
@@ -145,6 +146,8 @@
               v-for="i in num_shown_files"
               :key="i - 1 + start_index"
               :name="files[i - 1 + start_index].filename"
+              :index="i + start_index"
+              :show_index="files.length > num_shown_files"
             />
             <v-col cols="1">
               <v-btn icon small>

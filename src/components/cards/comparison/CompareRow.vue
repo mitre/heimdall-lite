@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :watcher="file_num_watch">
     <v-row>
       <!-- Control ID -->
       <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
@@ -71,6 +71,8 @@ import { HDFControl } from "inspecjs";
 import { ControlDelta } from "@/utilities/delta_util";
 import DeltaView from "@/components/cards/comparison/DeltaView.vue";
 import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
+import FilteredDataModule from "../../../store/data_filters";
+import { getModule } from "vuex-module-decorators";
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -200,6 +202,12 @@ export default class CompareRow extends Props {
       }
     }
     return null;
+  }
+
+  get file_num_watch(): string {
+    let filter_module = getModule(FilteredDataModule, this.$store);
+    this.selection = filter_module.selected_file_ids.map(x => false);
+    return filter_module.selected_file_ids.length + "";
   }
   /** If more than one row selected */
 }
