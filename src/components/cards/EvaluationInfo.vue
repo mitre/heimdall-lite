@@ -127,10 +127,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     }
   }
 
-  //reset() {
-  //  (this.$refs.form as any).reset();
-  //}
-
   mounted() {
     console.log("mounted ID: " + this.filter + ", DBID: " + this.database_id);
     if (!this.database_id) {
@@ -144,9 +140,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
 
   watch() {
     console.log("Prop changed: " + this.filter);
-    //this.filter; (newVal: string, oldVal: string): void => { // watch it
-    //  console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-    //}
   }
 
   get filename() {
@@ -186,13 +179,11 @@ export default class EvaluationInfo extends EvaluationInfoProps {
         this.edit_tags = false;
       } else {
         this.database_id = eva.database_id || null;
-        //this.load_tags(this.database_id);
       }
     }
   }
 
   open_tag_edit() {
-    //(this.$refs.form as any).reset();
     this.show_tags = false;
     this.edit_tags = true;
   }
@@ -210,7 +201,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     console.log("submit " + this.tag_name + ": " + this.tag_value);
     const host = process.env.VUE_APP_API_URL!;
 
-    // Get server module
     let file_id: number | null = this.database_id;
     if (file_id && this.tag_name && this.tag_value) {
       let tag_hash: TagHash = {
@@ -219,7 +209,7 @@ export default class EvaluationInfo extends EvaluationInfoProps {
         value: this.tag_value
       };
       (this.$refs.form as any).reset();
-      //this.load_tags(file_id);
+      // Get server module
       let mod = getModule(ServerModule, this.$store);
       await mod
         .connect(host)
@@ -309,7 +299,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
 
       // Get server module
       let mod = getModule(ServerModule, this.$store);
-      //let eva = plainToClass(Evaluation, mod.evaluation);
       await mod
         .connect(host)
         .catch(bad => {

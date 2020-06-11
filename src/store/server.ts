@@ -383,8 +383,6 @@ class HeimdallServerModule extends VuexModule {
           updatedAt: eval_hash.eva.updatedAt,
           tags: eval_hash.eva.tags
         });
-        //this.set_evaluation(v.data);
-        //this.set_tags(null);
       });
   }
 
