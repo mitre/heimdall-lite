@@ -2,7 +2,6 @@
   <v-card>
     <v-row class="pa-4" justify="space-between">
       <v-col cols="5">
-        <b>ID: </b> {{ filter }}<br />
         <b>Filename:</b> {{ filename }}<br />
         <b>InSpec version:</b> {{ version }}<br />
         <b>Platform:</b> {{ platform_name }} {{ platform_release }}<br />
@@ -62,15 +61,11 @@ import FilteredDataModule, { Filter } from "../../store/data_filters";
 import { InspecFile, EvaluationFile } from "../../store/report_intake";
 import { context } from "inspecjs";
 import { plainToClass } from "class-transformer";
-import { LocalStorageVal } from "@/utilities/helper_util";
 import { Evaluation, Tag, Tags } from "@/types/models.ts";
 import VeeValidate from "vee-validate";
 import VuePassword from "vue-password";
 
 Vue.use(VeeValidate);
-
-const local_evaluation_id = new LocalStorageVal<number | null>("evaluation_id");
-const local_tags = new LocalStorageVal<string | null>("evaluation_tags");
 
 export interface TagIdsHash {
   id: number;
@@ -112,17 +107,23 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   updated() {
-    console.log("updated");
     let store = getModule(InspecDataModule, this.$store);
     let file = store.allFiles.find(f => f.unique_id === this.filter);
     if (file) {
       let eva = file as EvaluationFile;
       this.version = eva.execution.version;
-      console.log("updated this.version: " + this.version);
       this.platform_name = eva.execution.platform.name;
       this.platform_release = eva.execution.platform.release;
       this.duration = eva.execution.statistics.duration;
       this.database_id = eva.database_id || null;
+    }
+    console.log("updated ID: " + this.filter + ", DBID: " + this.database_id);
+    if (!this.database_id) {
+      this.show_tags = false;
+      this.edit_tags = false;
+      console.log("No Tags");
+    } else {
+      this.show_tags = true;
     }
   }
 
@@ -131,7 +132,14 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   //}
 
   mounted() {
-    console.log("mounted");
+    console.log("mounted ID: " + this.filter + ", DBID: " + this.database_id);
+    if (!this.database_id) {
+      this.show_tags = false;
+      this.edit_tags = false;
+      console.log("No Tags");
+    } else {
+      this.show_tags = true;
+    }
   }
 
   watch() {
@@ -171,11 +179,14 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       this.platform_name = eva.execution.platform.name;
       this.platform_release = eva.execution.platform.release;
       this.duration = eva.execution.statistics.duration;
+      this.tags = eva.tags || null;
       if (eva.database_id === null) {
         console.log("null file");
+        this.show_tags = false;
+        this.edit_tags = false;
       } else {
         this.database_id = eva.database_id || null;
-        this.load_tags(this.database_id);
+        //this.load_tags(this.database_id);
       }
     }
   }
