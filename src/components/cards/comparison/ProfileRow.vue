@@ -1,6 +1,6 @@
 <template>
-  <v-col cols="1">
-    <div style="text-align:center; left:10px;">
+  <v-col cols="4" xs="4" sm="3" md="2" lg="1" xl="1">
+    <div style="text-align:center;">
       {{ name }}
     </div>
   </v-col>

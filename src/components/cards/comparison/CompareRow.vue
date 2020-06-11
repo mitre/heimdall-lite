@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <!-- Control ID -->
-      <v-col cols="1" class="pt-0">
+      <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
           {{ hdf_controls[0].wraps.id }}
         </div>
@@ -10,20 +10,42 @@
 
       <!-- Various Statuses -->
       <v-col
-        cols="1"
-        v-for="(control, index) in hdf_controls"
+        cols="4"
+        xs="4"
+        sm="3"
+        md="2"
+        lg="1"
+        xl="1"
+        v-for="index in shown_files"
         filter
-        :key="index"
-        :value="index"
+        :key="index - 1"
+        :value="index - 1"
       >
         <v-btn
-          :color="`status${control.status.replace(' ', '')}`"
+          width="100%"
+          :color="
+            `status${hdf_controls[index - 1 + shift].status.replace(' ', '')}`
+          "
           centered
-          @click="view(index)"
-          :depressed="selection[index]"
-          :outlined="selection[index]"
+          @click="view(index - 1 + shift)"
+          :depressed="selection[index - 1 + shift]"
+          :outlined="selection[index - 1 + shift]"
         >
-          {{ control.status.replace(" ", "\n") }}
+          <template
+            v-if="hdf_controls[index - 1 + shift].status == 'Not Applicable'"
+          >
+            Not <br />
+            Applicable
+          </template>
+          <template
+            v-else-if="hdf_controls[index - 1 + shift].status == 'Not Reviewed'"
+          >
+            Not <br />
+            Reviewed
+          </template>
+          <template v-else>
+            {{ hdf_controls[index - 1 + shift].status }}
+          </template>
         </v-btn>
       </v-col>
 
@@ -53,7 +75,9 @@ import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    controls: Array // Of type Array<ContextualizedControl>
+    controls: Array, // Of type Array<ContextualizedControl>
+    shown_files: Number,
+    shift: Number
   }
 });
 

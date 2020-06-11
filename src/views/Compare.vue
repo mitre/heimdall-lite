@@ -1,5 +1,5 @@
 <template>
-  <BaseView>
+  <BaseView v-resize:debounce="on_resize">
     <!-- Topbar config - give it a search bar -->
     <template #topbar-content>
       <!-- Search field
@@ -43,8 +43,8 @@
               </h1>
             </div>
           </v-col>
-          <v-col cols="4"> </v-col>
-          <v-col cols="3">
+          <v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col>
+          <v-col cols="4" xs="4" sm="4" md="3" lg="3" xl="3">
             <v-checkbox
               color="blue"
               v-model="checkbox"
@@ -130,18 +130,41 @@
           <v-card-title>Test Evaluations</v-card-title>
           <hr />
           <v-row>
-            <v-col cols="1" />
+            <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
+              <v-btn icon small style="float: right;">
+                <v-icon
+                  v-if="files.length > num_shown_files"
+                  @click="scroll_left"
+                  :disabled="start_index == 0"
+                >
+                  mdi-arrow-left
+                </v-icon>
+              </v-btn>
+            </v-col>
             <ProfileRow
-              v-for="(file, i) in files"
-              :key="i"
-              :name="file.filename"
+              v-for="i in num_shown_files"
+              :key="i - 1 + start_index"
+              :name="files[i - 1 + start_index].filename"
             />
+            <v-col cols="1">
+              <v-btn icon small>
+                <v-icon
+                  v-if="files.length > num_shown_files"
+                  @click="scroll_right"
+                  :disabled="start_index >= files.length - num_shown_files"
+                >
+                  mdi-arrow-right
+                </v-icon>
+              </v-btn>
+            </v-col>
           </v-row>
           <CompareRow
             v-for="(control_set, i) in show_set"
             :controls="control_set"
+            :shown_files="num_shown_files"
             class="my-4"
             :key="i"
+            :shift="start_index"
           />
         </v-card>
       </v-container>
@@ -183,6 +206,8 @@ import { isFromProfileFile } from "@/store/data_store";
 import ApexLineChart, {
   SeriesItem
 } from "@/components/generic/ApexLineChart.vue";
+//@ts-ignore
+import resize from "vue-resize-directive";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -201,6 +226,9 @@ const Props = Vue.extend({
     StatusChart,
     DeltaView,
     ApexLineChart
+  },
+  directives: {
+    resize
   }
 })
 export default class Compare extends Props {
@@ -236,6 +264,8 @@ export default class Compare extends Props {
   dialog: boolean = false;
   checkbox: boolean = false;
   tab: number = 0;
+  width: number = window.innerWidth;
+  start_index: number = 0;
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
@@ -290,6 +320,9 @@ export default class Compare extends Props {
   }
 
   get statusCols(): number {
+    if (this.width < 600) {
+      return 12;
+    }
     return Math.floor(12 / this.files.length);
   }
 
@@ -312,7 +345,6 @@ export default class Compare extends Props {
       );
       return a_date.valueOf() - b_date.valueOf();
     });
-    console.log(fileArr);
     return fileArr;
   }
 
@@ -391,7 +423,6 @@ export default class Compare extends Props {
         .start_time;
       names.push(time);
     }
-    //console.log(typeof names[0]);
     return names;
   }
 
@@ -406,10 +437,50 @@ export default class Compare extends Props {
     return failed;
   }
 
+  get num_shown_files(): number {
+    if (this.width < 600) {
+      if (this.files.length > 2) {
+        return 2;
+      }
+      return this.files.length;
+    } else if (this.width < 960) {
+      if (this.files.length > 3) {
+        return 3;
+      }
+    } else if (this.width < 1264) {
+      if (this.files.length > 4) {
+        return 4;
+      }
+      return this.files.length;
+    } else if (this.files.length > 10) {
+      return 10;
+    }
+    return this.files.length;
+  }
+
   log_out() {
     getModule(ServerModule, this.$store).clear_token();
     this.dialog;
     this.$router.push("/");
+  }
+
+  on_resize(elt: any) {
+    if (this.start_index > this.files.length - this.num_shown_files) {
+      this.start_index = this.files.length - this.num_shown_files;
+    }
+    if (elt.clientWidth !== undefined && elt.clientWidth > 1) {
+      this.width = elt.clientWidth - 24;
+    }
+  }
+
+  scroll_left() {
+    this.start_index += -1;
+    console.log(this.start_index);
+  }
+
+  scroll_right() {
+    this.start_index += 1;
+    console.log(this.start_index);
   }
 }
 </script>
