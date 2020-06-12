@@ -174,7 +174,7 @@
     </template>
 
     <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="dialog = false" />
+    <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -481,6 +481,17 @@ export default class Compare extends Props {
   scroll_right() {
     this.start_index += 1;
     console.log(this.start_index);
+  }
+
+  on_got_files(ids: FileID[]) {
+    // Close the dialog
+    this.dialog = false;
+
+    //enable all uploaded files
+    let filter_module = getModule(FilteredDataModule, this.$store);
+    for (let i of ids) {
+      filter_module.set_toggle_file_on(i);
+    }
   }
 }
 </script>
