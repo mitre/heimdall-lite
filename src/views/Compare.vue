@@ -195,7 +195,6 @@ import {
   ControlDelta,
   ControlSeries
 } from "../utilities/delta_util";
-import DeltaView from "@/components/cards/comparison/DeltaView.vue";
 import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import ApexPieChart, { Category } from "@/components/generic/ApexPieChart.vue";
@@ -224,10 +223,8 @@ const Props = Vue.extend({
     Modal,
     UploadNexus,
     CompareRow,
-    ApexPieChart,
     ProfileRow,
     StatusChart,
-    DeltaView,
     ApexLineChart
   },
   directives: {

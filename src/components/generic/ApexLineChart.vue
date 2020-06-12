@@ -23,8 +23,8 @@ const ApexLineChartProps = Vue.extend({
   props: {
     categories: Array, // Should be of type string[]
     series: Array, // Should be of type object[]
-    upper_range: Number,
-    sev_chart: Boolean,
+    upper_range: Number, //upper bound of y axis
+    sev_chart: Boolean, //identifies chart as severity chart
     title: String,
     y_title: String
   }

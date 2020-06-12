@@ -183,10 +183,6 @@ export default class CompareRow extends Props {
     return selected;
   }
 
-  get profile_watch(): String {
-    return "do nothing";
-  }
-
   color(status: String) {
     if (status == "Passed") {
       return "green";
