@@ -58,7 +58,7 @@
               <v-tabs fixed-tabs v-model="tab">
                 <v-tab key="compliance"> % Compliance </v-tab>
                 <v-tab key="severity"> Failed Tests by Severity </v-tab>
-                <v-tab key="status"> Status Data by File </v-tab>
+                <v-tab key="status"> Status by Results File </v-tab>
               </v-tabs>
               <transition>
                 <keep-alive>
