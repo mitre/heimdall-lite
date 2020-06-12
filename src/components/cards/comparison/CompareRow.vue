@@ -48,7 +48,6 @@
             {{ hdf_controls[index - 1 + shift].status }}
           </template>
         </v-btn>
-        <p v-else style="text-align: center;"><strong>No Data</strong></p>
       </v-col>
 
       <!-- Depending on selection, more details -->

@@ -48,7 +48,7 @@
             <v-checkbox
               color="blue"
               v-model="checkbox"
-              :label="'Only Changed Tests'"
+              :label="'Display Only Changed Results'"
             ></v-checkbox>
           </v-col>
         </v-row>
@@ -56,32 +56,13 @@
           <v-col cols="12">
             <v-card class="fill-height">
               <v-tabs fixed-tabs v-model="tab">
+                <v-tab key="status"> Status by Results File </v-tab>
                 <v-tab key="compliance"> % Compliance </v-tab>
                 <v-tab key="severity"> Failed Tests by Severity </v-tab>
-                <v-tab key="status"> Status by Results File </v-tab>
               </v-tabs>
               <transition>
                 <keep-alive>
                   <v-col v-if="tab == 0" cols="12">
-                    <ApexLineChart
-                      :series="compliance_series"
-                      :categories="fileTimes"
-                      :upper_range="100"
-                      :title="'Total Compliance'"
-                      :y_title="'% Compliance'"
-                    ></ApexLineChart>
-                  </v-col>
-                  <v-col v-else-if="tab == 1" cols="12">
-                    <ApexLineChart
-                      :series="line_sev_series"
-                      :categories="fileTimes"
-                      :upper_range="total_failed + 1"
-                      :sev_chart="true"
-                      :title="'Failed Tests by Severity'"
-                      :y_title="'Tests Failed'"
-                    ></ApexLineChart>
-                  </v-col>
-                  <v-col v-else cols="12">
                     <v-row>
                       <v-sheet class="mx-auto" elevation="8" max-width="100%">
                         <v-slide-group :show-arrows="true">
@@ -106,13 +87,32 @@
                       </v-sheet>
                     </v-row>
                   </v-col>
+                  <v-col v-else-if="tab == 1" cols="12">
+                    <ApexLineChart
+                      :series="compliance_series"
+                      :categories="fileTimes"
+                      :upper_range="100"
+                      :title="'Total Compliance'"
+                      :y_title="'% Compliance'"
+                    ></ApexLineChart>
+                  </v-col>
+                  <v-col v-else cols="12">
+                    <ApexLineChart
+                      :series="line_sev_series"
+                      :categories="fileTimes"
+                      :upper_range="total_failed + 1"
+                      :sev_chart="true"
+                      :title="'Failed Tests by Severity'"
+                      :y_title="'Tests Failed'"
+                    ></ApexLineChart>
+                  </v-col>
                 </keep-alive>
               </transition>
             </v-card>
           </v-col>
         </v-row>
         <v-card>
-          <v-card-title>Test Evaluations</v-card-title>
+          <v-card-title>Test Results</v-card-title>
           <hr />
           <v-row>
             <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
@@ -250,12 +250,6 @@ export default class Compare extends Props {
   tab: number = 0;
   width: number = window.innerWidth;
   start_index: number = 0;
-
-  mounted() {
-    if (this.files.length == 1) {
-      this.tab = 2;
-    }
-  }
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
