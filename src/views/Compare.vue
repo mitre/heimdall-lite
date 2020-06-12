@@ -52,23 +52,7 @@
             ></v-checkbox>
           </v-col>
         </v-row>
-        <v-row justify="space-around" v-if="files.length < 3">
-          <v-col :cols="statusCols" v-for="(file, i) in files" :key="i">
-            <v-card class="fill-height">
-              <v-card-title class="justify-center">{{
-                file.filename
-              }}</v-card-title>
-              <v-card-actions class="justify-center">
-                <StatusChart
-                  :filter="{ fromFile: [file.unique_id] }"
-                  :value="null"
-                  :show_compliance="true"
-                />
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row v-else>
+        <v-row>
           <v-col cols="12">
             <v-card class="fill-height">
               <v-tabs fixed-tabs v-model="tab">
@@ -266,6 +250,12 @@ export default class Compare extends Props {
   tab: number = 0;
   width: number = window.innerWidth;
   start_index: number = 0;
+
+  mounted() {
+    if (this.files.length == 1) {
+      this.tab = 2;
+    }
+  }
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
