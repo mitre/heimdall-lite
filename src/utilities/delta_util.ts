@@ -11,6 +11,10 @@ import {
   Change as DiffChange,
   diffJson
 } from "diff";
+import { exec } from "child_process";
+import { EvaluationFile } from "@/store/report_intake";
+import { getModule } from "vuex-module-decorators";
+import { ContextualizedEvaluation } from "inspecjs/dist/context";
 
 /**
  * Represents a change in a property.
@@ -224,6 +228,44 @@ export class ControlDelta {
   }
 }
 
+export function get_eval_start_time(
+  ev: ContextualizedEvaluation
+): string | null {
+  for (let prof of ev.contains) {
+    for (let ctrl of prof.contains) {
+      if (ctrl.hdf.segments!.length) {
+        let t = ctrl.hdf.segments![0].start_time;
+        return t;
+      }
+    }
+  }
+  return null;
+}
+
+export function sorted_evals(
+  input_evals: Readonly<context.ContextualizedEvaluation[]>
+): Readonly<context.ContextualizedEvaluation[]> {
+  let evals = [...input_evals];
+  evals = evals.sort((a, b) => {
+    let a_date = new Date(get_eval_start_time(a) || 0);
+    let b_date = new Date(get_eval_start_time(b) || 0);
+    return a_date.valueOf() - b_date.valueOf();
+  });
+  return evals;
+}
+
+export function sorted_eval_files(
+  files: Readonly<EvaluationFile[]>
+): Readonly<EvaluationFile[]> {
+  let fileArr = [...files];
+  fileArr = fileArr.sort((a, b) => {
+    let a_date = new Date(get_eval_start_time(a.evaluation) || 0);
+    let b_date = new Date(get_eval_start_time(b.evaluation) || 0);
+    return a_date.valueOf() - b_date.valueOf();
+  });
+  return fileArr;
+}
+
 /**
  * Grabs the "top" (IE non-overlayed/end of overlay chain) controls from the execution.
  *
@@ -240,7 +282,7 @@ function extract_top_level_controls(
   return top;
 }
 /** An array of contextualized controls with the same ID, sorted by time */
-export type ControlSeries = context.ContextualizedControl[];
+export type ControlSeries = Array<context.ContextualizedControl | null>;
 
 /** Matches ControlID keys to Arrays of Controls, sorted by time */
 export type ControlSeriesLookup = { [key: string]: ControlSeries };
@@ -256,34 +298,34 @@ export class ComparisonContext {
 
     // Organize them by ID
     let matched: ControlSeriesLookup = {};
-    all_controls.forEach(ctrl => {
+    for (let ctrl of all_controls) {
       let id = ctrl.data.id;
-
-      // Group them up
-      if (id in matched) {
-        matched[id].push(ctrl);
-      } else {
-        matched[id] = [ctrl];
+      if (!(id in matched)) {
+        matched[id] = [];
       }
-
-      // Sort them by start time
-      Object.values(matched).forEach(ctrl_list =>
-        ctrl_list.sort(
-          (
-            a: context.ContextualizedControl,
-            b: context.ContextualizedControl
-          ) => {
-            // TODO: Move this to a more stable, external library based solution
-            // TODO: Create a method for getting the start time of an execution, and instead do this sort on executions at the start
-            // Convert to dates, and
-            let a_date = new Date(a.root.hdf.start_time || 0);
-            let b_date = new Date(b.root.hdf.start_time || 0);
-            return a_date.valueOf() - b_date.valueOf();
+    }
+    let sorted_eval: Readonly<context.ContextualizedEvaluation[]> = sorted_evals(
+      executions
+    );
+    for (let ev of sorted_eval) {
+      let ev_controls_by_id: {
+        [k: string]: context.ContextualizedControl;
+      } = {};
+      for (let prof of ev.contains) {
+        for (let ctrl of prof.contains) {
+          if (ctrl.root == ctrl) {
+            ev_controls_by_id[ctrl.data.id] = ctrl;
           }
-        )
-      );
-    });
-
+        }
+      }
+      for (let id of Object.keys(matched)) {
+        if (id in ev_controls_by_id) {
+          matched[id].push(ev_controls_by_id[id]);
+        } else {
+          matched[id].push(null);
+        }
+      }
+    }
     // Store
     this.pairings = matched;
   }

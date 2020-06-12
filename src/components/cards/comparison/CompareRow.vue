@@ -4,7 +4,7 @@
       <!-- Control ID -->
       <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
-          {{ hdf_controls[0].wraps.id }}
+          {{ control_id }}
         </div>
       </v-col>
 
@@ -22,6 +22,7 @@
         :value="index - 1"
       >
         <v-btn
+          v-if="hdf_controls[index - 1 + shift] != null"
           width="100%"
           :color="
             `status${hdf_controls[index - 1 + shift].status.replace(' ', '')}`
@@ -47,6 +48,7 @@
             {{ hdf_controls[index - 1 + shift].status }}
           </template>
         </v-btn>
+        <p v-else style="text-align: center;"><strong>No Data</strong></p>
       </v-col>
 
       <!-- Depending on selection, more details -->
@@ -109,6 +111,15 @@ export default class CompareRow extends Props {
     }
   }
 
+  get control_id(): string {
+    for (let ctrl of this.hdf_controls) {
+      if (ctrl != null) {
+        return ctrl.wraps.id;
+      }
+    }
+    return "Error";
+  }
+
   /** Provides actual data about which controls we have selected */
   get selected_controls(): context.ContextualizedControl[] {
     // Multiple selected
@@ -128,8 +139,13 @@ export default class CompareRow extends Props {
   }
 
   /** Just maps controls to hdf. Makes our template a bit less verbose */
-  get hdf_controls(): HDFControl[] {
-    return this._controls.map(c => c.root.hdf);
+  get hdf_controls(): Array<HDFControl | null> {
+    return this._controls.map(c => {
+      if (c == null) {
+        return null;
+      }
+      return c.root.hdf;
+    });
   }
 
   /** If exactly two controls selected, provides a delta. Elsewise gives null */

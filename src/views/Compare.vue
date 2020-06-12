@@ -273,12 +273,18 @@ export default class Compare extends Props {
 
   /** Yields the control pairings that have changed*/
   get delta_sets(): ControlSeries[] {
+    function get_status_safe(ctrl: null | context.ContextualizedControl) {
+      if (ctrl == null) {
+        return "No Data";
+      }
+      return ctrl.hdf.status;
+    }
     return this.control_sets.filter(series => {
       // Get the first status. If no change, all should equal this
-      let first = series[0].hdf.status;
+      let first = get_status_safe(series[0]);
       for (let i = 1; i < series.length; i++) {
         // Check if the status has changed. If so, keep
-        if (series[i].hdf.status !== first) {
+        if (get_status_safe(series[i]) !== first) {
           return true;
         }
       }
@@ -420,11 +426,16 @@ export default class Compare extends Props {
     if (this.files.length < 1) {
       return 0;
     }
-    let file = this.files[0];
-    let filter = { fromFile: [file.unique_id] };
+    let highest_failed = 0;
     let counts = getModule(StatusCountModule, this.$store);
-    let failed = counts.failed(filter);
-    return failed;
+    for (let file of this.files) {
+      let filter = { fromFile: [file.unique_id] };
+      let failed = counts.failed(filter);
+      if (failed > highest_failed) {
+        highest_failed = failed;
+      }
+    }
+    return highest_failed;
   }
 
   get num_shown_files(): number {
