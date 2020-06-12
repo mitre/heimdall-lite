@@ -39,7 +39,7 @@
           <v-col cols="5">
             <div style="position:relative; top:14px;">
               <h1>
-                Evaluation Comparisons
+                Results Comparisons
               </h1>
             </div>
           </v-col>
