@@ -120,16 +120,36 @@
           <hr />
           <v-row>
             <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
-              <div style="text-align: center;"><strong>Test ID</strong></div>
-              <v-btn icon small style="float: right;">
-                <v-icon
-                  v-if="files.length > num_shown_files"
-                  @click="scroll_left"
-                  :disabled="start_index == 0"
-                >
-                  mdi-arrow-left
-                </v-icon>
-              </v-btn>
+              <br />
+              <v-row>
+                <v-col cols="8">
+                  <div style="text-align: right;">
+                    <v-btn
+                      icon
+                      small
+                      style="float: left; padding-bottom: 8px; padding-left: 7px;"
+                      @click="changeSort"
+                    >
+                      <v-icon v-if="ascending"
+                        >mdi-sort-alphabetical-ascending</v-icon
+                      >
+                      <v-icon v-else>mdi-sort-alphabetical-descending</v-icon>
+                    </v-btn>
+                    <strong>Test ID</strong>
+                  </div>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn icon small style="float: right;">
+                    <v-icon
+                      v-if="files.length > num_shown_files"
+                      @click="scroll_left"
+                      :disabled="start_index == 0"
+                    >
+                      mdi-arrow-left
+                    </v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-col>
             <ProfileRow
               v-for="i in num_shown_files"
@@ -140,20 +160,24 @@
               :show_index="files.length > num_shown_files"
             />
             <v-col cols="1">
-              <p></p>
-              <v-btn icon small>
-                <v-icon
-                  v-if="files.length > num_shown_files"
-                  @click="scroll_right"
-                  :disabled="start_index >= files.length - num_shown_files"
-                >
-                  mdi-arrow-right
-                </v-icon>
-              </v-btn>
+              <br />
+              <v-row>
+                <v-col cols="12">
+                  <v-btn icon small>
+                    <v-icon
+                      v-if="files.length > num_shown_files"
+                      @click="scroll_right"
+                      :disabled="start_index >= files.length - num_shown_files"
+                    >
+                      mdi-arrow-right
+                    </v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
           <CompareRow
-            v-for="(control_set, i) in show_set"
+            v-for="(control_set, i) in show_sets"
             :controls="control_set"
             :shown_files="num_shown_files"
             class="my-4"
@@ -257,6 +281,7 @@ export default class Compare extends Props {
   tab: number = 0;
   width: number = window.innerWidth;
   start_index: number = 0;
+  ascending: boolean = true;
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
@@ -309,11 +334,30 @@ export default class Compare extends Props {
     return false;
   }
 
-  get show_set(): ControlSeries[] {
+  get show_sets(): ControlSeries[] {
+    let sorted = [];
     if (this.checkbox) {
-      return this.delta_sets;
+      if (this.ascending) {
+        return this.delta_sets;
+      }
+      sorted = [...this.delta_sets];
+      sorted.reverse();
+      return sorted;
     }
-    return this.control_sets;
+    if (this.ascending) {
+      return this.control_sets;
+    }
+    sorted = [...this.control_sets];
+    sorted.reverse();
+    return sorted;
+  }
+
+  changeSort(): void {
+    this.ascending = !this.ascending;
+  }
+
+  get control_sort(): boolean {
+    return this.ascending;
   }
 
   get statusCols(): number {
