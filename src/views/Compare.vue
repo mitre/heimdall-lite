@@ -36,20 +36,12 @@
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
         <v-row>
-          <v-col cols="5">
+          <v-col cols="12">
             <div style="position:relative; top:14px;">
               <h1>
                 Results Comparisons
               </h1>
             </div>
-          </v-col>
-          <v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col>
-          <v-col cols="4" xs="4" sm="4" md="3" lg="3" xl="3">
-            <v-checkbox
-              color="blue"
-              v-model="checkbox"
-              :label="'Display Only Changed Results'"
-            ></v-checkbox>
           </v-col>
         </v-row>
         <v-row>
@@ -112,7 +104,19 @@
           </v-col>
         </v-row>
         <v-card>
-          <v-card-title>Test Results</v-card-title>
+          <v-row>
+            <v-col cols="5">
+              <v-card-title>Test Results</v-card-title>
+            </v-col>
+            <v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col>
+            <v-col cols="4" xs="4" sm="4" md="3" lg="3" xl="3">
+              <v-checkbox
+                color="blue"
+                v-model="checkbox"
+                :label="'Display Only Changed Results'"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
           <hr />
           <v-row>
             <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
