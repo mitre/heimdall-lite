@@ -135,7 +135,7 @@
               v-for="i in num_shown_files"
               :key="i - 1 + start_index"
               :name="files[i - 1 + start_index].filename"
-              :start_time="fileTimes[i]"
+              :start_time="fileTimes[i - 1]"
               :index="i + start_index"
               :show_index="files.length > num_shown_files"
             />
