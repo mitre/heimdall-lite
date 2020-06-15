@@ -116,6 +116,7 @@
           <hr />
           <v-row>
             <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
+              <div style="text-align: center;"><strong>Test ID</strong></div>
               <v-btn icon small style="float: right;">
                 <v-icon
                   v-if="files.length > num_shown_files"
@@ -130,10 +131,12 @@
               v-for="i in num_shown_files"
               :key="i - 1 + start_index"
               :name="files[i - 1 + start_index].filename"
+              :start_time="fileTimes[i]"
               :index="i + start_index"
               :show_index="files.length > num_shown_files"
             />
             <v-col cols="1">
+              <p></p>
               <v-btn icon small>
                 <v-icon
                   v-if="files.length > num_shown_files"
