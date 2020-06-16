@@ -103,10 +103,10 @@
         </v-row>
         <v-card>
           <v-row>
-            <v-col cols="5">
+            <v-col cols="2">
               <v-card-title>Test Results</v-card-title>
             </v-col>
-            <v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col>
+            <!--v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col-->
             <v-col cols="4" xs="4" sm="4" md="3" lg="3" xl="3">
               <v-checkbox
                 color="blue"
@@ -275,7 +275,7 @@ export default class Compare extends Props {
 
   /** Whether or not the model is showing */
   dialog: boolean = false;
-  checkbox: boolean = false;
+  checkbox: boolean = true;
   tab: number = 0;
   width: number = window.innerWidth;
   start_index: number = 0;
