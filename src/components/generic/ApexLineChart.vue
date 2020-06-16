@@ -1,5 +1,5 @@
 <template>
-  <div class="line-chart">
+  <div style="color: black;">
     <vue-apex-charts
       type="line"
       height="350"
@@ -148,6 +148,7 @@ export default class ApexLineChart extends ApexLineChartProps {
         zoom: {
           enabled: false
         }
+        //background: '#000'
       },
       colors: this.line_colors,
       dataLabels: {
@@ -166,6 +167,10 @@ export default class ApexLineChart extends ApexLineChartProps {
           color: this.white_black
         }
       },
+      //tooltip: {
+      //  custom: function({series, seriesIndex, dataPointIndex, w}) {
+      //    return '<div style="color: black;">'+ w.globals.labels + ":" + series[seriesIndex][dataPointIndex] + '</div>';}
+      //},
       legend: {
         //tooltipHoverFormatter: function(val, opts) {
         //  return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
@@ -214,14 +219,3 @@ export default class ApexLineChart extends ApexLineChartProps {
   }
 }
 </script>
-
-<style scoped>
-.line-chart {
-  color: "#000000";
-  font-size: 40px;
-}
-
-svg {
-  fill: currentColor;
-}
-</style>

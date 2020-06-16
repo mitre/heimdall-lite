@@ -2,7 +2,6 @@
   <BaseView v-resize:debounce="on_resize">
     <!-- Topbar config - give it a search bar -->
     <template #topbar-content>
-      <!-- Search field
       <v-text-field
         flat
         solo
@@ -13,7 +12,6 @@
         v-model="search_term"
         clearable
       ></v-text-field>
-      -->
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
         <span class="d-none d-md-inline pr-2">
           Upload
@@ -282,6 +280,7 @@ export default class Compare extends Props {
   width: number = window.innerWidth;
   start_index: number = 0;
   ascending: boolean = true;
+  search_term: string = "";
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
