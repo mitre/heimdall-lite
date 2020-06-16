@@ -304,7 +304,7 @@ export default class Compare extends Props {
       }
       return ctrl.hdf.status;
     }
-    return this.control_sets.filter(series => {
+    return this.searched_sets.filter(series => {
       // Get the first status. If no change, all should equal this
       let first = get_status_safe(series[0]);
       for (let i = 1; i < series.length; i++) {
@@ -315,6 +315,43 @@ export default class Compare extends Props {
       }
       return false;
     });
+  }
+
+  get searched_sets(): ControlSeries[] {
+    if (this.search_term == "") {
+      return this.control_sets;
+    }
+    function contains_term(
+      context_control: context.ContextualizedControl,
+      term: string
+    ): boolean {
+      let as_hdf = context_control.root.hdf;
+      // Get our (non-null) searchable data
+      let searchables: string[] = [
+        as_hdf.wraps.id,
+        as_hdf.wraps.title,
+        as_hdf.wraps.code,
+        as_hdf.severity,
+        as_hdf.status,
+        as_hdf.finding_details
+      ].filter(s => s !== null) as string[];
+
+      // See if any contain term
+      return searchables.some(s => s.toLowerCase().includes(term));
+    }
+    let term = this.search_term.toLowerCase();
+    let searched: ControlSeries[] = [];
+    for (let series of this.control_sets) {
+      for (let ctrl of series) {
+        if (searched.includes(series)) {
+          break;
+        } else if (contains_term(ctrl!, this.search_term)) {
+          searched.push(series);
+        }
+      }
+    }
+    //controls = controls.filter(c => contains_term(c, term));
+    return searched;
   }
 
   get profile_diff(): boolean {
@@ -344,9 +381,9 @@ export default class Compare extends Props {
       return sorted;
     }
     if (this.ascending) {
-      return this.control_sets;
+      return this.searched_sets;
     }
-    sorted = [...this.control_sets];
+    sorted = [...this.searched_sets];
     sorted.reverse();
     return sorted;
   }
