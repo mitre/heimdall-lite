@@ -12,5 +12,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Docker ps test
       run: docker ps -a
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Run test
+      run: npm run test:integration
