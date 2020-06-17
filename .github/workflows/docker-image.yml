@@ -4,6 +4,9 @@ on: [push]
 
 
 jobs:
+  container:
+    runs-on: ubuntu-latest
+    container: mitre/heimdall
 
   build:
 
