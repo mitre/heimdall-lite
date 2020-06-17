@@ -5,6 +5,11 @@
       {{ name }} <br />
       <p style="font-size: 12px;">{{ start_time }}</p>
     </div>
+    <!--v-btn small icon>
+        <v-icon style="padding-top:50px;">
+          mdi-unfold-more-horizontal
+        </v-icon>
+      </v-btn-->
   </v-col>
 </template>
 

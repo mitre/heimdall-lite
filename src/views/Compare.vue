@@ -1,5 +1,5 @@
 <template>
-  <BaseView v-resize:debounce="on_resize">
+  <BaseView v-resize="on_resize">
     <!-- Topbar config - give it a search bar -->
     <template #topbar-content>
       <v-text-field
@@ -44,7 +44,7 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-card class="fill-height">
+            <v-card :flat="true" class="fill-height">
               <v-tabs fixed-tabs v-model="tab">
                 <v-tab key="status"> Status by Results File </v-tab>
                 <v-tab key="compliance"> % Compliance </v-tab>
@@ -61,7 +61,8 @@
                               <v-card-title class="justify-center">
                                 <div style="text-align:center;">
                                   <i>{{ i + 1 }}</i> <br />
-                                  {{ file.filename }}
+                                  {{ file.filename }} <br />
+                                  {{ fileTimes[i] }}
                                 </div>
                               </v-card-title>
                               <v-card-actions class="justify-center">
@@ -103,11 +104,11 @@
         </v-row>
         <v-card>
           <v-row>
-            <v-col cols="2">
+            <v-col cols="4" xs="4" sm="3" md="2" lg="2" xl="2">
               <v-card-title>Test Results</v-card-title>
             </v-col>
             <!--v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col-->
-            <v-col cols="4" xs="4" sm="4" md="3" lg="3" xl="3">
+            <v-col cols="8" xs="8" sm="9" md="10" lg="10" xl="10">
               <v-checkbox
                 color="blue"
                 v-model="checkbox"
