@@ -4,18 +4,13 @@ on: [push]
 
 
 jobs:
-  container:
-    runs-on: ubuntu-latest
-    container: mitre/heimdall
-    steps:
-     - run: |
-          sleep 100
-       name: Run on VM
   build:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+    - name: Docker ps test
+      run: docker ps -a
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
