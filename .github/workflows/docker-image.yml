@@ -12,5 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Docker ps test
       run: docker ps -a
+    - name: npm install
+      run: npm install
     - name: Run test
       run: npm run test:integration
