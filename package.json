@@ -25,7 +25,7 @@
     "prepack": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "jest", 
-    "test:integration": "jest -c jest.config.integration.js"
+    "test:integration": "jest -c jest.config.integration.js --runInBand"
   },
   "dependencies": {
     "@types/chroma-js": "^1.4.3",

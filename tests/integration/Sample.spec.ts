@@ -17,28 +17,32 @@ describe("Google", () => {
     await page.waitForNavigation();
   });
 
-  it("Click Samples Tab", async () => {
-    await expect(page).toClick("a", { text: "Samples" });
+  it("Click Sample Files Tab", async () => {
+    //await expect(page).toClick("a", { text: "Samples" });
+    page.click("#sample_tab");
+    await page.waitForNavigation();
     //await expect(true).toBe(true)
   });
-  it("Click Sample", async () => {
-    await expect(page).toClick("button", { text: "TEST" });
+
+  it("Click Sample File", async () => {
+    await expect(page).toClick("#sample_button", { text: "" });
+    //await page.click('#sample')
     await page.waitForNavigation();
   });
 
-  it("Click Sample", async () => {
+  it("Click Upload Again", async () => {
     await expect(page).toClick("button", { text: "Upload" });
-    // await page.waitForNavigation();
   });
 
-  it("Click Local Files", async () => {
-    await expect(page).toClick("a", { text: "Local Files" });
-    await expect(page).toClick("a", { text: "Local Files" });
-
+  it("Click Another Sample ", async () => {
+    await expect(page).toClick("#sample_button", { text: "" });
+    //await page.click('#sample')
     await page.waitForNavigation();
   });
-  it("Click Local Files", async () => {
-    await expect(page).toClick("button", { text: "Upload" });
-    await page.waitForNavigation();
+
+  it("Logout", async () => {
+    await expect(page).toClick("button", { text: "Logout" });
+    //await page.click('#sample')
+    //await page.waitForNavigation();
   });
 });

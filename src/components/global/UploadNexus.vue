@@ -29,7 +29,7 @@
         <v-tab href="#uploadtab-splunk">Splunk</v-tab>
         <v-spacer />
         <v-divider />
-        <v-tab href="#uploadtab-samples">Samples</v-tab>
+        <v-tab id="sample_tab" href="#uploadtab-samples">Samples</v-tab>
 
         <!-- Include those components -->
         <v-tab-item value="uploadtab-local">
