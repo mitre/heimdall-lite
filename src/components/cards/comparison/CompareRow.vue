@@ -2,7 +2,7 @@
   <div :watcher="file_num_watch">
     <v-row>
       <!-- Control ID -->
-      <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
+      <v-col cols="3" xs="3" sm="2" md="2" lg="2" xl="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
           {{ control_id }}
         </div>
@@ -14,7 +14,7 @@
         xs="4"
         sm="3"
         md="2"
-        lg="1"
+        lg="2"
         xl="1"
         v-for="index in shown_files"
         filter
