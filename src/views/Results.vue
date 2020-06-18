@@ -34,7 +34,7 @@
           mdi-filter-remove
         </v-icon>
       </v-btn>
-      <v-btn @click="log_out" class="mx-2">
+      <v-btn v-if="is_server_mode" @click="log_out" class="mx-2">
         <span class="d-none d-md-inline pr-2">
           Logout
         </span>
@@ -54,12 +54,19 @@
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
+        <!-- Evaluation Info -->
+        <v-row>
+          <v-col xs-12>
+            <v-card elevation="2">
+              <EvaluationInfo :filter="file_filter" />
+            </v-card>
+          </v-col>
+        </v-row>
         <!-- Count Cards -->
         <StatusCardRow
           :filter="all_filter"
           @show-errors="status_filter = 'Profile Error'"
         />
-
         <!-- Compliance Cards -->
         <v-row justify="space-around">
           <v-col xs="4">
@@ -178,6 +185,7 @@ import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 import ExportNist from "@/components/global/ExportNist.vue";
 import ExportJson from "@/components/global/ExportJson.vue";
+import EvaluationInfo from "@/components/cards/EvaluationInfo.vue";
 
 import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
 import { ControlStatus, Severity } from "inspecjs";
@@ -206,7 +214,8 @@ const ResultsProps = Vue.extend({
     ProfileData,
     ExportCaat,
     ExportNist,
-    ExportJson
+    ExportJson,
+    EvaluationInfo
   }
 })
 export default class Results extends ResultsProps {
@@ -239,6 +248,17 @@ export default class Results extends ResultsProps {
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
 
+  /* This is supposed to cause the dialog to automatically appear if there is
+   * no file uploaded
+   */
+  /*mounted() {
+    if (this.file_filter) this.dialog = false;
+  }*/
+
+  get is_server_mode(): boolean | null {
+    let mod = getModule(ServerModule, this.$store);
+    return mod.serverMode;
+  }
   /**
    * The currently selected file, if one exists.
    * Controlled by router.

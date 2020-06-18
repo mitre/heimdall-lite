@@ -7,6 +7,7 @@ import { Module, VuexModule, getModule, Action } from "vuex-module-decorators";
 import DataModule from "@/store/data_store";
 import Store from "@/store/store";
 import { read_file_async } from "@/utilities/async_util";
+import { Evaluation, Tag } from "@/types/models.ts";
 
 /** Each FileID corresponds to a unique File in this store */
 export type FileID = number;
@@ -23,6 +24,13 @@ export type InspecFile = {
   unique_id: FileID;
   /** The filename that this file was uploaded under. */
   filename: string;
+
+  database_id?: number;
+
+  tags?: Tag[];
+
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 /** Modify our contextual types to sort of have back-linking to sourced from files */
@@ -60,6 +68,13 @@ export type TextLoadOptions = {
 
   /** The unique id to grant it */
   unique_id: FileID;
+
+  database_id?: number;
+
+  createdAt?: Date;
+  updatedAt?: Date;
+
+  tags?: Tag[];
 
   /** The text to use for it. */
   text: string;
@@ -119,7 +134,11 @@ class InspecIntakeModule extends VuexModule {
       // A bit of chicken and egg here
       let eval_file = {
         unique_id: options.unique_id,
-        filename: options.filename
+        filename: options.filename,
+        database_id: options.database_id,
+        createdAt: options.createdAt,
+        updatedAt: options.updatedAt,
+        tags: options.tags,
         // evaluation
       } as EvaluationFile;
 
