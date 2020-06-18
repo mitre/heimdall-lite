@@ -42,19 +42,27 @@
             </div>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-tabs fixed-tabs right v-model="tab">
-              <v-tab key="status"> Status by Results File </v-tab>
-              <v-tab key="compliance"> % Compliance </v-tab>
-              <v-tab key="severity"> Failed Tests by Severity </v-tab>
-              <v-tab key="collapse"
+        <!--v-expansion-panels readonly v-model="expansion">
+        <v-expansion-panel class="my-2">
+        <v-expansion-panel-header-->
+        <v-tabs fixed-tabs v-model="tab" show-arrows>
+          <v-tab key="status" @click="changeTab(0)">
+            Status by Results File
+          </v-tab>
+          <v-tab key="compliance" @click="changeTab(1)"> % Compliance </v-tab>
+          <v-tab key="severity" @click="changeTab(2)">
+            Failed Tests by Severity
+          </v-tab>
+          <!--v-tab key="collapse"
                 ><v-btn small icon @click="collapse"
                   ><v-icon v-if="!ableTab"> mdi-chevron-left </v-icon>
                   <v-icon v-else> mdi-chevron-down </v-icon></v-btn
                 ></v-tab
-              >
-            </v-tabs>
+              --> </v-tabs
+        ><!--/v-expansion-panel-header-->
+        <!--v-expansion-panel-content-->
+        <v-row>
+          <v-col cols="12">
             <transition>
               <keep-alive>
                 <v-col v-if="tab == 0 && ableTab" cols="12">
@@ -107,6 +115,10 @@
             </transition>
           </v-col>
         </v-row>
+        <!--/v-expansion-panel-content>
+        </v-expansion-panel>
+        </v-expansion-panels-->
+
         <v-card>
           <v-row>
             <v-col cols="4" xs="4" sm="3" md="2" lg="2" xl="2">
@@ -290,6 +302,7 @@ export default class Compare extends Props {
   ascending: boolean = true;
   search_term: string = "";
   ableTab: boolean = true;
+  expansion: number = 0;
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
@@ -535,16 +548,19 @@ export default class Compare extends Props {
   }
 
   get num_shown_files(): number {
-    if (this.width < 600) {
+    if (this.$vuetify.breakpoint.name == "xs") {
       if (this.files.length > 2) {
         return 2;
       }
       return this.files.length;
-    } else if (this.width < 960) {
+    } else if (this.$vuetify.breakpoint.name == "sm") {
       if (this.files.length > 3) {
         return 3;
       }
-    } else if (this.width < 1904) {
+    } else if (
+      this.$vuetify.breakpoint.name == "md" ||
+      this.$vuetify.breakpoint.name == "lg"
+    ) {
       if (this.files.length > 4) {
         return 4;
       }
@@ -588,6 +604,14 @@ export default class Compare extends Props {
     let filter_module = getModule(FilteredDataModule, this.$store);
     for (let i of ids) {
       filter_module.set_toggle_file_on(i);
+    }
+  }
+
+  changeTab(x: number) {
+    if (this.tab == x) {
+      this.ableTab = !this.ableTab;
+    } else {
+      this.ableTab = true;
     }
   }
 }
