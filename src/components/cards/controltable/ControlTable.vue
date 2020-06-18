@@ -42,7 +42,7 @@
       </template>
 
       <template #tags>
-        <ColumnHeader text="800-53 Controls & Control Items" sort="disabled" />
+        <ColumnHeader text="NIST SP 800-53 Security Controls & CCIs" sort="disabled" />
       </template>
     </ResponsiveRowSwitch>
 
