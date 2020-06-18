@@ -138,7 +138,7 @@ class InspecIntakeModule extends VuexModule {
         database_id: options.database_id,
         createdAt: options.createdAt,
         updatedAt: options.updatedAt,
-        tags: options.tags,
+        tags: options.tags
         // evaluation
       } as EvaluationFile;
 

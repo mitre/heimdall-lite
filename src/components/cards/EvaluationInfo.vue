@@ -111,10 +111,10 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     let file = store.allFiles.find(f => f.unique_id === this.filter);
     if (file) {
       let eva = file as EvaluationFile;
-      this.version = eva.execution.version;
-      this.platform_name = eva.execution.platform.name;
-      this.platform_release = eva.execution.platform.release;
-      this.duration = eva.execution.statistics.duration;
+      this.version = eva.evaluation.data.version;
+      this.platform_name = eva.evaluation.data.platform.name;
+      this.platform_release = eva.evaluation.data.platform.release;
+      this.duration = eva.evaluation.data.statistics.duration;
       this.database_id = eva.database_id || null;
     }
     console.log("updated ID: " + this.filter + ", DBID: " + this.database_id);
@@ -168,10 +168,10 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       let eva = file as EvaluationFile;
       console.log("filename 2: " + eva.filename);
       this.filename2 = eva.filename;
-      this.version = eva.execution.version;
-      this.platform_name = eva.execution.platform.name;
-      this.platform_release = eva.execution.platform.release;
-      this.duration = eva.execution.statistics.duration;
+      this.version = eva.evaluation.data.version;
+      this.platform_name = eva.evaluation.data.platform.name;
+      this.platform_release = eva.evaluation.data.platform.release;
+      this.duration = eva.evaluation.data.statistics.duration;
       this.tags = eva.tags || null;
       if (eva.database_id === null) {
         console.log("null file");
