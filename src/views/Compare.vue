@@ -44,62 +44,67 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-card :flat="true" class="fill-height">
-              <v-tabs fixed-tabs v-model="tab">
-                <v-tab key="status"> Status by Results File </v-tab>
-                <v-tab key="compliance"> % Compliance </v-tab>
-                <v-tab key="severity"> Failed Tests by Severity </v-tab>
-              </v-tabs>
-              <transition>
-                <keep-alive>
-                  <v-col v-if="tab == 0" cols="12">
-                    <v-row>
-                      <v-sheet class="mx-auto" elevation="8" max-width="100%">
-                        <v-slide-group :show-arrows="true">
-                          <v-slide-item v-for="(file, i) in files" :key="i">
-                            <v-card class="fill-height">
-                              <v-card-title class="justify-center">
-                                <div style="text-align:center;">
-                                  <i>{{ i + 1 }}</i> <br />
-                                  {{ file.filename }} <br />
-                                  {{ fileTimes[i] }}
-                                </div>
-                              </v-card-title>
-                              <v-card-actions class="justify-center">
-                                <StatusChart
-                                  :filter="{ fromFile: [file.unique_id] }"
-                                  :value="null"
-                                  :show_compliance="true"
-                                />
-                              </v-card-actions>
-                            </v-card>
-                          </v-slide-item>
-                        </v-slide-group>
-                      </v-sheet>
-                    </v-row>
-                  </v-col>
-                  <v-col v-else-if="tab == 1" cols="12">
-                    <ApexLineChart
-                      :series="compliance_series"
-                      :categories="fileTimes"
-                      :upper_range="100"
-                      :title="'Total Compliance'"
-                      :y_title="'% Compliance'"
-                    ></ApexLineChart>
-                  </v-col>
-                  <v-col v-else cols="12">
-                    <ApexLineChart
-                      :series="line_sev_series"
-                      :categories="fileTimes"
-                      :upper_range="total_failed + 1"
-                      :sev_chart="true"
-                      :title="'Failed Tests by Severity'"
-                      :y_title="'Tests Failed'"
-                    ></ApexLineChart>
-                  </v-col>
-                </keep-alive>
-              </transition>
-            </v-card>
+            <v-tabs fixed-tabs right v-model="tab">
+              <v-tab key="status"> Status by Results File </v-tab>
+              <v-tab key="compliance"> % Compliance </v-tab>
+              <v-tab key="severity"> Failed Tests by Severity </v-tab>
+              <v-tab key="collapse"
+                ><v-btn small icon @click="collapse"
+                  ><v-icon v-if="!ableTab"> mdi-chevron-left </v-icon>
+                  <v-icon v-else> mdi-chevron-down </v-icon></v-btn
+                ></v-tab
+              >
+            </v-tabs>
+            <transition>
+              <keep-alive>
+                <v-col v-if="tab == 0 && ableTab" cols="12">
+                  <v-row>
+                    <v-sheet class="mx-auto" elevation="8" max-width="100%">
+                      <v-slide-group :show-arrows="true" :elevation="0">
+                        <v-slide-item v-for="(file, i) in files" :key="i">
+                          <v-card class="fill-height">
+                            <v-card-title class="justify-center">
+                              <div style="text-align:center;">
+                                <i>{{ i + 1 }}</i> <br />
+                                {{ file.filename }} <br />
+                                {{ fileTimes[i] }}
+                              </div>
+                            </v-card-title>
+                            <v-card-actions class="justify-center">
+                              <StatusChart
+                                :filter="{ fromFile: [file.unique_id] }"
+                                :value="null"
+                                :show_compliance="true"
+                              />
+                            </v-card-actions>
+                          </v-card>
+                        </v-slide-item>
+                      </v-slide-group>
+                    </v-sheet>
+                  </v-row>
+                </v-col>
+                <v-col v-else-if="tab == 1 && ableTab" cols="12">
+                  <ApexLineChart
+                    :series="compliance_series"
+                    :categories="fileTimes"
+                    :upper_range="100"
+                    :title="'Total Compliance'"
+                    :y_title="'% Compliance'"
+                  ></ApexLineChart>
+                </v-col>
+                <v-col v-else-if="tab == 2 && ableTab" cols="12">
+                  <ApexLineChart
+                    :series="line_sev_series"
+                    :categories="fileTimes"
+                    :upper_range="total_failed + 1"
+                    :sev_chart="true"
+                    :title="'Failed Tests by Severity'"
+                    :y_title="'Tests Failed'"
+                  ></ApexLineChart>
+                </v-col>
+                <v-col v-else cols="12"> </v-col>
+              </keep-alive>
+            </transition>
           </v-col>
         </v-row>
         <v-card>
@@ -118,7 +123,7 @@
           </v-row>
           <hr />
           <v-row>
-            <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
+            <v-col cols="3" xs="3" sm="2" md="2" lg="2" xl="1">
               <br />
               <v-row>
                 <v-col cols="8">
@@ -134,7 +139,8 @@
                       >
                       <v-icon v-else>mdi-sort-alphabetical-descending</v-icon>
                     </v-btn>
-                    <strong>Test ID</strong>
+                    <strong v-if="width > 960">Test ID</strong>
+                    <strong v-else>ID</strong>
                   </div>
                 </v-col>
                 <v-col cols="4">
@@ -175,6 +181,7 @@
               </v-row>
             </v-col>
           </v-row>
+          <v-divider dark></v-divider>
           <CompareRow
             v-for="(control_set, i) in show_sets"
             :controls="control_set"
@@ -282,6 +289,7 @@ export default class Compare extends Props {
   start_index: number = 0;
   ascending: boolean = true;
   search_term: string = "";
+  ableTab: boolean = true;
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
@@ -316,6 +324,12 @@ export default class Compare extends Props {
       }
       return false;
     });
+  }
+
+  collapse(evt: Event) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    this.ableTab = !this.ableTab;
   }
 
   get searched_sets(): ControlSeries[] {
@@ -530,7 +544,7 @@ export default class Compare extends Props {
       if (this.files.length > 3) {
         return 3;
       }
-    } else if (this.width < 1264) {
+    } else if (this.width < 1904) {
       if (this.files.length > 4) {
         return 4;
       }
