@@ -106,6 +106,8 @@ export default class ApexLineChart extends ApexLineChartProps {
   get y_axis_tick(): number {
     if (this.upper_range < 15) {
       return this.upper_range;
+    } else if (this.upper_range < 50) {
+      return Math.floor(this.upper_range / 5);
     } else {
       return Math.floor(this.upper_range / 10);
     }
