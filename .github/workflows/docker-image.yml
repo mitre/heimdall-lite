@@ -12,8 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/checkout@master
       with:
-        name: org1/repo1     <-- clone https://github.com/mitre/heimdallts
-        ref: refs/heads/release
+        repository: mitre/heimdallts
+
     - name: Docker ps test
       run: docker ps -a
     - name: npm install
