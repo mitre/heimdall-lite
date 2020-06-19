@@ -135,7 +135,7 @@
           </v-row>
           <hr />
           <v-row>
-            <v-col cols="3" xs="3" sm="2" md="2" lg="2" xl="1">
+            <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
               <br />
               <v-row>
                 <v-col cols="8">
@@ -151,7 +151,13 @@
                       >
                       <v-icon v-else>mdi-sort-alphabetical-descending</v-icon>
                     </v-btn>
-                    <strong v-if="width > 960">Test ID</strong>
+                    <strong
+                      v-if="
+                        (width > 960 && $vuetify.breakpoint.name != 'lg') ||
+                          width > 1700
+                      "
+                      >Test ID</strong
+                    >
                     <strong v-else>ID</strong>
                   </div>
                 </v-col>
@@ -367,7 +373,7 @@ export default class Compare extends Props {
       // See if any contain term
       return searchables.some(s => s.toLowerCase().includes(term));
     }
-    let term = this.search_term.toLowerCase();
+    let term = (this.search_term || "").toLowerCase();
     let searched: ControlSeries[] = [];
     for (let series of this.control_sets) {
       for (let ctrl of series) {
@@ -557,12 +563,14 @@ export default class Compare extends Props {
       if (this.files.length > 3) {
         return 3;
       }
-    } else if (
-      this.$vuetify.breakpoint.name == "md" ||
-      this.$vuetify.breakpoint.name == "lg"
-    ) {
+    } else if (this.$vuetify.breakpoint.name == "md") {
       if (this.files.length > 4) {
         return 4;
+      }
+      return this.files.length;
+    } else if (this.$vuetify.breakpoint.name == "lg") {
+      if (this.files.length > 5) {
+        return 5;
       }
       return this.files.length;
     } else if (this.files.length > 10) {
@@ -588,12 +596,10 @@ export default class Compare extends Props {
 
   scroll_left() {
     this.start_index += -1;
-    console.log(this.start_index);
   }
 
   scroll_right() {
     this.start_index += 1;
-    console.log(this.start_index);
   }
 
   on_got_files(ids: FileID[]) {
