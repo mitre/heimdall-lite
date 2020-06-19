@@ -75,7 +75,7 @@
                               <div style="text-align:center;">
                                 <i>{{ i + 1 }}</i> <br />
                                 {{ file.filename }} <br />
-                                {{ fileTimes[i] }}
+                                <span>{{ fileTimes[i] }}</span>
                               </div>
                             </v-card-title>
                             <v-card-actions class="justify-center">
@@ -377,10 +377,11 @@ export default class Compare extends Props {
     let searched: ControlSeries[] = [];
     for (let series of this.control_sets) {
       for (let ctrl of series) {
-        if (searched.includes(series)) {
-          break;
+        if (ctrl == null) {
+          continue;
         } else if (contains_term(ctrl!, this.search_term)) {
           searched.push(series);
+          break;
         }
       }
     }
