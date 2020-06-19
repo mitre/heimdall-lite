@@ -10,6 +10,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      steps:
+    - uses: actions/checkout@master
+      with:
+        name: org1/repo1     <-- clone https://github.com/mitre/heimdallts
+        ref: refs/heads/release
     - name: Docker ps test
       run: docker ps -a
     - name: npm install
