@@ -68,27 +68,31 @@ export default class SampleList extends Props {
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/fortify_h_tools_conv_webgoat.json`
       },
       {
-        name: "AWS S3 Permissions Check InSpec Sample",
+        name: "AWS S3 Permissions Check",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/aws-s3-baseline.json`
       },
       {
-        name: "AWS CIS Foundations Baseline InSpec Sample",
+        name: "AWS CIS Foundations Baseline",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/cis-aws-foundations-baseline.json`
       },
       {
-        name: "NGINX Inspec Sample",
+        name: "NGINX Clean Sample",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/good_nginxresults.json`
       },
       {
-        name: "Red Hat CVE Vulnerability Scan InSpec Sample",
+        name: "NGINX With Failing Tests",
+        url: `https://raw.githubusercontent.com/${this.repo}/master/samples/bad_nginx.json`
+      },
+      {
+        name: "Red Hat CVE Vulnerability Scan",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/rhel_cve_vulnerability_scan_baseline_with_failures.json`
       },
       {
-        name: "RedHat 7 STIG Baseline InSpec Sample",
+        name: "RedHat 7 STIG Baseline",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/rhel7-results.json`
       },
       {
-        name: "Ubuntu STIG Baseline InSpec Sample",
+        name: "Ubuntu STIG Baseline",
         url: `https://raw.githubusercontent.com/${this.repo}/master/samples/ubuntu-16.04-baseline-results.json`
       }
     ];

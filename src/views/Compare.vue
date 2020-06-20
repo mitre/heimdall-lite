@@ -13,20 +13,12 @@
         clearable
       ></v-text-field>
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Upload
-        </span>
-        <v-icon>
-          mdi-cloud-upload
-        </v-icon>
+        <span class="d-none d-md-inline pr-2">Upload</span>
+        <v-icon>mdi-cloud-upload</v-icon>
       </v-btn>
       <v-btn @click="log_out" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Logout
-        </span>
-        <v-icon>
-          mdi-logout
-        </v-icon>
+        <span class="d-none d-md-inline pr-2">Logout</span>
+        <v-icon>mdi-logout</v-icon>
       </v-btn>
     </template>
 
@@ -36,31 +28,24 @@
         <v-row>
           <v-col cols="12">
             <div style="position:relative; top:14px;">
-              <h1>
-                Results Comparisons
-              </h1>
+              <h1>Results Comparisons</h1>
             </div>
           </v-col>
         </v-row>
-        <!--v-expansion-panels readonly v-model="expansion">
-        <v-expansion-panel class="my-2">
-        <v-expansion-panel-header-->
-        <v-tabs fixed-tabs v-model="tab" show-arrows>
+        <v-tabs fixed-tabs v-model="tab" icons-and-text>
           <v-tab key="status" @click="changeTab(0)">
             Status by Results File
+            <v-icon>mdi-unfold-more-horizontal</v-icon>
           </v-tab>
-          <v-tab key="compliance" @click="changeTab(1)"> % Compliance </v-tab>
+          <v-tab key="compliance" @click="changeTab(1)">
+            % Compliance
+            <v-icon>mdi-unfold-more-horizontal</v-icon>
+          </v-tab>
           <v-tab key="severity" @click="changeTab(2)">
             Failed Tests by Severity
+            <v-icon>mdi-unfold-more-horizontal</v-icon>
           </v-tab>
-          <!--v-tab key="collapse"
-                ><v-btn small icon @click="collapse"
-                  ><v-icon v-if="!ableTab"> mdi-chevron-left </v-icon>
-                  <v-icon v-else> mdi-chevron-down </v-icon></v-btn
-                ></v-tab
-              --> </v-tabs
-        ><!--/v-expansion-panel-header-->
-        <!--v-expansion-panel-content-->
+        </v-tabs>
         <v-row>
           <v-col cols="12">
             <transition>
@@ -73,8 +58,10 @@
                           <v-card class="fill-height">
                             <v-card-title class="justify-center">
                               <div style="text-align:center;">
-                                <i>{{ i + 1 }}</i> <br />
-                                {{ file.filename }} <br />
+                                <i>{{ i + 1 }}</i>
+                                <br />
+                                {{ file.filename }}
+                                <br />
                                 <span>{{ fileTimes[i] }}</span>
                               </div>
                             </v-card-title>
@@ -110,21 +97,16 @@
                     :y_title="'Tests Failed'"
                   ></ApexLineChart>
                 </v-col>
-                <v-col v-else cols="12"> </v-col>
+                <v-col v-else cols="12"></v-col>
               </keep-alive>
             </transition>
           </v-col>
         </v-row>
-        <!--/v-expansion-panel-content>
-        </v-expansion-panel>
-        </v-expansion-panels-->
-
         <v-card>
           <v-row>
             <v-col cols="4" xs="4" sm="3" md="2" lg="2" xl="2">
               <v-card-title>Test Results</v-card-title>
             </v-col>
-            <!--v-col cols="3" xs="3" sm="3" md="4" lg="4" xl="4"> </v-col-->
             <v-col cols="8" xs="8" sm="9" md="10" lg="10" xl="10">
               <v-checkbox
                 color="blue"
@@ -167,9 +149,8 @@
                       v-if="files.length > num_shown_files"
                       @click="scroll_left"
                       :disabled="start_index == 0"
+                      >mdi-arrow-left</v-icon
                     >
-                      mdi-arrow-left
-                    </v-icon>
                   </v-btn>
                 </v-col>
               </v-row>
@@ -191,9 +172,8 @@
                       v-if="files.length > num_shown_files"
                       @click="scroll_right"
                       :disabled="start_index >= files.length - num_shown_files"
+                      >mdi-arrow-right</v-icon
                     >
-                      mdi-arrow-right
-                    </v-icon>
                   </v-btn>
                 </v-col>
               </v-row>
@@ -306,6 +286,7 @@ export default class Compare extends Props {
   width: number = window.innerWidth;
   start_index: number = 0;
   ascending: boolean = true;
+  chartsOpen: boolean = true;
   search_term: string = "";
   ableTab: boolean = true;
   expansion: number = 0;
@@ -385,7 +366,6 @@ export default class Compare extends Props {
         }
       }
     }
-    //controls = controls.filter(c => contains_term(c, term));
     return searched;
   }
 
@@ -404,7 +384,6 @@ export default class Compare extends Props {
     }
     return false;
   }
-
   get show_sets(): ControlSeries[] {
     let sorted = [];
     if (this.checkbox) {
@@ -425,6 +404,10 @@ export default class Compare extends Props {
 
   changeSort(): void {
     this.ascending = !this.ascending;
+  }
+
+  changeChartState(): void {
+    this.chartsOpen = !this.chartsOpen;
   }
 
   get control_sort(): boolean {
@@ -620,6 +603,7 @@ export default class Compare extends Props {
     } else {
       this.ableTab = true;
     }
+    this.changeChartState();
   }
 }
 </script>
