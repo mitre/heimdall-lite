@@ -4,7 +4,7 @@
       <LinkItem
         key="export_nist"
         text="NIST SP 800-53 Security Control Coverage"
-        icon="mdi-download"
+        icon="mdi-file-excel-outline"
         @click="export_nist()"
         v-on="on"
       />

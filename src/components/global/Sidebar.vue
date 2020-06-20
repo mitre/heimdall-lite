@@ -19,10 +19,10 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title
-            ><div v-if="all_toggled">Deselect all reports</div>
-            <div v-else>Select all reports</div></v-list-item-title
-          >
+          <v-list-item-title>
+            <div v-if="all_toggled">Deselect all reports</div>
+            <div v-else>Select all reports</div>
+          </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 

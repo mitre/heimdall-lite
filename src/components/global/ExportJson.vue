@@ -4,7 +4,7 @@
       <LinkItem
         key="export_json"
         text="Export as JSON"
-        icon="mdi-download"
+        icon="mdi-code-json"
         @click="export_json()"
         v-on="on"
       />
@@ -49,7 +49,6 @@ export default class ExportJSON extends Props {
       }
     }
   }
-
   export_execution(file?: EvaluationFile) {
     if (file) {
       let blob = new Blob([JSON.stringify(file.evaluation.data)], {
