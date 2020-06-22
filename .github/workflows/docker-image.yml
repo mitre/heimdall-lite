@@ -17,10 +17,14 @@ jobs:
 #      run: pwd
 #    - name: Docker ps test
 #      run: ls
-    - name: Docker Build
-      run: docker build -t heimdall-lite .
+#    - name: Docker Build
+#      run: docker build -t heimdall-lite .
     - name: Docker Run
-      run: docker run -d -p 8080:8080 heimdall-lite   
+      run: docker run -d -p 8080:8080 mitre/heimdall-lite   
+    - name: docker ps 
+      run: docker ps -a
+    - name: Curl 
+      run: curl 0.0.0.0:8080
     - name: npm install
       run: npm install
     - name: Run test
