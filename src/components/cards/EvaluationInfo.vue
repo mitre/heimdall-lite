@@ -3,9 +3,9 @@
     <v-row class="pa-4" justify="space-between">
       <v-col cols="5">
         <b>Filename:</b> {{ filename }}<br />
-        <b>InSpec version:</b> {{ version }}<br />
-        <b>Platform:</b> {{ platform_name }} {{ platform_release }}<br />
-        <b>Duration:</b> {{ duration }}<br />
+        <b>InSpec version:</b> {{ inspec_version }}<br />
+        <b>Platform:</b> {{ platform }}<br />
+        <b>Duration:</b> {{ get_duration }}<br />
       </v-col>
       <v-divider vertical></v-divider>
       <v-col v-if="show_tags" class="text-center">
@@ -64,6 +64,7 @@ import { plainToClass } from "class-transformer";
 import { Evaluation, Tag, Tags } from "@/types/models.ts";
 import VeeValidate from "vee-validate";
 import VuePassword from "vue-password";
+import { FileName } from "aws-sdk/clients/iot";
 
 Vue.use(VeeValidate);
 
@@ -142,22 +143,78 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     console.log("Prop changed: " + this.filter);
   }
 
-  get filename() {
-    let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === this.filter);
-    if (file) {
-      let eva = file as EvaluationFile;
-      console.log("filename 1: " + eva.filename);
-      if (eva.database_id === null) {
-        console.log("no database id");
-      } else {
-        this.database_id = eva.database_id || null;
-        this.load_tags(this.database_id);
-      }
-      return eva.filename;
-    } else {
-      return null;
+  get filename(): string {
+    let names = "";
+    if (this.files.length === 1) {
+      return this.files[0].filename + "";
     }
+    for (let file of this.files) {
+      names = names + file.filename + ", ";
+    }
+    return names;
+  }
+
+  get inspec_version(): string {
+    let version = "";
+    if (this.files.length === 1) {
+      return this.files[0].evaluation.data.version + "";
+    }
+    for (let file of this.files) {
+      version = version + file.evaluation.data.version + ", ";
+    }
+    return version;
+  }
+
+  get platform(): string {
+    let platform = "";
+    if (this.files.length === 1) {
+      return (
+        this.files[0].evaluation.data.platform.name +
+        this.files[0].evaluation.data.platform.release +
+        ""
+      );
+    }
+    for (let file of this.files) {
+      platform =
+        platform +
+        file.evaluation.data.platform.name +
+        file.evaluation.data.platform.release +
+        ", ";
+    }
+    return platform;
+  }
+
+  get get_duration(): string {
+    let duration = "";
+    if (this.files.length === 1) {
+      return this.files[0].evaluation.data.statistics.duration + "";
+    }
+    for (let file of this.files) {
+      duration = duration + file.evaluation.data.statistics.duration + ", ";
+    }
+    return duration;
+  }
+
+  get files(): EvaluationFile[] {
+    let filter_module = getModule(FilteredDataModule, this.$store);
+    let fileArr = [];
+    let fileList = filter_module.evaluations(filter_module.selected_file_ids);
+    for (let i = 0; i < fileList.length; i++) {
+      fileArr.push(fileList[i].from_file);
+    }
+
+    fileArr = fileArr.sort((a, b) => {
+      let a_date = new Date(
+        filter_module.controls({ fromFile: [a.unique_id] })[0].root.hdf
+          .start_time || 0
+      );
+      let b_date = new Date(
+        filter_module.controls({ fromFile: [b.unique_id] })[0].root.hdf
+          .start_time || 0
+      );
+      return a_date.valueOf() - b_date.valueOf();
+    });
+    return fileArr;
   }
 
   load_file() {
