@@ -2,7 +2,7 @@ import "expect-puppeteer";
 
 describe("Google", () => {
   beforeAll(async () => {
-    await page.goto("http://localhost:8080/login");
+    await page.goto("http://heimdall-lite/login");
   });
 
   it("Fill out login", async () => {
