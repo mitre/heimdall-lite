@@ -10,15 +10,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/checkout@master
-      with:
-        repository: mitre/heimdallts
-    - name: Docker ps test
-      run: pwd
-    - name: Docker ps test
-      run: ls
-    - name: Docker ps test
-      run: docker ps -a
+#    - uses: actions/checkout@master
+#      with:
+#        repository: mitre/heimdallts
+#    - name: Docker ps test
+#      run: pwd
+#    - name: Docker ps test
+#      run: ls
+#    - name: Docker ps test
+#      run: docker ps -a
     - name: npm install
       run: npm install
     - name: Run test
