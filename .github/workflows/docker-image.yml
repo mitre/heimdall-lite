@@ -19,7 +19,7 @@ jobs:
 #      run: ls
     - name: Docker Build
       run: docker build -t heimdall-lite .
-   - name: Docker Run
+    - name: Docker Run
       run: docker run -d -p 8080:8080 heimdall-lite   
 #    - name: npm install
 #      run: npm install
