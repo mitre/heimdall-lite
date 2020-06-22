@@ -12,7 +12,7 @@
       <v-list-item-title v-text="file.filename" />
     </v-list-item-content>
 
-    <v-list-item-action @click="save_this_file">
+    <v-list-item-action v-if="serverMode" @click="save_this_file">
       <v-btn icon small>
         <v-icon> mdi-content-save </v-icon>
       </v-btn>
@@ -134,6 +134,15 @@ export default class FileItem extends FileItemProps {
     } else {
       return "mdi-google-analytics";
     }
+  }
+
+  get serverMode(): boolean {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.server_mode();
+    }
+
+    return mod.serverMode!;
   }
 }
 </script>
