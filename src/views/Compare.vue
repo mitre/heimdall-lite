@@ -34,16 +34,22 @@
         </v-row>
         <v-tabs fixed-tabs v-model="tab" icons-and-text>
           <v-tab key="status" @click="changeTab(0)">
-            Status by Results File
-            <v-icon>mdi-unfold-more-horizontal</v-icon>
+            <v-flex style="padding-top: 28px;">
+              Status by Results File
+              <v-icon small>mdi-unfold-more-horizontal</v-icon>
+            </v-flex>
           </v-tab>
           <v-tab key="compliance" @click="changeTab(1)">
-            % Compliance
-            <v-icon>mdi-unfold-more-horizontal</v-icon>
+            <v-flex style="padding-top: 28px;">
+              % Compliance
+              <v-icon small>mdi-unfold-more-horizontal</v-icon>
+            </v-flex>
           </v-tab>
           <v-tab key="severity" @click="changeTab(2)">
-            Failed Tests by Severity
-            <v-icon>mdi-unfold-more-horizontal</v-icon>
+            <v-flex style="padding-top: 28px;">
+              Failed Tests by Severity
+              <v-icon small>mdi-unfold-more-horizontal</v-icon>
+            </v-flex>
           </v-tab>
         </v-tabs>
         <v-row>
