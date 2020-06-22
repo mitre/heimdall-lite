@@ -17,9 +17,11 @@ jobs:
 #      run: pwd
 #    - name: Docker ps test
 #      run: ls
-#    - name: Docker ps test
-#      run: docker ps -a
-    - name: npm install
-      run: npm install
+    - name: Docker Build
+      run: docker build -t heimdall-lite .
+   - name: Docker Run
+      run: docker run -d -p 8080:8080 heimdall-lite   
+#    - name: npm install
+#      run: npm install
     - name: Run test
       run: npm run test:integration
