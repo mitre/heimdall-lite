@@ -41,6 +41,10 @@ import rhel_cve_vulnerability_scan_baseline_with_failures from "../../../assets/
 import rhel7_results from "../../../assets/samples/rhel7-results.json";
 import sonarqube_java_sample from "../../../assets/samples/sonarqube_java_sample.json";
 import ubuntu_1604_baseline_results from "../../../assets/samples/ubuntu-16.04-baseline-results.json";
+import red_hat_bad from "../../../assets/samples/red_hat_bad.json";
+import red_hat_good from "../../../assets/samples/red_hat_good.json";
+import aws_report_worse from "../../../assets/samples/aws_report_worse.json";
+import aws_report_better from "../../../assets/samples/aws_report_better.json";
 
 interface Sample {
   name: string;
@@ -101,11 +105,27 @@ export default class SampleList extends Props {
       {
         name: "RedHat 7 STIG Baseline",
         sample: rhel7_results
-      }
-      /*{
+      },
+      {
         name: "Ubuntu STIG Baseline",
         sample: ubuntu_1604_baseline_results
-      }*/
+      },
+      {
+        name: "Red Hat With Failing Tests",
+        sample: red_hat_bad
+      },
+      {
+        name: "Red Hat Clean Sample",
+        sample: red_hat_good
+      },
+      {
+        name: "AWS Better",
+        sample: aws_report_better
+      },
+      {
+        name: "AWS Worse",
+        sample: aws_report_worse
+      }
     ];
   }
 

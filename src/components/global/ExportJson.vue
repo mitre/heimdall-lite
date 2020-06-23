@@ -22,7 +22,10 @@ import LinkItem, {
 } from "@/components/global/sidebaritems/SidebarLink.vue";
 import { EvaluationFile, ProfileFile } from "@/store/report_intake";
 import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "../../store/data_store";
+import InspecDataModule, { isFromProfileFile } from "../../store/data_store";
+import FilteredDataModule from "../../store/data_filters";
+import { ZipFile } from "yazl";
+import concat from "concat-stream";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -37,38 +40,60 @@ const Props = Vue.extend({
 })
 export default class ExportJSON extends Props {
   export_json() {
-    let id_string: string = this.$route.params.id;
-    let file_id = parseInt(id_string);
-    let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === file_id);
-    if (file) {
-      if (file.hasOwnProperty("evaluation")) {
-        this.export_execution(file as EvaluationFile);
-      } else {
-        this.export_profile(file as ProfileFile);
+    let filter_mod = getModule(FilteredDataModule, this.$store);
+    let ids = filter_mod.selected_file_ids;
+    if (ids.length < 1) {
+      return;
+    } else if (ids.length === 1) {
+      //will only ever loop once
+      for (let evaluation of filter_mod.evaluations(ids)) {
+        let blob = new Blob([JSON.stringify(evaluation.data)], {
+          type: "application/json"
+        });
+        saveAs(blob, evaluation.from_file.filename);
       }
+      for (let prof of filter_mod.profiles(ids)) {
+        if (isFromProfileFile(prof)) {
+          let blob = new Blob([JSON.stringify(prof.data)], {
+            type: "application/json"
+          });
+          saveAs(blob, prof.from_file.filename);
+        }
+      }
+    } else {
+      let zipfile = new ZipFile();
+      for (let evaluation of filter_mod.evaluations(ids)) {
+        let buffer = Buffer.from(JSON.stringify(evaluation.data));
+        zipfile.addBuffer(
+          buffer,
+          this.cleanup_filename(evaluation.from_file.filename)
+        );
+      }
+      for (let prof of filter_mod.profiles(ids)) {
+        if (isFromProfileFile(prof)) {
+          let buffer = Buffer.from(JSON.stringify(prof.data));
+          zipfile.addBuffer(
+            buffer,
+            this.cleanup_filename(prof.from_file.filename)
+          );
+        }
+      }
+      //let zipfile.addBuffer(Buffer.from("hello"), "hello.txt");
+      // call end() after all the files have been added
+      zipfile.outputStream.pipe(
+        concat({ encoding: "uint8array" }, (b: Uint8Array) => {
+          saveAs(new Blob([b]), "exported_jsons.zip");
+        })
+      );
+      zipfile.end();
     }
   }
-  export_execution(file?: EvaluationFile) {
-    if (file) {
-      let blob = new Blob([JSON.stringify(file.evaluation.data)], {
-        type: "application/json"
-      });
-      if (blob) {
-        saveAs(blob, file.filename);
-      }
+  cleanup_filename(filename: string): string {
+    filename = filename.replace(/\s+/g, "_");
+    if (filename.substring(filename.length - 6) != ".json") {
+      filename = filename + ".json";
     }
-  }
-
-  export_profile(file?: ProfileFile) {
-    if (file) {
-      let blob = new Blob([JSON.stringify(file.profile.data)], {
-        type: "application/json"
-      });
-      if (blob) {
-        saveAs(blob, file.filename);
-      }
-    }
+    return filename;
   }
 }
 </script>

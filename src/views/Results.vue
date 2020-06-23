@@ -58,7 +58,7 @@
         <v-row>
           <v-col xs-12>
             <v-card elevation="2">
-              <EvaluationInfo :filter="file_filter" />
+              <EvaluationInfo :file_filter="file_filter" />
             </v-card>
           </v-col>
         </v-row>
