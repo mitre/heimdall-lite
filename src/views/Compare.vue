@@ -235,6 +235,7 @@ import ApexLineChart, {
 } from "@/components/generic/ApexLineChart.vue";
 //@ts-ignore
 import resize from "vue-resize-directive";
+import { get_eval_start_time } from "@/utilities/delta_util";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -339,7 +340,8 @@ export default class Compare extends Props {
   }
 
   get searched_sets(): ControlSeries[] {
-    if (this.search_term == "") {
+    let term = (this.search_term || "").toLowerCase().trim();
+    if (term == "") {
       return this.control_sets;
     }
     function contains_term(
@@ -360,7 +362,6 @@ export default class Compare extends Props {
       // See if any contain term
       return searchables.some(s => s.toLowerCase().includes(term));
     }
-    let term = (this.search_term || "").toLowerCase();
     let searched: ControlSeries[] = [];
     for (let series of this.control_sets) {
       for (let ctrl of series) {
@@ -520,8 +521,7 @@ export default class Compare extends Props {
     let data_store = getModule(FilteredDataModule, this.$store);
     var names = [];
     for (let file of this.files) {
-      let time = data_store.controls({ fromFile: [file.unique_id] })[0].root.hdf
-        .start_time;
+      let time = get_eval_start_time(file.evaluation) || undefined;
       names.push(time);
     }
     return names;
