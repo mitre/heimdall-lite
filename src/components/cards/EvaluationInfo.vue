@@ -1,54 +1,52 @@
 <template>
-  <v-card>
-    <v-row class="pa-4" justify="space-between">
-      <v-col cols="5">
-        <b>Filename:</b> {{ filename }}<br />
-        <b>InSpec version:</b> {{ inspec_version }}<br />
-        <b>Platform:</b> {{ platform }}<br />
-        <b>Duration:</b> {{ get_duration }}<br />
-      </v-col>
-      <v-divider vertical></v-divider>
-      <v-col v-if="show_tags" class="text-center">
-        <div v-if="tags" class="column_wrapper">
+  <v-row class="pa-4" justify="space-between">
+    <v-col cols="5">
+      <b>Filename:</b> {{ filename }}<br />
+      <b>InSpec version:</b> {{ inspec_version }}<br />
+      <b>Platform:</b> {{ platform }}<br />
+      <b>Duration:</b> {{ get_duration }}<br />
+    </v-col>
+    <!--v-divider vertical></v-divider-->
+    <v-col v-if="show_tags" class="text-center">
+      <div v-if="tags" class="column_wrapper">
+        <div v-for="item in tags.filter(not_filename)" :key="item.id">
+          <b>{{ item.content.name }}:</b> {{ item.content.value }}
+        </div>
+      </div>
+    </v-col>
+    <v-col v-if="edit_tags" class="text-center">
+      <div class="column_wrapper">
+        <v-list v-if="tags" dense class="px-2" subheader>
+          <v-subheader>Remove Tag</v-subheader>
           <div v-for="item in tags.filter(not_filename)" :key="item.id">
             <b>{{ item.content.name }}:</b> {{ item.content.value }}
+            <v-btn icon small @click="remove_tag(item)">
+              <v-icon> mdi-close </v-icon>
+            </v-btn>
           </div>
-        </div>
-      </v-col>
-      <v-col v-if="edit_tags" class="text-center">
-        <div class="column_wrapper">
-          <v-list v-if="tags" dense class="px-2" subheader>
-            <v-subheader>Remove Tag</v-subheader>
-            <div v-for="item in tags.filter(not_filename)" :key="item.id">
-              <b>{{ item.content.name }}:</b> {{ item.content.value }}
-              <v-btn icon small @click="remove_tag(item)">
-                <v-icon> mdi-close </v-icon>
-              </v-btn>
-            </div>
-          </v-list>
-          <v-list dense class="px-2" subheader>
-            <v-subheader>Add Tag</v-subheader>
-            <v-form ref="form">
-              <v-combobox
-                :items="tag_list"
-                v-model="tag_name"
-                label="Tag Name"
-                dense
-              ></v-combobox>
-              <v-text-field v-model="tag_value" label="Value" />
-              <v-btn class="mr-4" @click="submit_tag">submit</v-btn>
-            </v-form>
-          </v-list>
-        </div>
-      </v-col>
-      <v-btn v-if="show_tags" icon small @click="open_tag_edit">
-        <v-icon class="float-right"> mdi-pencil-box-outline </v-icon>
-      </v-btn>
-      <v-btn v-if="edit_tags" icon small @click="close_tag_edit">
-        <v-icon class="float-right"> mdi-close </v-icon>
-      </v-btn>
-    </v-row>
-  </v-card>
+        </v-list>
+        <v-list dense class="px-2" subheader>
+          <v-subheader>Add Tag</v-subheader>
+          <v-form ref="form">
+            <v-combobox
+              :items="tag_list"
+              v-model="tag_name"
+              label="Tag Name"
+              dense
+            ></v-combobox>
+            <v-text-field v-model="tag_value" label="Value" />
+            <v-btn class="mr-4" @click="submit_tag">submit</v-btn>
+          </v-form>
+        </v-list>
+      </div>
+    </v-col>
+    <v-btn v-if="show_tags" icon small @click="open_tag_edit">
+      <v-icon class="float-right"> mdi-pencil-box-outline </v-icon>
+    </v-btn>
+    <v-btn v-if="edit_tags" icon small @click="close_tag_edit">
+      <v-icon class="float-right"> mdi-close </v-icon>
+    </v-btn>
+  </v-row>
 </template>
 
 <script lang="ts">
@@ -82,7 +80,7 @@ export interface TagHash {
 // to make props types inferrable.
 const EvaluationInfoProps = Vue.extend({
   props: {
-    filter: Number // Of type Filer from filteredData
+    file_filter: Number // Of type Filer from filteredData
   }
 });
 
@@ -109,7 +107,7 @@ export default class EvaluationInfo extends EvaluationInfoProps {
 
   updated() {
     let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === this.filter);
+    let file = store.allFiles.find(f => f.unique_id === this.file_filter);
     if (file) {
       let eva = file as EvaluationFile;
       this.version = eva.evaluation.data.version;
@@ -118,7 +116,9 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       this.duration = eva.evaluation.data.statistics.duration;
       this.database_id = eva.database_id || null;
     }
-    console.log("updated ID: " + this.filter + ", DBID: " + this.database_id);
+    console.log(
+      "updated ID: " + this.file_filter + ", DBID: " + this.database_id
+    );
     if (!this.database_id) {
       this.show_tags = false;
       this.edit_tags = false;
@@ -129,7 +129,9 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   mounted() {
-    console.log("mounted ID: " + this.filter + ", DBID: " + this.database_id);
+    console.log(
+      "mounted ID: " + this.file_filter + ", DBID: " + this.database_id
+    );
     if (!this.database_id) {
       this.show_tags = false;
       this.edit_tags = false;
@@ -140,87 +142,38 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   watch() {
-    console.log("Prop changed: " + this.filter);
+    console.log("Prop changed: " + this.file_filter);
   }
 
   get filename(): string {
-    let names = "";
-    if (this.files.length === 1) {
-      return this.files[0].filename + "";
-    }
-    for (let file of this.files) {
-      names = names + file.filename + ", ";
-    }
-    return names;
+    return this.file.filename;
   }
 
   get inspec_version(): string {
-    let version = "";
-    if (this.files.length === 1) {
-      return this.files[0].evaluation.data.version + "";
-    }
-    for (let file of this.files) {
-      version = version + file.evaluation.data.version + ", ";
-    }
-    return version;
+    return this.file.evaluation.data.version;
   }
 
   get platform(): string {
-    let platform = "";
-    if (this.files.length === 1) {
-      return (
-        this.files[0].evaluation.data.platform.name +
-        this.files[0].evaluation.data.platform.release +
-        ""
-      );
-    }
-    for (let file of this.files) {
-      platform =
-        platform +
-        file.evaluation.data.platform.name +
-        file.evaluation.data.platform.release +
-        ", ";
-    }
-    return platform;
+    return (
+      this.file.evaluation.data.platform.name +
+      this.file.evaluation.data.platform.release
+    );
   }
 
   get get_duration(): string {
-    let duration = "";
-    if (this.files.length === 1) {
-      return this.files[0].evaluation.data.statistics.duration + "";
-    }
-    for (let file of this.files) {
-      duration = duration + file.evaluation.data.statistics.duration + ", ";
-    }
-    return duration;
+    return this.file.evaluation.data.statistics.duration + "";
   }
 
-  get files(): EvaluationFile[] {
+  get file(): EvaluationFile {
+    console.log("file filter: " + this.file_filter);
     let filter_module = getModule(FilteredDataModule, this.$store);
-    let fileArr = [];
-    let fileList = filter_module.evaluations(filter_module.selected_file_ids);
-    for (let i = 0; i < fileList.length; i++) {
-      fileArr.push(fileList[i].from_file);
-    }
-
-    fileArr = fileArr.sort((a, b) => {
-      let a_date = new Date(
-        filter_module.controls({ fromFile: [a.unique_id] })[0].root.hdf
-          .start_time || 0
-      );
-      let b_date = new Date(
-        filter_module.controls({ fromFile: [b.unique_id] })[0].root.hdf
-          .start_time || 0
-      );
-      return a_date.valueOf() - b_date.valueOf();
-    });
-    return fileArr;
+    return filter_module.evaluations([this.file_filter])[0].from_file;
   }
 
   load_file() {
-    console.log("load_file: " + this.filter);
+    console.log("load_file: " + this.file_filter);
     let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === this.filter);
+    let file = store.allFiles.find(f => f.unique_id === this.file_filter);
     if (file) {
       let eva = file as EvaluationFile;
       console.log("filename 2: " + eva.filename);

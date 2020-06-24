@@ -56,11 +56,30 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
-          <v-col xs-12>
+          <v-col cols="12">
+            <v-card>
+              <v-carousel
+                v-if="file_filter.length > 1"
+                show-arrows-on-hover
+                height="150"
+                hide-delimiter-background
+                delimiter-icon="mdi-minus"
+              >
+                <v-carousel-item v-for="(file, i) in file_filter" :key="i">
+                  <EvaluationInfo :file_filter="file" />
+                </v-carousel-item>
+              </v-carousel>
+              <EvaluationInfo
+                v-else-if="file_filter.length == 1"
+                :file_filter="file_filter[0]"
+              />
+            </v-card>
+          </v-col>
+          <!--v-col xs-12>
             <v-card elevation="2">
               <EvaluationInfo :file_filter="file_filter" />
             </v-card>
-          </v-col>
+          </v-col-->
         </v-row>
         <!-- Count Cards -->
         <StatusCardRow
