@@ -10,7 +10,7 @@
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
-                <v-form ref="form">
+                <v-form name="login_form" ref="form">
                   <v-text-field
                     label="Login"
                     name="login"

@@ -10,7 +10,7 @@
           <v-list-item-title v-text="sample.name" />
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn icon @click="load_sample(sample)">
+          <v-btn icon id="sample_button" @click="load_sample(sample)">
             <v-icon>mdi-plus-circle</v-icon>
           </v-btn>
         </v-list-item-action>

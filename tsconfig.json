@@ -12,7 +12,8 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "jest", "chai", "vuetify", "node"],
+    "types": ["puppeteer",    "jest-environment-puppeteer",
+      "expect-puppeteer","webpack-env", "jest", "chai", "vuetify", "node"],
     "paths": {
       "@/*": ["src/*"],
       "vue-analytics": ["src/types/vue-analytics"]
