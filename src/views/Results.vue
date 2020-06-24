@@ -57,23 +57,19 @@
         <!-- Evaluation Info -->
         <v-row>
           <v-col cols="12">
-            <v-card>
-              <v-carousel
-                v-if="file_filter.length > 1"
-                show-arrows-on-hover
-                height="150"
-                hide-delimiter-background
-                delimiter-icon="mdi-minus"
+            <v-slide-group show-arrows>
+              <v-slide-item
+                v-for="(file, i) in file_filter"
+                :key="i"
+                class="mx-2"
               >
-                <v-carousel-item v-for="(file, i) in file_filter" :key="i">
+                <v-card :width="info_width">
                   <EvaluationInfo :file_filter="file" />
-                </v-carousel-item>
-              </v-carousel>
-              <EvaluationInfo
-                v-else-if="file_filter.length == 1"
-                :file_filter="file_filter[0]"
-              />
-            </v-card>
+                </v-card>
+                <!--/v-carousel-item>
+              </v-carousel-->
+              </v-slide-item>
+            </v-slide-group>
           </v-col>
           <!--v-col xs-12>
             <v-card elevation="2">
@@ -400,6 +396,17 @@ export default class Results extends ResultsProps {
     for (let i of ids) {
       filter_module.set_toggle_file_on(i);
     }
+  }
+
+  get info_width(): number {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.server_mode();
+    }
+    if (mod.serverMode) {
+      return 500;
+    }
+    return 300;
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-row class="pa-4" justify="space-between">
-    <v-col cols="5">
+    <v-col :cols="info_cols">
       <b>Filename:</b> {{ filename }}<br />
       <b>InSpec version:</b> {{ inspec_version }}<br />
       <b>Platform:</b> {{ platform }}<br />
@@ -168,6 +168,28 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     console.log("file filter: " + this.file_filter);
     let filter_module = getModule(FilteredDataModule, this.$store);
     return filter_module.evaluations([this.file_filter])[0].from_file;
+  }
+
+  get width(): number {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.server_mode();
+    }
+    if (mod.serverMode) {
+      return 500;
+    }
+    return 350;
+  }
+
+  get info_cols(): number {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.server_mode();
+    }
+    if (mod.serverMode) {
+      return 5;
+    }
+    return 12;
   }
 
   load_file() {
