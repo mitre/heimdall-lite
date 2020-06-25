@@ -5,17 +5,22 @@
       formats
     </v-card-subtitle>
     <v-list>
-      <v-list-item v-for="(sample, index) in samples" :key="index">
+      <v-list-item v-for="(sample, index) in samples" :key="index" class="mx-2">
         <v-list-item-content>
           <v-list-item-title v-text="sample.name" />
         </v-list-item-content>
-        <v-list-item-action>
-          <v-btn icon @click="load_sample(sample)">
+        <v-list-item-action @click="select_samp(sample)">
+          <v-checkbox color="blue" :info-value="selected(sample)" />
+          <!--v-btn icon @click="load_sample(sample)">
             <v-icon>mdi-plus-circle</v-icon>
-          </v-btn>
+          </v-btn-->
         </v-list-item-action>
       </v-list-item>
     </v-list>
+    <v-btn width="98%" class="mx-2" @click="load_selected_samps">
+      Upload
+      <v-icon class="pl-2"> mdi-file-upload</v-icon>
+    </v-btn>
   </v-card>
 </template>
 
@@ -43,8 +48,6 @@ import sonarqube_java_sample from "../../../assets/samples/sonarqube_java_sample
 import ubuntu_1604_baseline_results from "../../../assets/samples/ubuntu-16.04-baseline-results.json";
 import red_hat_bad from "../../../assets/samples/red_hat_bad.json";
 import red_hat_good from "../../../assets/samples/red_hat_good.json";
-import aws_report_worse from "../../../assets/samples/aws_report_worse.json";
-import aws_report_better from "../../../assets/samples/aws_report_better.json";
 
 interface Sample {
   name: string;
@@ -64,6 +67,8 @@ const Props = Vue.extend({
   components: {}
 })
 export default class SampleList extends Props {
+  selected_samps: Sample[] = [];
+
   get samples(): Sample[] {
     return [
       {
@@ -117,14 +122,6 @@ export default class SampleList extends Props {
       {
         name: "Red Hat Clean Sample",
         sample: red_hat_good
-      },
-      {
-        name: "AWS Better",
-        sample: aws_report_better
-      },
-      {
-        name: "AWS Worse",
-        sample: aws_report_worse
       }
     ];
   }
@@ -132,6 +129,10 @@ export default class SampleList extends Props {
   get repo(): string {
     let mod = getModule(AppInfoModule, this.$store);
     return `${mod.repo_org}/${mod.repo_name}`;
+  }
+
+  selected(samp: Sample): boolean {
+    return this.selected_samps.includes(samp);
   }
 
   /** Callback for our list item clicks */
@@ -156,6 +157,23 @@ export default class SampleList extends Props {
           this.$emit("got-files", [unique_id]);
         }
       });
+  }
+
+  load_selected_samps() {
+    for (let samp of this.selected_samps) {
+      this.load_sample(samp);
+    }
+    this.selected_samps = [];
+  }
+
+  select_samp(samp: Sample) {
+    for (let i = 0; i < this.selected_samps.length; i++) {
+      if (this.selected_samps[i] === samp) {
+        this.selected_samps.splice(i);
+        return;
+      }
+    }
+    this.selected_samps.push(samp);
   }
 }
 </script>
