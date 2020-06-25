@@ -34,5 +34,7 @@ jobs:
     - uses: actions/checkout@master
       with:
         repository: mitre/heimdallts
-    - name: NPM test
-      run: npm run test:integration
+    - name: check file
+      run: ls
+    - name: run curl
+      run: curl http://localhost:8080
