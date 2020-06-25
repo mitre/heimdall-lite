@@ -2,7 +2,7 @@
   <v-row class="pa-4" justify="space-between">
     <v-col :cols="info_cols">
       <b>Filename:</b> {{ filename }}<br />
-      <b>InSpec version:</b> {{ inspec_version }}<br />
+      <b>Tool Version:</b> {{ inspec_version }}<br />
       <b>Platform:</b> {{ platform }}<br />
       <b>Duration:</b> {{ get_duration }}<br />
     </v-col>
@@ -129,6 +129,10 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   mounted() {
+    let mod = getModule(ServerModule, this.$store);
+    if (mod.serverMode == undefined) {
+      mod.server_mode();
+    }
     console.log(
       "mounted ID: " + this.file_filter + ", DBID: " + this.database_id
     );
@@ -170,11 +174,9 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     return filter_module.evaluations([this.file_filter])[0].from_file;
   }
 
+  //Width of component depending on server
   get width(): number {
     let mod = getModule(ServerModule, this.$store);
-    if (mod.serverMode == undefined) {
-      mod.server_mode();
-    }
     if (mod.serverMode) {
       return 500;
     }
@@ -183,9 +185,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
 
   get info_cols(): number {
     let mod = getModule(ServerModule, this.$store);
-    if (mod.serverMode == undefined) {
-      mod.server_mode();
-    }
     if (mod.serverMode) {
       return 5;
     }
