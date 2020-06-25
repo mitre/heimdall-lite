@@ -56,7 +56,7 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
-          <v-col cols="12">
+          <v-col v-if="file_filter.length > 3">
             <v-slide-group show-arrows>
               <v-slide-item
                 v-for="(file, i) in file_filter"
@@ -66,16 +66,19 @@
                 <v-card :width="info_width">
                   <EvaluationInfo :file_filter="file" />
                 </v-card>
-                <!--/v-carousel-item>
-              </v-carousel-->
               </v-slide-item>
             </v-slide-group>
           </v-col>
-          <!--v-col xs-12>
-            <v-card elevation="2">
-              <EvaluationInfo :file_filter="file_filter" />
+          <v-col
+            v-else
+            v-for="(file, i) in file_filter"
+            :key="i"
+            :cols="12 / file_filter.length"
+          >
+            <v-card>
+              <EvaluationInfo :file_filter="file" />
             </v-card>
-          </v-col-->
+          </v-col>
         </v-row>
         <!-- Count Cards -->
         <StatusCardRow
