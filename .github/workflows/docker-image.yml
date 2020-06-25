@@ -19,13 +19,15 @@ jobs:
 #      run: ls
 #    - name: Docker Build
 #      run: docker build -t heimdall-lite .
-    - name: Create Network
-      run: docker network create -d bridge docker_default
-    - name: Docker Run
-      run: docker run -d --network docker_default --network-alias heimdall-lite mitre/heimdall-lite   
+#    - name: Create Network
+#      run: docker network create -d bridge docker_default
+#    - name: Docker Run
+#      run: docker run -d --network docker_default --network-alias heimdall-lite mitre/heimdall-lite   
     - name: docker ps 
       run: docker ps -a
     - name: npm install
       run: npm install
-    - name: Run test
+    - name: Run NPM 
+      run: npm run serve
+    - name: NPM test
       run: npm run test:integration
