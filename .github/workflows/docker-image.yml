@@ -31,5 +31,8 @@ jobs:
       run: npm run serve &
     - name: run curl
       run: curl http://localhost:8080
+    - uses: actions/checkout@master
+      with:
+        repository: mitre/heimdallts
     - name: NPM test
       run: npm run test:integration
