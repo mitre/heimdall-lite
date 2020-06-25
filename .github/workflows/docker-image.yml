@@ -28,6 +28,6 @@ jobs:
     - name: npm install
       run: npm install
     - name: Run NPM 
-      run: npm run serve &&
+      run: npm run serve &
     - name: NPM test
       run: npm run test:integration
