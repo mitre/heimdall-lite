@@ -29,5 +29,7 @@ jobs:
       run: npm install
     - name: Run NPM 
       run: npm run serve &
+    - name: run curl
+      run: curl http://localhost:8080
     - name: NPM test
       run: npm run test:integration
