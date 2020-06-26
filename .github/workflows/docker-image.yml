@@ -36,11 +36,10 @@ jobs:
         DATABASE_USER: testuser
         DATABASE_PASSWORD: testpassword
         JWT_SECRET: test
+    - name: sleep 60
+      run: sleep 120
     - name: run curl
-      with:
-        retry_wait_seconds: 10
-        max_attempts: 10
-        command: curl localhost:8050
+      run: curl localhost:8050
     - uses: actions/checkout@v2
 #    - uses: actions/checkout@master
 #      with:
