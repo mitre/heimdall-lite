@@ -25,7 +25,7 @@ jobs:
     - name: Npm install & link
       run: npm i && sudo npm link heimdallts-db
     - name: Npm run
-      run: npm run start:dev & 
+      run: npm run start:dev 
     - name: run curl
       run: curl http://localhost:8050
     - uses: actions/checkout@v2
