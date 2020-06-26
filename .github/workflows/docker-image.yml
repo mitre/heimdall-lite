@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: run Postgres
-      run: docker run -e POSTGRES_PASSWORD=testpassword -e POSTGRES_USER=testuser -e POSTGRES_DB=heimdall -p 5432:5432 postgres -d
+      run: docker run -e POSTGRES_PASSWORD=testpassword -e POSTGRES_USER=testuser -e POSTGRES_DB=heimdall -p 5432:5432 -d postgres
       
     - uses: actions/checkout@master
       with:
