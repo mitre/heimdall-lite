@@ -1,6 +1,6 @@
 module.exports = {
   rootDir: ".",
-  preset: "jest-puppeteer-docker",
+  preset: "./Preset.js",
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   testMatch: ["<rootDir>/tests/integration/*.spec.ts"],
   testPathIgnorePatterns: ["<rootDir>/src/__mocks__/*"],

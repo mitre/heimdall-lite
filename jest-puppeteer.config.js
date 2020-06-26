@@ -1,13 +1,8 @@
-const getConfig = require("jest-puppeteer-docker/lib/config");
-
-const baseConfig = getConfig();
-const customConfig = Object.assign({}, baseConfig);
-
-customConfig.connect.defaultViewport = {
-  width: 500,
-  height: 500
+module.exports = {
+  launch: {
+    dumpio: true,
+    headless: true,
+    args: ["--disable-infobars"]
+  },
+  browserContext: "default"
 };
-
-customConfig.chromiumFlags = ["–ignore-certificate-errors"];
-
-module.exports = customConfig;
