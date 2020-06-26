@@ -37,7 +37,10 @@ jobs:
         DATABASE_PASSWORD: testpassword
         JWT_SECRET: test
     - name: run curl
-      run: curl http://localhost:8050
+      with:
+        retry_wait_seconds: 10
+        max_attempts: 10
+        command: curl localhost:8050
     - uses: actions/checkout@v2
 #    - uses: actions/checkout@master
 #      with:
