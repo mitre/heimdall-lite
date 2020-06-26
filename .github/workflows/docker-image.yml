@@ -12,18 +12,20 @@ jobs:
     - uses: actions/checkout@master
       with:
         repository: mitre/heimdallts-db
+        path: heimdallts-db
     - name: check file
       run: ls   
     - name: Npm install & link
-      run: sudo npm i && npm run build && sudo npm link
+      run: cd heimdallts-db && sudo npm i && npm run build && sudo npm link
 
     - uses: actions/checkout@master
       with:
         repository: mitre/heimdallts
+        path: heimdallts
     - name: check file
       run: ls
     - name: Npm install & link
-      run: npm i && sudo npm link heimdallts-db
+      run: cd heimdallts && npm i && sudo npm link heimdallts-db
     - name: Npm run
       run: npm run start:dev 
     - name: run curl
