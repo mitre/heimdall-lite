@@ -23,7 +23,7 @@ jobs:
     - name: check file
       run: ls
     - name: Npm install & link
-      run: npm i && npm link heimdallts-db
+      run: npm i && sudo npm link heimdallts-db
     - name: Npm run
       run: npm run start:dev & 
       
