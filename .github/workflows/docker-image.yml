@@ -1,4 +1,4 @@
-name: Docker Imag
+name: Node CI
 
 on: [push]
 
@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: run Postgres
+      run: docker run -e POSTGRES_PASSWORD=testpassword -e POSTGRES_USER=testuser -e POSTGRES_DB=heimdall -p 5432:5432 postgres -d
+      
     - uses: actions/checkout@master
       with:
         repository: mitre/heimdallts-db
@@ -28,6 +31,11 @@ jobs:
       run: cd heimdallts && npm i && sudo npm link heimdallts-db
     - name: Npm run
       run: cd heimdallts && npm run start:dev 
+      env:
+        DATABASE: heimdall
+        DATABASE_USER: testuser
+        DATABASE_PASSWORD: testpassword
+        JWT_SECRET: test
     - name: run curl
       run: curl http://localhost:8050
     - uses: actions/checkout@v2
