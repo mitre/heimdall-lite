@@ -41,25 +41,14 @@ jobs:
     - name: run curl
       run: curl localhost:8050
     - uses: actions/checkout@v2
-#    - uses: actions/checkout@master
-#      with:
-#        repository: mitre/heimdallts
-#    - name: Docker ps test
-#      run: pwd
-#    - name: Docker ps test
-#      run: ls
-#    - name: Docker Build
-#      run: docker build -t heimdall-lite .
-#    - name: Create Network
-#      run: docker network create -d bridge docker_default
-#    - name: Docker Run
-#      run: docker run -d --network docker_default --network-alias heimdall-lite mitre/heimdall-lite   
-    - name: docker ps 
-      run: docker ps -a
+      with:
+        path: heimdall-lite
     - name: npm install
-      run: npm install
+      run: cd heimdall-lite && npm install
     - name: Run NPM 
-      run: npm run serve &
+      run: cd heimdall-lite && npm run serve &
     - name: run curl
       run: curl http://localhost:8080
+    - name: npm test
+      run: cd heimdall-lite && npm run test:integration
 
