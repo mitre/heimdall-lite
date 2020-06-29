@@ -7,7 +7,7 @@ describe("Google", () => {
 
   it("Fill out login", async () => {
     await expect(page).toFillForm('form[name="saurabform"]', {
-      login: "saurabjdc@gmail.com",
+      login: "test@gmail.com",
       password: "password"
     });
   });
