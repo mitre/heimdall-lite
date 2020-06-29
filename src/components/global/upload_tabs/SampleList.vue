@@ -1,10 +1,10 @@
 <template>
-  <v-card class="elevation-0" max-height="500">
+  <v-card class="elevation-0">
     <v-card-subtitle>
       Samples to show the power of the Heimdall application and supported HDF
       formats
     </v-card-subtitle>
-    <v-list>
+    <v-list max-height="434" style="overflow-y:scroll;">
       <v-list-item v-for="(sample, index) in samples" :key="index" class="mx-2">
         <v-list-item-content>
           <v-list-item-title v-text="sample.name" />
@@ -17,7 +17,7 @@
         </v-list-item-action>
       </v-list-item>
     </v-list>
-    <v-btn width="98%" class="mx-2" @click="load_selected_samps">
+    <v-btn block class="px-2" @click="load_selected_samps">
       Upload
       <v-icon class="pl-2"> mdi-file-upload</v-icon>
     </v-btn>
