@@ -1,29 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>
-      Profiles
-    </v-card-title>
     <v-row class="pa-4" justify="space-between">
-      <v-col cols="5">
-        <v-treeview
-          :items="items"
-          :active.sync="active"
-          hoverable
-          open-all
-          dense
-          activatable
-          color="info"
-          selection-type="independent"
-          transition
-        >
-          <template v-slot:prepend="{ item, active }">
-            <v-icon>mdi-note</v-icon>
-          </template>
-        </v-treeview>
-      </v-col>
-
-      <v-divider vertical></v-divider>
-
       <v-col class="d-flex text-center">
         <v-scroll-y-transition mode="out-in">
           <div
@@ -34,12 +11,12 @@
             Select a Profile
           </div>
           <v-card v-else :key="selected.id" class="mx-auto" flat>
-            <v-card-text>
-              <h3 class="headline mb-2">
+            <v-card-title>
+              <h3>
                 {{ selected.name }}
               </h3>
               <div class="mb-2">{{ selected.data.title }}</div>
-            </v-card-text>
+            </v-card-title>
             <v-divider></v-divider>
             <v-row class="text-left py-2" tag="v-card-text">
               <template v-for="info in selected_info">
@@ -98,7 +75,8 @@ class TreeItem {
 // to make props types inferrable.
 const Props = Vue.extend({
   props: {
-    filter: Object // Of type Filer from filteredData
+    filter: Object, // Of type Filer from filteredData
+    selected_prof: String
   }
 });
 
@@ -106,9 +84,6 @@ const Props = Vue.extend({
   components: {}
 })
 export default class ProfileData extends Props {
-  /** Models selected item ids */
-  active: string[] = [];
-
   /** Models all loaded profiles */
   get items(): TreeItem[] {
     return this.root_profiles.map(p => new TreeItem(p));
@@ -131,11 +106,7 @@ export default class ProfileData extends Props {
 
   /** Get the most recently selected */
   get selected(): context.ContextualizedProfile | undefined {
-    // If no active, then who cares
-    if (!this.active.length) return undefined;
-
-    // Otherwise take the most recent active
-    const id = this.active[0];
+    const id = this.selected_prof;
     const selected_profile = this.visible_profiles.find(
       prof => profile_unique_key(prof) === id
     );

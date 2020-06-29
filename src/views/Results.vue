@@ -57,17 +57,29 @@
         <!-- Evaluation Info -->
         <v-row>
           <v-col v-if="file_filter.length > 3">
-            <v-slide-group show-arrows>
+            <v-slide-group show-arrows v-model="eval_info">
               <v-slide-item
                 v-for="(file, i) in file_filter"
                 :key="i"
                 class="mx-2"
+                v-slot:default="{ active, toggle }"
               >
-                <v-card :width="info_width">
+                <v-card :width="info_width" @click="toggle">
                   <EvaluationInfo :file_filter="file" />
+                  <v-card-subtitle style="text-align: right;">
+                    Profile Info ↓
+                  </v-card-subtitle>
                 </v-card>
               </v-slide-item>
             </v-slide-group>
+            <v-expand-transition>
+              <ProfData
+                class="my-4 mx-10"
+                v-if="eval_info != null"
+                :filter="all_filter"
+                :selected_prof="prof_ids[eval_info]"
+              ></ProfData>
+            </v-expand-transition>
           </v-col>
           <v-col
             v-else
@@ -118,13 +130,6 @@
                 100]</v-card-text
               >
             </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- Profile information -->
-        <v-row>
-          <v-col xs-12>
-            <ProfileData :filter="all_filter" />
           </v-col>
         </v-row>
 
@@ -199,7 +204,6 @@ import Treemap from "@/components/cards/treemap/Treemap.vue";
 import StatusChart from "@/components/cards/StatusChart.vue";
 import SeverityChart from "@/components/cards/SeverityChart.vue";
 import ComplianceChart from "@/components/cards/ComplianceChart.vue";
-import ProfileData from "@/components/cards/ProfileData.vue";
 import ExportCaat from "@/components/global/ExportCaat.vue";
 import ExportNist from "@/components/global/ExportNist.vue";
 import ExportJson from "@/components/global/ExportJson.vue";
@@ -212,6 +216,9 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import { need_redirect_file } from "@/utilities/helper_util";
 import ServerModule from "@/store/server";
+import ProfData from "@/components/cards/ProfData.vue";
+import { context } from "inspecjs";
+import { profile_unique_key } from "../utilities/format_util";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -229,11 +236,11 @@ const ResultsProps = Vue.extend({
     StatusChart,
     SeverityChart,
     ComplianceChart,
-    ProfileData,
     ExportCaat,
     ExportNist,
     ExportJson,
-    EvaluationInfo
+    EvaluationInfo,
+    ProfData
   }
 })
 export default class Results extends ResultsProps {
@@ -265,6 +272,13 @@ export default class Results extends ResultsProps {
 
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
+
+  eval_info = null;
+
+  get info(): number | null {
+    console.log(this.eval_info);
+    return this.eval_info;
+  }
 
   /* This is supposed to cause the dialog to automatically appear if there is
    * no file uploaded
@@ -410,6 +424,28 @@ export default class Results extends ResultsProps {
       return 500;
     }
     return 300;
+  }
+
+  /** Flat representation of all profiles that ought to be visible  */
+  get visible_profiles(): Readonly<context.ContextualizedProfile[]> {
+    let filtered = getModule(FilteredDataModule, this.$store);
+    return filtered.profiles(this.all_filter.fromFile);
+  }
+
+  get root_profiles(): context.ContextualizedProfile[] {
+    // Strip to roots
+    let profiles = this.visible_profiles.filter(
+      p => p.extends_from.length === 0
+    );
+    return profiles;
+  }
+
+  get prof_ids(): string[] {
+    let ids = [];
+    for (let prof of this.root_profiles) {
+      ids.push(profile_unique_key(prof));
+    }
+    return ids;
   }
 }
 </script>
