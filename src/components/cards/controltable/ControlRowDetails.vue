@@ -222,6 +222,7 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
     ].filter(v => v.value); // Get rid of nulls
   }
 
+  //for zebra background
   zebra(ix: number): string {
     if (ix % 2 == 0) {
       return "zebra-table";

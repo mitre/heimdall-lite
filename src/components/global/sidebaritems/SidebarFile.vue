@@ -68,11 +68,13 @@ export default class FileItem extends FileItemProps {
     data_store.set_toggled_files([this.file.unique_id]);
   }
 
+  //checks if file is selected
   get selected(): boolean {
     let data_store = getModule(FilteredDataModule, this.$store);
     return data_store.selected_file_ids.includes(this.file.unique_id);
   }
 
+  //removes uploaded file from the currently observed files, not from database
   close_this_file(evt: Event) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -80,6 +82,7 @@ export default class FileItem extends FileItemProps {
     data_store.removeFile(this.file.unique_id);
   }
 
+  //saves file to database
   save_this_file(evt: Event) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -118,6 +121,7 @@ export default class FileItem extends FileItemProps {
     }
   }
 
+  //saves profile to database
   save_profile(file?: ProfileFile) {
     // Strip the file
     if (file) {
@@ -128,6 +132,7 @@ export default class FileItem extends FileItemProps {
     }
   }
 
+  //gives different icons for a file if it is just a profile
   get icon(): string {
     if (this.file.profile !== undefined) {
       return "note";
@@ -136,6 +141,7 @@ export default class FileItem extends FileItemProps {
     }
   }
 
+  //checks if heimdall is in server mode
   get serverMode(): boolean {
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode == undefined) {

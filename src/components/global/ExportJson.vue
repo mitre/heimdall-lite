@@ -39,6 +39,7 @@ const Props = Vue.extend({
   }
 })
 export default class ExportJSON extends Props {
+  //exports .zip of jsons if multiple are selected, if one is selected it will export that .json file
   export_json() {
     let filter_mod = getModule(FilteredDataModule, this.$store);
     let ids = filter_mod.selected_file_ids;

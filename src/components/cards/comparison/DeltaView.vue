@@ -2,20 +2,6 @@
 <template>
   <v-card>
     <v-container fluid>
-      <!-- Title row >
-      <v-row class="background lighten-2">
-        <v-col cols="1">
-        </v-col>
-        <v-col cols="5">
-          {{ old_name }}
-        </v-col>
-        <v-col cols="1">
-        </v-col>
-        <v-col cols="5">
-          {{ new_name }}
-        </v-col>
-      </v-row-->
-
       <!-- Header stuff -->
       <v-row v-if="header_changes.any" justify="center">
         <v-col cols="12">
@@ -94,59 +80,6 @@
           </ControlRowCol>
         </v-col>
       </v-row>
-      <!--template v-for="change_group in result_changes">
-        <v-row justify="center" :key="change_group.name">
-          <v-col cols="12">
-            <TruncatedText
-              :span_classes="['font-weight-bold']"
-            />
-          </v-col>
-        </v-row-->
-
-      <!--ChangeItem
-          v-for="change in change_group.changes"
-          :key="change_group.name + change.name"
-        >
-          <template #name>
-            {{ change.name }}
-          </template>
-          <template #old>
-            {{ change.old }}
-          </template>
-          <template #new>
-            {{ change.new }}
-          </template>
-        </ChangeItem>
-      </template-->
-      <!-- Code stuff -->
-      <!--v-row justify="center">
-        <v-col cols="1">
-        </v-col>
-        <v-col cols="5">
-          <span class="font-weight-black"> Code changes: 
-            <prism language="ruby">{{ this._delta.old.data.code }}</prism>
-          </span>
-          <div>
-            <code-diff 
-            :old-string="this._delta.old.data.code" 
-            :new-string="this._delta.new.data.code" :context="10"
-            :outputFormat="side-by-side"/>
-          </div>
-        </v-col>
-        <v-col cols="1">
-        </v-col>
-        <v-col cols="5">
-          <span class="font-weight-black">
-            <prism language="ruby">{{ this._delta.new.data.code }}</prism>
-          </span>
-          <div>
-            <code-diff 
-            :old-string="this._delta.old.data.code" 
-            :new-string="this._delta.new.data.code" :context="10"
-            :outputFormat="side-by-side"/>
-          </div>
-        </v-col>
-      </v-row-->
     </v-container>
   </v-card>
 </template>
@@ -215,6 +148,7 @@ export default class DeltaView extends Props {
     return this._delta.header_changes;
   }
 
+  //color of newer control
   get colorNew(): String {
     if (this._delta.new.root.hdf.status == "Failed") {
       return "red";
@@ -224,6 +158,7 @@ export default class DeltaView extends Props {
     return "clear";
   }
 
+  //color of older control
   get colorOld(): String {
     if (this._delta.old.root.hdf.status == "Failed") {
       return "red";
@@ -233,14 +168,17 @@ export default class DeltaView extends Props {
     return "clear";
   }
 
+  //TODO: Code Diff
   get code_changes(): ControlChangeGroup | undefined {
     return this._delta.code_changes;
   }
 
+  //returns changes in results
   get result_changes(): ControlChangeGroup[] | undefined {
     return this._delta.segment_changes;
   }
 
+  //creates backround zebra affect
   zebra(ix: number): string {
     return ix % 2 ? "" : "zebra-table";
   }

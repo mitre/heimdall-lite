@@ -168,13 +168,13 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     return this.file.evaluation.data.statistics.duration + "";
   }
 
+  //gets file to retrieve corresponding data
   get file(): EvaluationFile {
-    console.log("file filter: " + this.file_filter);
     let filter_module = getModule(FilteredDataModule, this.$store);
     return filter_module.evaluations([this.file_filter])[0].from_file;
   }
 
-  //Width of component depending on server
+  //width of component needs to be larger for formating when in server mode
   get width(): number {
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode) {
@@ -183,6 +183,7 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     return 350;
   }
 
+  //gives more room for actual info when the "tags" button is not displayed
   get info_cols(): number {
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode) {

@@ -176,6 +176,7 @@ export default class CompareRow extends Props {
     return false;
   }
 
+  //This is used to SELECT controls to view their data
   view(index: number) {
     Vue.set(this.selection, index, !this.selection[index]);
     if (this.selection.length == 2) {
@@ -187,6 +188,7 @@ export default class CompareRow extends Props {
     }
   }
 
+  //returns the number of selected controls in a row, used to determine what to show
   get num_selected(): number {
     var selected = 0;
     var i;
@@ -206,6 +208,7 @@ export default class CompareRow extends Props {
     }
   }
 
+  //returns the control select
   get detail_control(): context.ContextualizedControl | null {
     for (let i = 0; i < this.selection.length; i++) {
       if (this.selection[i]) {
@@ -215,6 +218,7 @@ export default class CompareRow extends Props {
     return null;
   }
 
+  //Updates selection array to match file count
   get file_num_watch(): string {
     let filter_module = getModule(FilteredDataModule, this.$store);
     this.selection = filter_module.selected_file_ids.map(x => false);

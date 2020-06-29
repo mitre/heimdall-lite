@@ -103,6 +103,7 @@ export default class ApexLineChart extends ApexLineChartProps {
     return colors;
   }
 
+  //creates differing number of ticks based on number of controls
   get y_axis_tick(): number {
     if (this.upper_range < 15) {
       return this.upper_range;
@@ -113,6 +114,7 @@ export default class ApexLineChart extends ApexLineChartProps {
     }
   }
 
+  //gives apex charts the severity colors
   get sev_colors(): string[] {
     let colors = [];
     colors.push("#FFEB3B");
@@ -130,6 +132,7 @@ export default class ApexLineChart extends ApexLineChartProps {
     return undefined;
   }
 
+  //changes text based on light or dark mode
   get white_black(): string {
     var whiteBlack;
     if (this.$vuetify.theme.dark) {
@@ -169,14 +172,7 @@ export default class ApexLineChart extends ApexLineChartProps {
           color: this.white_black
         }
       },
-      //tooltip: {
-      //  custom: function({series, seriesIndex, dataPointIndex, w}) {
-      //    return '<div style="color: black;">'+ w.globals.labels + ":" + series[seriesIndex][dataPointIndex] + '</div>';}
-      //},
       legend: {
-        //tooltipHoverFormatter: function(val, opts) {
-        //  return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
-        //},
         labels: {
           useSeriesColors: true
         }

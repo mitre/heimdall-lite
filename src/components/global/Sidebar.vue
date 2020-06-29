@@ -96,6 +96,7 @@ const SidebarProps = Vue.extend({
   }
 })
 export default class Sidebar extends SidebarProps {
+  //selects/deselects all files. Will select all unless all are already selected
   toggle_all(): void {
     let filtered_module = getModule(FilteredDataModule, this.$store);
     let data_module = getModule(InspecDataModule, this.$store);
@@ -109,6 +110,7 @@ export default class Sidebar extends SidebarProps {
     }
   }
 
+  //checks if all files are selected
   get all_toggled(): boolean {
     let filtered_module = getModule(FilteredDataModule, this.$store);
     let data_module = getModule(InspecDataModule, this.$store);

@@ -415,6 +415,7 @@ export default class Results extends ResultsProps {
     }
   }
 
+  //changes width of eval info if it is in server mode and needs more room for tags
   get info_width(): number {
     let mod = getModule(ServerModule, this.$store);
     if (mod.serverMode == undefined) {
@@ -440,6 +441,7 @@ export default class Results extends ResultsProps {
     return profiles;
   }
 
+  //gets profile ids for the profData component to display corresponding info
   get prof_ids(): string[] {
     let ids = [];
     for (let prof of this.root_profiles) {
