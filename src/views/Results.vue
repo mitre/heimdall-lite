@@ -72,14 +72,12 @@
                 </v-card>
               </v-slide-item>
             </v-slide-group>
-            <v-expand-transition>
-              <ProfData
-                class="my-4 mx-10"
-                v-if="eval_info != null"
-                :filter="all_filter"
-                :selected_prof="prof_ids[eval_info]"
-              ></ProfData>
-            </v-expand-transition>
+            <ProfData
+              class="my-4 mx-10"
+              v-if="eval_info != null"
+              :filter="all_filter"
+              :selected_prof="prof_ids[eval_info]"
+            ></ProfData>
           </v-col>
           <v-col
             v-else
@@ -87,10 +85,19 @@
             :key="i"
             :cols="12 / file_filter.length"
           >
-            <v-card>
+            <v-card @click="toggle_prof(i)">
               <EvaluationInfo :file_filter="file" />
+              <v-card-subtitle style="text-align: right;">
+                Profile Info ↓
+              </v-card-subtitle>
             </v-card>
           </v-col>
+          <ProfData
+            class="my-4 mx-10"
+            v-if="eval_info != null && file_filter.length <= 3"
+            :filter="all_filter"
+            :selected_prof="prof_ids[eval_info]"
+          ></ProfData>
         </v-row>
         <!-- Count Cards -->
         <StatusCardRow
@@ -273,12 +280,7 @@ export default class Results extends ResultsProps {
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
 
-  eval_info = null;
-
-  get info(): number | null {
-    console.log(this.eval_info);
-    return this.eval_info;
-  }
+  eval_info: number | null = null;
 
   /* This is supposed to cause the dialog to automatically appear if there is
    * no file uploaded
@@ -448,6 +450,15 @@ export default class Results extends ResultsProps {
       ids.push(profile_unique_key(prof));
     }
     return ids;
+  }
+
+  //basically a v-model for the eval info cards when there is no slide group
+  toggle_prof(index: number) {
+    if (index == this.eval_info) {
+      this.eval_info = null;
+    } else {
+      this.eval_info = index;
+    }
   }
 }
 </script>
