@@ -322,10 +322,19 @@ export default class Compare extends Props {
     }
     return this.searched_sets.filter(series => {
       // Get the first status. If no change, all should equal this
-      let first = get_status_safe(series[0]);
+      let first;
+      for (let i = 0; i < series.length; i++) {
+        if (get_status_safe(series[i]) !== "No Data") {
+          first = get_status_safe(series[i]);
+          break;
+        }
+      }
       for (let i = 1; i < series.length; i++) {
         // Check if the status has changed. If so, keep
-        if (get_status_safe(series[i]) !== first) {
+        if (
+          get_status_safe(series[i]) !== first &&
+          get_status_safe(series[i]) !== "No Data"
+        ) {
           return true;
         }
       }
