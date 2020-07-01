@@ -10,7 +10,7 @@
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
-                <v-form ref="form">
+                <v-form name="signup_form" ref="form">
                   <v-text-field
                     label="Username"
                     name="username"
@@ -42,6 +42,7 @@
                       style="padding-left: 35px;"
                       ref="password"
                       type="password"
+                      name="password"
                       v-model="password"
                       label="password"
                       v-validate="'required'"

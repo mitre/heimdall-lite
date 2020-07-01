@@ -2,7 +2,19 @@ import "expect-puppeteer";
 
 describe("Google", () => {
   beforeAll(async () => {
-    await page.goto("http://192.168.65.2:8083");
+    await page.goto("http://localhost:8083/signup");
+  });
+
+  it("Fill out Signup", async () => {
+    await expect(page).toFillForm('form[name="signup_form"]', {
+      username: "saurabjdc1@gmail.com",
+      password: "password",
+      confirm_password: "password"
+    });
+  });
+  it("Click Login", async () => {
+    await expect(page).toClick("button", { text: "Register" });
+    await page.waitForNavigation();
   });
 
   it("Fill out login", async () => {
