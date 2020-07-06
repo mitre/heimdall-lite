@@ -17,12 +17,14 @@ const router = new Router({
     {
       path: '/results',
       name: 'results',
-      component: Results
+      component: Results,
+      meta: {requiresAuth: true}
     },
     {
       path: '/compare',
       name: 'compare',
-      component: Compare
+      component: Compare,
+      meta: {requiresAuth: true}
     },
     {
       path: '/',
@@ -33,12 +35,14 @@ const router = new Router({
     {
       path: '/profile',
       name: 'profile',
-      component: Profile
+      component: Profile,
+      meta: {requiresAuth: true}
     },
     {
       path: '/usergroup/:id',
       name: 'usergroup',
-      component: Usergroup
+      component: Usergroup,
+      meta: {requiresAuth: true}
     },
     {
       path: '/login',
@@ -52,7 +56,8 @@ const router = new Router({
     },
     {
       path: '*',
-      redirect: '/results/all'
+      redirect: '/results/all',
+      meta: {requiresAuth: true}
     }
   ]
 });
