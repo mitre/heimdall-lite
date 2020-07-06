@@ -51,7 +51,7 @@ class Backend extends VuexModule implements IBackendState {
 
   @Mutation
   CLEAR_TOKEN() {
-    local_token.set(null);
+    local_token.clear();
     location.reload();
   }
 
@@ -106,8 +106,8 @@ class Backend extends VuexModule implements IBackendState {
   }
 
   @Action
-  public Logout() {
-    this.CLEAR_TOKEN;
+  public Logout(): void {
+    this.CLEAR_TOKEN();
   }
 }
 
