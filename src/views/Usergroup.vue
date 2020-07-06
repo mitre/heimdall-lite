@@ -1,18 +1,5 @@
 <template>
   <BaseView :title="curr_title">
-    <!-- Topbar config - give it a search bar -->
-    <template #topbar-content>
-      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Load
-        </span>
-        <v-icon>
-          mdi-cloud-upload
-        </v-icon>
-      </v-btn>
-      <UserMenu />
-    </template>
-
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
@@ -106,9 +93,6 @@
         </v-row>
       </v-container>
     </template>
-
-    <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -116,7 +100,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
-import UploadNexus from '@/components/global/UploadNexus.vue';
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
@@ -157,7 +140,6 @@ const UsergroupProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus,
     UserMenu
   }
 })
@@ -360,17 +342,6 @@ export default class UsergroupView extends UsergroupProps {
         console.log('Loaded ' + unique_id);
         this.on_got_files([unique_id]);
       });
-  }
-
-  profile_page() {
-    this.dialog = false;
-    this.$router.push('/profile');
-  }
-
-  log_out() {
-    getModule(ServerModule, this.$store).clear_token();
-    this.dialog = false;
-    this.$router.push('/');
   }
 
   /**

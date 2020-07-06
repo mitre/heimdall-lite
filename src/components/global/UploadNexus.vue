@@ -1,13 +1,10 @@
 <template>
-  <v-container>
+  <div>
     <Modal
       :value="value"
       @input="$emit('input', $event.target.value)"
       :persistent="persistent"
     >
-      <div v-if="is_logged_in" style="padding: 8px;float: right; width:100px">
-        <v-btn id="logout" @click="logout()" color="normal">Logout</v-btn>
-      </div>
       <v-tabs
         :vertical="$vuetify.breakpoint.mdAndUp"
         active
@@ -54,7 +51,7 @@
       </v-tabs>
       <HelpFooter />
     </Modal>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -71,6 +68,7 @@ import SplunkReader from '@/components/global/upload_tabs/splunk/SplunkReader.vu
 import SampleList from '@/components/global/upload_tabs/SampleList.vue';
 import ServerModule from '@/store/server';
 import {LocalStorageVal} from '@/utilities/helper_util';
+import {BackendModule} from '@/store/backend';
 
 export class UserProfile {
   id?: number;
@@ -118,14 +116,8 @@ export default class UploadNexus extends Props {
   }
 
   get is_logged_in(): boolean {
-    let mod = getModule(ServerModule, this.$store);
-
-    if (mod.serverMode) {
-      if (this.token) {
-        return true;
-      } else {
-        return false;
-      }
+    if (BackendModule.serverMode && BackendModule.token) {
+      return true;
     } else {
       return false;
     }

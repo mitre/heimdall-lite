@@ -103,19 +103,8 @@ export class HSConnectionConfig {
 class HeimdallServerModule extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
-  serverMode: boolean | null = null;
+  serverMode: boolean = false;
   serverUrl: string = '';
-  @Mutation
-  set_connection(new_url: string) {
-    this.connection = new HSConnectionConfig(new_url);
-  }
-
-  @Action
-  async connect(new_url: string): Promise<void> {
-    console.log('connected :' + new_url);
-    this.set_connection(new_url);
-  }
-
   /** Our currently granted JWT token */
   token: string | null = local_token.get();
   profile: UserProfile | null = local_user.get();
@@ -126,6 +115,17 @@ class HeimdallServerModule extends VuexModule {
   user_evaluations: string | null = local_user_evaluations.get();
   evaluation: string | null = local_evaluation.get();
   tags: string | null = local_tags.get();
+
+  @Mutation
+  set_connection(new_url: string) {
+    this.connection = new HSConnectionConfig(new_url);
+  }
+
+  @Action
+  async connect(new_url: string): Promise<void> {
+    console.log('connected :' + new_url);
+    this.set_connection(new_url);
+  }
 
   /** Mutation to set above, as well as to update our localstorage */
   @Mutation
@@ -146,7 +146,7 @@ class HeimdallServerModule extends VuexModule {
 
   @Action
   server_mode() {
-    let url = window.location.origin + '/api';
+    let url = window.location.origin;
     console.log(url);
     /*This will check if api is available */
     if (process.env.VUE_APP_API_URL) {
@@ -154,13 +154,12 @@ class HeimdallServerModule extends VuexModule {
       this.mod_server_mode(true);
     } else {
       axios
-        .get(url, {
+        .get(url + '/api', {
           validateStatus: function(status) {
             return status < 500; // Reject only if the status code is greater than or equal to 500
           }
         })
         .then(res => {
-          console.log('test');
           if (res.status == 200) {
             this.mod_server_mode(true); //window.location.href;
             this.mod_server_url(url); // = true;

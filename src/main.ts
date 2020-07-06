@@ -9,6 +9,8 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import VueAnalytics from 'vue-analytics';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
+import {BackendModule} from './store/backend';
+import axios from 'axios';
 
 Vue.use(VueAnalytics, {
   id: 'UA-149784359-1',
@@ -26,6 +28,18 @@ new Vue({
   router,
   store,
   vuetify,
+  created() {
+    axios.interceptors.response.use(
+      response => response, // simply return the response
+      error => {
+        if (error.response.status === 401) {
+          // if we catch a 401 error
+          BackendModule.Logout();
+        }
+        return Promise.reject(error); // reject the Promise, with the error as the reason
+      }
+    );
+  },
   render: h => h(App)
 }).$mount('#app');
 

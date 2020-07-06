@@ -1,17 +1,6 @@
 <template>
   <BaseView :title="curr_title">
-    <!-- Topbar config - give it a search bar -->
-    <template #topbar-content>
-      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Load
-        </span>
-        <v-icon>
-          mdi-cloud-upload
-        </v-icon>
-      </v-btn>
-      <UserMenu />
-    </template>
+    <template #topbar-content />
 
     <!-- The main content: cards, etc -->
     <template #main-content>
@@ -124,9 +113,6 @@
         </v-row>
       </v-container>
     </template>
-
-    <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -134,7 +120,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
-import UploadNexus from '@/components/global/UploadNexus.vue';
+import Navbar from '@/views/Navbar.vue';
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
@@ -168,7 +154,6 @@ const ProfileProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus,
     UserMenu
   }
 })
@@ -329,7 +314,10 @@ export default class Profile extends ProfileProps {
       })
       .then(() => {
         console.log('Loaded ' + unique_id);
-        this.on_got_files([unique_id]);
+        // TODO: The following line being removed breaks the ability for users
+        // To import profile results, however this function is currently broken
+        // anyway since it has not yet been migrated over to the heimdall2 server
+        // this.on_got_files([unique_id]);
       });
   }
 
@@ -357,36 +345,6 @@ export default class Profile extends ProfileProps {
         .then(() => {
           console.log('here2');
         });
-    }
-  }
-
-  profile_page() {
-    this.dialog = false;
-    this.$router.push('/profile');
-  }
-
-  log_out() {
-    getModule(ServerModule, this.$store).clear_token();
-    this.dialog = false;
-    this.$router.push('/');
-  }
-
-  /**
-   * Invoked when file(s) are loaded.
-   */
-  on_got_files(ids: FileID[]) {
-    // Close the dialog
-    this.dialog = false;
-
-    // If just one file, focus it
-    if (ids.length === 1) {
-      this.$router.push(`/results/${ids[0]}`);
-    }
-
-    // If more than one, focus all.
-    // TODO: Provide support for focusing a subset of files
-    else if (ids.length > 1) {
-      this.$router.push(`/results/all`);
     }
   }
 }

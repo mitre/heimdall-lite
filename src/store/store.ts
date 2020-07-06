@@ -9,6 +9,7 @@ import InspecIntakeModule from '@/store/report_intake';
 import ColorHackModule from '@/store/color_hack';
 import AppInfoModule from '@/store/app_info';
 import HeimdallServerModule from './server';
+import {IBackendState} from './backend';
 
 Vue.use(Vuex);
 
@@ -35,6 +36,7 @@ interface StoreType {
   colors: ColorHackModule;
   info: AppInfoModule;
   heimdallServer: HeimdallServerModule;
+  backend: IBackendState;
 }
 const store = new Vuex.Store<StoreType>({});
 

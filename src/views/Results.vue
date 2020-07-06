@@ -11,20 +11,7 @@
         label="Search"
         v-model="search_term"
         clearable
-      ></v-text-field>
-      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Load
-        </span>
-        <v-icon>
-          mdi-cloud-upload
-        </v-icon>
-      </v-btn>
-      <v-btn @click="clear" :disabled="!can_clear">
-        Clear
-        <v-icon class="px-1">mdi-filter-remove</v-icon>
-      </v-btn>
-      <UserMenu />
+      />
     </template>
 
     <!-- Custom sidebar content -->
@@ -153,9 +140,6 @@
       </v-container>
     </template>
 
-    <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
-
     <!-- Everything-is-filtered snackbar -->
     <v-snackbar
       style="margin-top: 44px;"
@@ -188,7 +172,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
-import UploadNexus from '@/components/global/UploadNexus.vue';
 
 import StatusCardRow from '@/components/cards/StatusCardRow.vue';
 import ControlTable from '@/components/cards/controltable/ControlTable.vue';
@@ -227,7 +210,6 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus,
     StatusCardRow,
     Treemap,
     ControlTable,
@@ -273,11 +255,6 @@ export default class Results extends ResultsProps {
   filter_snackbar: boolean = false;
 
   eval_info: number | null = null;
-
-  get is_server_mode(): boolean | null {
-    let mod = getModule(ServerModule, this.$store);
-    return mod.serverMode;
-  }
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
@@ -334,17 +311,6 @@ export default class Results extends ResultsProps {
     this.tree_filters = [];
   }
 
-  profile_page() {
-    this.dialog = false;
-    this.$router.push('/profile');
-  }
-
-  log_out() {
-    getModule(ServerModule, this.$store).clear_token();
-    this.dialog = false;
-    this.$router.push('/');
-  }
-
   /**
    * Returns true if we can currently clear.
    * Essentially, just controls whether the button is available
@@ -391,20 +357,6 @@ export default class Results extends ResultsProps {
       return this.file_filter.length + ' files selected';
     } else {
       return 'No files selected';
-    }
-  }
-
-  /**
-   * Invoked when file(s) are loaded.
-   */
-  on_got_files(ids: FileID[]) {
-    // Close the dialog
-    this.dialog = false;
-
-    //enable all uploaded files
-    let filter_module = getModule(FilteredDataModule, this.$store);
-    for (let i of ids) {
-      filter_module.set_toggle_file_on(i);
     }
   }
 

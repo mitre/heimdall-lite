@@ -4,14 +4,14 @@ import Results from '@/views/Results.vue';
 import Compare from '@/views/Compare.vue';
 import Landing from '@/views/Landing.vue';
 import Profile from '@/views/Profile.vue';
-import Auth from '@/views/Auth.vue';
 import Login from '@/views/Login.vue';
 import Signup from '@/views/Signup.vue';
 import Usergroup from '@/views/Usergroup.vue';
+import {BackendModule} from './store/backend';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -27,12 +27,8 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Landing
-    },
-    {
-      path: '/home',
-      name: 'home',
-      component: Landing
+      component: Landing,
+      meta: {requiresAuth: true}
     },
     {
       path: '/profile',
@@ -60,3 +56,17 @@ export default new Router({
     }
   ]
 });
+
+router.beforeEach((to, _, next) => {
+  BackendModule.CheckForServer().then(() => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (BackendModule.serverMode && !BackendModule.token) {
+        next('/login');
+        return;
+      }
+    }
+    next();
+  });
+});
+
+export default router;

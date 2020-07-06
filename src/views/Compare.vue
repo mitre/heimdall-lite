@@ -12,14 +12,6 @@
         v-model="search_term"
         clearable
       ></v-text-field>
-      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">Load</span>
-        <v-icon>mdi-cloud-upload</v-icon>
-      </v-btn>
-      <v-btn @click="log_out" class="mx-2">
-        <span class="d-none d-md-inline pr-2">Logout</span>
-        <v-icon>mdi-logout</v-icon>
-      </v-btn>
     </template>
 
     <!-- The main content: comparisons of each set of controls in control_sets, etc -->
