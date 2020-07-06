@@ -123,7 +123,6 @@ class HeimdallServerModule extends VuexModule {
 
   @Action
   async connect(new_url: string): Promise<void> {
-    console.log('connected :' + new_url);
     this.set_connection(new_url);
   }
 
@@ -131,7 +130,6 @@ class HeimdallServerModule extends VuexModule {
   @Mutation
   set_token(new_token: string | null) {
     this.token = new_token;
-    console.log('server.ts - set token: ' + this.token);
     local_token.set(new_token);
   }
   @Mutation
@@ -147,7 +145,6 @@ class HeimdallServerModule extends VuexModule {
   @Action
   server_mode() {
     let url = window.location.origin;
-    console.log(url);
     /*This will check if api is available */
     if (process.env.VUE_APP_API_URL) {
       this.mod_server_url(process.env.VUE_APP_API_URL); // this.serverUrl = process.env.VUE_APP_API_URL;
@@ -168,7 +165,6 @@ class HeimdallServerModule extends VuexModule {
           }
         })
         .catch(error => {
-          console.log('caught error');
           this.mod_server_mode(false);
         });
     }
@@ -183,7 +179,6 @@ class HeimdallServerModule extends VuexModule {
   @Mutation
   set_evaluation(evaluation: string | null) {
     this.evaluation = evaluation;
-    console.log('server.ts - set evaluation: ' + this.evaluation);
     local_evaluation.set(evaluation);
   }
 
@@ -191,7 +186,6 @@ class HeimdallServerModule extends VuexModule {
   @Mutation
   set_tags(tags: string | null) {
     this.tags = tags;
-    console.log('server.ts - set tags: ' + this.tags);
     local_tags.set(tags);
   }
 
@@ -214,24 +208,18 @@ class HeimdallServerModule extends VuexModule {
     } else {
       this.profile = null;
     }
-    console.log('server.ts - set user: ' + this.profile);
     local_user.set(this.profile);
   }
 
   /** Mutation to set usergroups */
   @Mutation
   set_usergroups(usergroups: string | null) {
-    console.log('Usergroups: ' + JSON.stringify(usergroups));
     if (usergroups) {
       let eval_obj = Array.from(usergroups) || [];
       this.usergroups = eval_obj.map((x: any) => plainToClass(Usergroup, x));
       this.personal_group = this.usergroups.shift() || null;
       local_usergroups.set(this.usergroups);
       local_personal_group.set(this.personal_group);
-      console.log('this.usergroups: ' + JSON.stringify(this.usergroups));
-      console.log(
-        'this.personal_group: ' + JSON.stringify(this.personal_group)
-      );
     } else {
       local_usergroups.set(null);
       local_personal_group.set(null);
@@ -241,7 +229,6 @@ class HeimdallServerModule extends VuexModule {
   /** Mutation to set usergroups */
   @Mutation
   set_users(users: string | null) {
-    console.log('users: ' + JSON.stringify(users));
     if (users) {
       let eval_obj = Array.from(users) || [];
       this.users = eval_obj.map((x: any) => plainToClass(UserProfile, x));
@@ -254,11 +241,9 @@ class HeimdallServerModule extends VuexModule {
   /** Mutation to set usergroups */
   @Mutation
   set_usergroup(usergroup: string | null) {
-    console.log('Usergroup: ' + JSON.stringify(usergroup));
     if (usergroup) {
       this.usergroup = plainToClass(Usergroup, usergroup);
       local_usergroup.set(this.usergroup);
-      console.log('this.usergroup: ' + JSON.stringify(this.usergroup));
     } else {
       local_usergroup.set(null);
     }
@@ -272,24 +257,13 @@ class HeimdallServerModule extends VuexModule {
     } else {
       this.user_evaluations = null;
     }
-    console.log('server.ts - set user_evaluations: ' + this.user_evaluations);
     local_user_evaluations.set(this.user_evaluations);
   }
 
   /** Attempts to login to the server */
   @Action
   async login(creds: LoginHash): Promise<void> {
-    console.log(
-      'Logging in to ' +
-        this.connection!.url +
-        '/auth/login' +
-        ' with ' +
-        creds['username'] +
-        '/' +
-        creds['password']
-    );
     //this.requires_connection();
-    console.log('has connection');
     //curl -X POST http://localhost:8050/auth/login -d '{"username": "blah", "password": "blaah"}' -H "Content-Type: application/json"
     return fetch(this.connection!.url + '/auth/login', {
       body: `{"username": "${creds['username']}", "password": "${creds['password']}"}`,
@@ -303,7 +277,6 @@ class HeimdallServerModule extends VuexModule {
       .then((v: any) => {
         if (typeof v === 'object') {
           this.set_token(v.access_token);
-          console.log('got token' + v.access_token);
           this.retrieve_profile();
           this.retrieve_personal_evaluations();
           this.retrieve_usergroups();
@@ -322,15 +295,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to login to the server */
   @Action
   async register(creds: LoginHash): Promise<void> {
-    console.log(
-      'Registering to ' +
-        this.connection!.url +
-        '/auth/register' +
-        ' with ' +
-        creds['username'] +
-        '/' +
-        creds['password']
-    );
     //curl -X POST http://localhost:8050/auth/register -d '{"email": "blah@gmail.com", "password": "blaah"}' -H "Content-Type: application/json"
     return (
       fetch(this.connection!.url + '/auth/register', {
@@ -343,9 +307,7 @@ class HeimdallServerModule extends VuexModule {
         //.then(this.check_code)
         //.then(res => res.json())
         .then((v: Response) => {
-          if (v.ok) {
-            console.log('registration returned ' + v.ok);
-          } else {
+          if (!v.ok) {
             console.error(
               `Something went wrong: Got ${JSON.stringify(
                 v
@@ -363,7 +325,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to login to the server */
   @Action
   async retrieve_profile(): Promise<void> {
-    console.log('Getting ' + this.connection!.url + '/auth/profile');
     //curl http://localhost:8050/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/auth/profile', {
@@ -380,9 +341,6 @@ class HeimdallServerModule extends VuexModule {
   @Action
   async save_evaluation(evaluation: EvaluationFile): Promise<void> {
     let decontextualized = evaluation.evaluation.data;
-    console.log(
-      'Saving execution to ' + this.connection!.url + '/executions/upload'
-    );
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -397,15 +355,12 @@ class HeimdallServerModule extends VuexModule {
         },
         options
       )
-      .then((v: any) => {
-        console.log('saved');
-      });
+      .then((v: any) => {});
   }
 
   /** Attempts to retrieve a list of personal evaluations */
   @Action
   async retrieve_personal_evaluations(): Promise<void> {
-    console.log('Getting ' + this.connection!.url + '/executions/personal');
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/executions/personal', {
@@ -414,7 +369,6 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        //console.log("personal evals: " + JSON.stringify(v.data));
         this.set_user_evaluations(v.data);
       });
   }
@@ -422,7 +376,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve a list of personal evaluations */
   @Action
   async retrieve_usergroups(): Promise<void> {
-    console.log('Getting ' + this.connection!.url + '/teams/usergroups');
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/teams/usergroups', {
@@ -431,7 +384,6 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        //console.log("personal evals: " + JSON.stringify(v.data));
         this.set_usergroups(v.data);
       });
   }
@@ -439,7 +391,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve a list of users */
   @Action
   async retrieve_users(): Promise<void> {
-    console.log('Getting ' + this.connection!.url + '/users');
     return axios.get(this.connection!.url + '/users').then((v: any) => {
       this.set_users(v.data);
     });
@@ -448,12 +399,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve an evaluations */
   @Action
   async retrieve_evaluation(eval_hash: RetrieveHash): Promise<void> {
-    console.log(
-      'Getting ' +
-        this.connection!.url +
-        '/executions/fetch/' +
-        eval_hash.eva.id
-    );
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/executions/fetch/' + eval_hash.eva.id, {
@@ -462,7 +407,6 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        console.log('got evaluation: ' + JSON.stringify(v.data));
         let intake_module = getModule(InspecIntakeModule, Store);
         intake_module.loadText({
           text: JSON.stringify(v.data),
@@ -479,9 +423,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve an evaluations */
   @Action
   async retrieve_tags(file_id: FileID): Promise<void> {
-    console.log(
-      'Getting ' + this.connection!.url + '/executions/tags/' + file_id
-    );
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/executions/tags/' + file_id, {
@@ -490,7 +431,6 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        console.log('got tags: ' + JSON.stringify(v.data));
         this.set_tags(v.data);
       });
   }
@@ -498,9 +438,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve an evaluations */
   @Action
   async retrieve_usergroup(group: GetUsergroupHash): Promise<void> {
-    console.log(
-      'Getting ' + this.connection!.url + '/teams/' + group['group_id']
-    );
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .get(this.connection!.url + '/teams/' + group['group_id'], {
@@ -509,7 +446,6 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        console.log('got usergroup: ' + JSON.stringify(v.data));
         this.set_usergroup(v.data);
       });
   }
@@ -517,16 +453,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to save evaluation to the database */
   @Action
   async save_tag(tag: TagHash): Promise<void> {
-    console.log(
-      'Saving tag (' +
-        tag['name'] +
-        ': ' +
-        tag['value'] +
-        ') to ' +
-        this.connection!.url +
-        '/executions/tags/' +
-        tag['tagger_id']
-    );
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -541,21 +467,12 @@ class HeimdallServerModule extends VuexModule {
         },
         options
       )
-      .then((v: any) => {
-        console.log('saved');
-      });
+      .then((v: any) => {});
   }
 
   /** Attempts to save evaluation to the database */
   @Action
   async new_usergroup(group: UsergroupHash): Promise<void> {
-    console.log(
-      'Saving group ' +
-        group['name'] +
-        ' to ' +
-        this.connection!.url +
-        '/teams/usergroups'
-    );
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -570,7 +487,6 @@ class HeimdallServerModule extends VuexModule {
         options
       )
       .then((v: any) => {
-        console.log('saved');
         this.set_usergroups(v.data);
       });
   }
@@ -578,13 +494,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to save evaluation to the database */
   @Action
   async add_to_usergroup(group: AddToUsergroupHash): Promise<void> {
-    console.log(
-      'Adding to group ' +
-        group['group_id'] +
-        this.connection!.url +
-        '/executions/addusergroup/' +
-        group['group_id']
-    );
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -598,23 +507,12 @@ class HeimdallServerModule extends VuexModule {
         },
         options
       )
-      .then((v: any) => {
-        console.log('saved');
-      });
+      .then((v: any) => {});
   }
 
   /** Attempts to add a team member to a usergroup */
   @Action
   async add_team_member(group: AddMemberUsergroupHash): Promise<void> {
-    console.log(
-      'Adding to group ' +
-        group['group_id'] +
-        this.connection!.url +
-        '/teams/' +
-        group['group_id'] +
-        '/add/' +
-        group['user_id']
-    );
     //curl -X POST http://localhost:8050/teams/13/add -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTU5MzUzOTM0MywiZXhwIjoxNTkzNTQyOTQzfQ.GEbmH01kA3yCEf6TVa8GbQXr355LP8d2UdIVA9TJ7xg"
     const options = {
       headers: {
@@ -630,7 +528,6 @@ class HeimdallServerModule extends VuexModule {
         options
       )
       .then((v: any) => {
-        console.log('got usergroup: ' + JSON.stringify(v.data));
         this.set_usergroup(v.data);
       });
   }
@@ -638,14 +535,6 @@ class HeimdallServerModule extends VuexModule {
   /** Attempts to retrieve an evaluations */
   @Action
   async delete_tag(tag: TagIdsHash): Promise<void> {
-    console.log(
-      'Deleting ' +
-        this.connection!.url +
-        '/executions/' +
-        tag['tagger_id'] +
-        '/tags/' +
-        tag['id']
-    );
     //curl http://localhost:8050/executions/personal -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
     return axios
       .delete(
@@ -661,8 +550,6 @@ class HeimdallServerModule extends VuexModule {
         }
       )
       .then((v: any) => {
-        console.log('deleted tag');
-        console.log('got tags: ' + JSON.stringify(v.data));
         this.set_tags(v.data);
       });
   }
@@ -672,10 +559,7 @@ class HeimdallServerModule extends VuexModule {
 
   private async check_code(res: Response): Promise<Response> {
     // if ok, pass
-    console.log('check_code res.ok: ' + res.ok);
     if (res.ok) {
-      console.log('check_code res.status: ' + res.status);
-      console.log('check_code res.body: ' + res.body);
       return res;
     }
 

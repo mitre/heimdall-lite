@@ -212,7 +212,6 @@ export default class Profile extends ProfileProps {
       const evals: Evaluation[] = eval_obj.map((x: any) =>
         plainToClass(Evaluation, x)
       );
-      console.log('evals: ' + evals.length);
       evals.forEach(eva => {
         eva.filename = this.evaluation_label(eva);
       });
@@ -223,13 +222,10 @@ export default class Profile extends ProfileProps {
   }
 
   get usergroups(): Usergroup[] {
-    console.log('Get usergroups');
     let mod = getModule(ServerModule, this.$store);
     if (mod.usergroups) {
-      console.log('Return usergroups: ' + JSON.stringify(mod.usergroups));
       return mod.usergroups;
     } else {
-      console.log('No usergroups');
       return [];
     }
   }
@@ -238,7 +234,6 @@ export default class Profile extends ProfileProps {
     let label = evaluation.version;
     if (evaluation.tags) {
       evaluation.tags.forEach(tag => {
-        console.log('tag ' + tag.content.name + ': ' + tag.content.value);
         if (tag.content.name == 'filename') {
           label = tag.content.value;
         }
@@ -262,7 +257,6 @@ export default class Profile extends ProfileProps {
   }
 
   async submit_usergroup(): Promise<void> {
-    console.log('submit ' + this.group_name);
     const host = process.env.VUE_APP_API_URL!;
 
     if (this.group_name) {
@@ -283,14 +277,11 @@ export default class Profile extends ProfileProps {
         .catch(bad => {
           console.error(`bad save ${bad}`);
         })
-        .then(() => {
-          console.log('here2');
-        });
+        .then(() => {});
     }
   }
 
   async load_this_evaluation(evaluation: Evaluation): Promise<void> {
-    console.log('load this file: ' + evaluation.id);
     const host = process.env.VUE_APP_API_URL!;
     // Generate an id
     let unique_id = next_free_file_ID();
@@ -302,7 +293,6 @@ export default class Profile extends ProfileProps {
         console.error('Unable to connect to ' + host);
       })
       .then(() => {
-        console.log('here');
         let eva_hash: RetrieveHash = {
           unique_id: unique_id,
           eva: evaluation
@@ -313,7 +303,6 @@ export default class Profile extends ProfileProps {
         console.error(`bad login ${bad}`);
       })
       .then(() => {
-        console.log('Loaded ' + unique_id);
         // TODO: The following line being removed breaks the ability for users
         // To import profile results, however this function is currently broken
         // anyway since it has not yet been migrated over to the heimdall2 server
@@ -322,7 +311,6 @@ export default class Profile extends ProfileProps {
   }
 
   async add_to_group(): Promise<void> {
-    console.log('Add ' + this.selected + ' to ' + this.selected_group);
     const host = process.env.VUE_APP_API_URL!;
 
     if (this.selected && this.selected_group) {
@@ -342,9 +330,7 @@ export default class Profile extends ProfileProps {
         .catch(bad => {
           console.error(`bad save ${bad}`);
         })
-        .then(() => {
-          console.log('here2');
-        });
+        .then(() => {});
     }
   }
 }

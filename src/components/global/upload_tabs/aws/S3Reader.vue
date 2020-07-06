@@ -102,14 +102,6 @@ export default class S3Reader extends Props {
   files: S3.Object[] = [];
 
   /**
-   * Logs out of current auth stage
-   */
-  logout() {
-    this.assumed_role = null;
-    this.mfa_token = '';
-  }
-
-  /**
    * Handle a basic login.
    * Gets a session token
    */

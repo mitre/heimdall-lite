@@ -99,7 +99,6 @@ export default class DatabaseReader extends Props {
       const evals: Evaluation[] = eval_obj.map((x: any) =>
         plainToClass(Evaluation, x)
       );
-      console.log('evals: ' + evals.length);
       evals.forEach(eva => {
         eva.filename = this.evaluation_label(eva);
       });
@@ -116,7 +115,6 @@ export default class DatabaseReader extends Props {
       const evals: Evaluation[] = eval_obj.map((x: any) =>
         plainToClass(Evaluation, x)
       );
-      console.log('evals: ' + evals.length);
       return evals;
     } else {
       return [new Evaluation()];
@@ -127,7 +125,6 @@ export default class DatabaseReader extends Props {
     let label = evaluation.version;
     if (evaluation.tags) {
       evaluation.tags.forEach(tag => {
-        console.log('tag ' + tag.content.name + ': ' + tag.content.value);
         if (tag.content.name == 'filename') {
           label = tag.content.value;
         }
@@ -137,7 +134,6 @@ export default class DatabaseReader extends Props {
   }
 
   async load_this_evaluation(evaluation: Evaluation): Promise<void> {
-    console.log('load this file: ' + evaluation.id);
     const host = process.env.VUE_APP_API_URL!;
     // Generate an id
     let unique_id = next_free_file_ID();
@@ -149,7 +145,6 @@ export default class DatabaseReader extends Props {
         console.error('Unable to connect to ' + host);
       })
       .then(() => {
-        console.log('here');
         let eva_hash: RetrieveHash = {
           unique_id: unique_id,
           eva: evaluation
@@ -160,7 +155,6 @@ export default class DatabaseReader extends Props {
         console.error(`bad login ${bad}`);
       })
       .then(() => {
-        console.log('Loaded ' + unique_id);
         this.$emit('got-files', [unique_id]);
       });
   }

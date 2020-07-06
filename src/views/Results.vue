@@ -349,7 +349,6 @@ export default class Results extends ResultsProps {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter[0]);
       if (file) {
-        //console.log("file: " + JSON.stringify(file));
         return file.filename;
       }
     }

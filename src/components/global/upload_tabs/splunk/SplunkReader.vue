@@ -103,7 +103,7 @@ export default class SplunkReader extends Props {
     this.step = 2;
   }
 
-  /** When cancel/logoutis clicked from the search window */
+  /** When cancel/logout is clicked from the search window */
   handle_logout() {
     this.step = 1;
     this.splunk_state = null;

@@ -120,9 +120,6 @@ class InspecIntakeModule extends VuexModule {
     try {
       result = parse.convertFile(options.text);
     } catch (e) {
-      console.log(
-        `Failed to convert file ${options.filename} due to error "${e}".`
-      );
       return new Error(
         `Failed to convert file ${options.filename} due to error "${e}".`
       );
@@ -169,7 +166,6 @@ class InspecIntakeModule extends VuexModule {
       Object.freeze(profile);
       data.addProfile(profile_file);
     } else {
-      console.log('is Nothing');
       return new Error("Couldn't parse data");
     }
     return null;

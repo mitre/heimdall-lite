@@ -111,7 +111,6 @@ export default class UploadNexus extends Props {
 
   // Loads the last open tab
   mounted() {
-    console.log('mount UploadNexus');
     this.active_tab = local_tab.get_default('uploadtab-local');
   }
 
@@ -137,12 +136,6 @@ export default class UploadNexus extends Props {
     }
   }
 
-  //logout from backend
-  logout() {
-    console.log('logout');
-    getModule(ServerModule, this.$store).clear_token();
-    this.$router.push('/login');
-  }
   // Handles change in tab
   selected_tab(new_tab: string) {
     this.active_tab = new_tab;
@@ -152,7 +145,6 @@ export default class UploadNexus extends Props {
 
   // Event passthrough
   got_files(files: FileID[]) {
-    console.log('got_files');
     this.$emit('got-files', files);
   }
 }

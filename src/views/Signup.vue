@@ -88,7 +88,9 @@
                 <v-spacer />
 
                 <div class="my-2">
-                  <v-btn @click="login" depressed small>Login</v-btn>
+                  <router-link to="/login">
+                    <v-btn depressed small>Login</v-btn>
+                  </router-link>
                 </div>
               </v-card-actions>
             </v-card>

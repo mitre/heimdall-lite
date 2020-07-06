@@ -100,7 +100,6 @@ export default class FileItem extends FileItemProps {
   }
 
   async save_evaluation(file?: EvaluationFile): Promise<void> {
-    console.log('Save evaluation to ' + this.host);
     // checking if the input is valid
     if (file) {
       let mod = getModule(ServerModule, this.$store);
@@ -110,7 +109,6 @@ export default class FileItem extends FileItemProps {
           console.error('Unable to connect to ' + this.host);
         })
         .then(() => {
-          console.log('mode.save_evaluation');
           return mod.save_evaluation(file);
         })
         .catch(bad => {
