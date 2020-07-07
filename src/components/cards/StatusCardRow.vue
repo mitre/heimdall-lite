@@ -76,28 +76,34 @@ export default class StatusCardRow extends StatusCardRowProps {
       {
         icon: "check-circle",
         title: "Passed",
-        subtitle: "All tests passed",
+        subtitle: `All ${counts.passedTests(filter)} tests passed`,
         color: "statusPassed",
         number: counts.passed(filter)
       },
       {
         icon: "close-circle",
         title: "Failed",
-        subtitle: "Has tests that failed",
+        subtitle: `Has ${counts.failedTests(filter)} of ${counts.failedOutOf(
+          filter
+        )} tests that failed`,
         color: "statusFailed",
         number: counts.failed(filter)
       },
       {
         icon: "minus-circle",
         title: "Not Applicable",
-        subtitle: "System exception or absent component",
+        subtitle: `System exception or absent component (${counts.notApplicableTests(
+          filter
+        )} tests)`,
         color: "statusNotApplicable",
         number: counts.notApplicable(filter)
       },
       {
         icon: "alert-circle",
         title: "Not Reviewed",
-        subtitle: "Can only be tested manually at this time",
+        subtitle: `Can only be tested manually at this time (${counts.notReviewedTests(
+          filter
+        )} tests)`,
         color: "statusNotReviewed",
         number: counts.notReviewed(filter)
       }
@@ -115,8 +121,9 @@ export default class StatusCardRow extends StatusCardRowProps {
     return {
       icon: "alert-circle",
       title: "Profile Errors",
-      subtitle:
-        "Errors running test - check profile run privileges or check with the author of profile",
+      subtitle: `Errors running test - check profile run privileges or check with the author of profile (${counts.erroredTests(
+        filter
+      )} tests)`,
       color: "statusProfileError",
       number: counts.profileError(filter)
     };

@@ -10,7 +10,16 @@ import { ControlStatus } from "inspecjs";
 import InspecDataModule from "@/store/data_store";
 
 // The hash that we will generally be working with herein
-export type StatusHash = { [key in ControlStatus]: number };
+type ControlStatusHash = { [key in ControlStatus]: number };
+type StatusHash = ControlStatusHash & {
+  passedTests: number; // from passed controls
+  failedTests: number;
+  failedOutOf: number; // total tests from failed controls
+  notApplicableTests: number;
+  notReviewedTests: number;
+  erroredOutOf: number;
+  erroredTests: number;
+};
 
 // Helper function for counting a status in a list of controls
 function count_statuses(data: FilteredData, filter: Filter): StatusHash {
@@ -30,11 +39,36 @@ function count_statuses(data: FilteredData, filter: Filter): StatusHash {
     "Not Applicable": 0,
     "Not Reviewed": 0,
     Passed: 0,
-    "Profile Error": 0
+    "Profile Error": 0,
+    passedTests: 0,
+    failedTests: 0,
+    failedOutOf: 0,
+    notApplicableTests: 0,
+    notReviewedTests: 0,
+    erroredOutOf: 0,
+    erroredTests: 0
   };
   controls.forEach(c => {
-    let status: ControlStatus = c.root.hdf.status;
+    c = c.root;
+    let status: ControlStatus = c.hdf.status;
     hash[status] += 1;
+    if (status == "Passed") {
+      hash.passedTests += (c.hdf.segments || []).length;
+    } else if (status == "Failed") {
+      hash.failedOutOf += (c.hdf.segments || []).length;
+      hash.failedTests += (c.hdf.segments || []).filter(
+        s => s.status == "failed"
+      ).length;
+    } else if (status == "Not Applicable") {
+      hash.notApplicableTests += (c.hdf.segments || []).length;
+    } else if (status == "Not Reviewed") {
+      hash.notReviewedTests += (c.hdf.segments || []).length;
+    } else if (status == "Profile Error") {
+      hash.erroredOutOf += (c.hdf.segments || []).length;
+      hash.erroredTests += (c.hdf.segments || []).filter(
+        s => s.status == "error"
+      ).length;
+    }
   });
 
   // And we're done
@@ -101,6 +135,34 @@ class StatusCountModule extends VuexModule {
 
   get fromProfile(): (filter: Filter) => number {
     return filter => this.hash(filter)["From Profile"];
+  }
+
+  get passedTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["passedTests"];
+  }
+
+  get failedTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["failedTests"];
+  }
+
+  get failedOutOf(): (filter: Filter) => number {
+    return filter => this.hash(filter)["failedOutOf"];
+  }
+
+  get notApplicableTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["notApplicableTests"];
+  }
+
+  get notReviewedTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["notReviewedTests"];
+  }
+
+  get erroredTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["erroredTests"];
+  }
+
+  get erroredOutOf(): (filter: Filter) => number {
+    return filter => this.hash(filter)["erroredOutOf"];
   }
 }
 

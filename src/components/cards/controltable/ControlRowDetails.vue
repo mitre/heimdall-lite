@@ -54,8 +54,8 @@
               </template>
             </v-clamp>
             <ControlRowCol
-              v-for="(result, index) in control.root.data.results"
-              :key="index"
+              v-for="(result, index) in control.root.hdf.segments"
+              :key="'col' + index"
               :class="zebra(index)"
               :result="result"
               :statusCode="result.status"
