@@ -73,7 +73,10 @@
                             </v-card-title>
                             <v-card-actions class="justify-center">
                               <StatusChart
-                                :filter="{ fromFile: [file.unique_id] }"
+                                :filter="{
+                                  fromFile: [file.unique_id],
+                                  omit_overlayed_controls: true
+                                }"
                                 :value="null"
                                 :show_compliance="true"
                               />
