@@ -16,7 +16,7 @@
           selection-type="independent"
           transition
         >
-          <template v-slot:prepend="{item, active}">
+          <template v-slot:prepend="{ item, active }">
             <v-icon>mdi-note</v-icon>
           </template>
         </v-treeview>
@@ -59,19 +59,19 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import Vue from "vue";
+import Component from "vue-class-component";
 import InspecDataModule, {
   SourcedContextualizedProfile,
   SourcedContextualizedEvaluation,
   isFromProfileFile
-} from '@/store/data_store';
-import StatusCountModule from '@/store/status_counts';
-import {getModule} from 'vuex-module-decorators';
-import FilteredDataModule, {Filter} from '../../store/data_filters';
-import {profile_unique_key} from '../../utilities/format_util';
-import {InspecFile, ProfileFile} from '../../store/report_intake';
-import {context} from 'inspecjs';
+} from "@/store/data_store";
+import StatusCountModule from "@/store/status_counts";
+import { getModule } from "vuex-module-decorators";
+import FilteredDataModule, { Filter } from "../../store/data_filters";
+import { profile_unique_key } from "../../utilities/format_util";
+import { InspecFile, ProfileFile } from "../../store/report_intake";
+import { context } from "inspecjs";
 
 /**
  * Makes a ContextualizedProfile work as a TreeView item
@@ -90,7 +90,7 @@ class TreeItem {
     // Base information
     this.id = profile_unique_key(profile);
     this.name = profile.data.name;
-    this.children = profile.extended_by.map(p => new TreeItem(p));
+    this.children = profile.extends_from.map(p => new TreeItem(p));
   }
 }
 
@@ -132,7 +132,7 @@ export default class ProfileData extends Props {
   get root_profiles(): context.ContextualizedProfile[] {
     // Strip to roots
     let profiles = this.visible_profiles.filter(
-      p => p.extends_from.length === 0
+      p => p.extended_by.length === 0
     );
     return profiles;
   }
@@ -157,7 +157,7 @@ export default class ProfileData extends Props {
     let output: InfoItem[] = [];
 
     output.push({
-      label: 'Version',
+      label: "Version",
       text: (this.selected.data as any).version //Todo: fix
     });
 
@@ -177,54 +177,54 @@ export default class ProfileData extends Props {
 
     // And put the filename
     output.push({
-      label: 'From file',
+      label: "From file",
       text: from_file.filename
     });
 
     if (start_time) {
       output.push({
-        label: 'Start time',
+        label: "Start time",
         text: start_time
       });
     }
 
     if (this.selected.data.sha256) {
       output.push({
-        label: 'Sha256 Hash',
+        label: "Sha256 Hash",
         text: this.selected.data.sha256
       });
     }
 
     if (this.selected.data.title) {
       output.push({
-        label: 'Title',
+        label: "Title",
         text: this.selected.data.title
       });
     }
 
     if (this.selected.data.maintainer) {
       output.push({
-        label: 'Maintainer',
+        label: "Maintainer",
         text: this.selected.data.maintainer
       });
     }
 
     if (this.selected.data.copyright) {
       output.push({
-        label: 'Copyright',
+        label: "Copyright",
         text: this.selected.data.copyright
       });
     }
 
     if (this.selected.data.copyright_email) {
       output.push({
-        label: 'Copyright Email',
+        label: "Copyright Email",
         text: this.selected.data.copyright_email
       });
     }
 
     output.push({
-      label: 'Controls',
+      label: "Controls",
       text: this.selected.data.controls.length.toString()
     });
 
