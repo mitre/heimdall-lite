@@ -10,8 +10,8 @@ import { ControlStatus } from "inspecjs";
 import InspecDataModule from "@/store/data_store";
 
 // The hash that we will generally be working with herein
-type ControlStatusHash = { [key in ControlStatus]: number };
-type StatusHash = ControlStatusHash & {
+export type ControlStatusHash = { [key in ControlStatus]: number };
+export type StatusHash = ControlStatusHash & {
   passedTests: number; // from passed controls
   failedTests: number;
   failedOutOf: number; // total tests from failed controls
