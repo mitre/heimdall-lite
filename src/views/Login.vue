@@ -53,7 +53,6 @@ import {FileID} from '@/store/report_intake';
 import {LocalStorageVal} from '@/utilities/helper_util';
 import VeeValidate from 'vee-validate';
 import VuePassword from 'vue-password';
-import ServerModule from '@/store/server';
 import {BackendModule} from '@/store/backend';
 
 Vue.use(VeeValidate);

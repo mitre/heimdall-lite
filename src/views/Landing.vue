@@ -16,10 +16,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import UploadNexus from '@/components/global/UploadNexus.vue';
-import ServerModule from '@/store/server';
-import {getModule} from 'vuex-module-decorators';
+import {ServerModule} from '@/store/server';
 
-import FilteredDataModule, {Filter} from '@/store/data_filters';
+import {FilteredDataModule, Filter} from '@/store/data_filters';
 import {FileID} from '@/store/report_intake';
 import {BackendModule} from '@/store/backend';
 
@@ -50,9 +49,8 @@ export default class Landing extends LandingProps {
    */
   on_got_files(ids: FileID[]) {
     //enable all uploaded files
-    let filter_module = getModule(FilteredDataModule, this.$store);
     for (let i of ids) {
-      filter_module.set_toggle_file_on(i);
+      FilteredDataModule.set_toggle_file_on(i);
     }
     this.$router.push(`/results`);
   }

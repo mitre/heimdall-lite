@@ -1,24 +1,15 @@
 import 'jest';
-import {getModule} from 'vuex-module-decorators';
-import {AllRaw, read_files, populate_hash} from '../util/fs';
-import Store from '../../src/store/store';
-import ReportIntakeModule, {
+import {AllRaw} from '../util/fs';
+import {
+  InspecIntakeModule,
   next_free_file_ID
 } from '../../src/store/report_intake';
-import FilteredDataModule from '@/store/data_filters';
-import StatusCountModule from '@/store/status_counts';
-import InspecDataModule from '@/store/data_store';
+import {FilteredDataModule} from '@/store/data_filters';
+import {StatusCountModule} from '@/store/status_counts';
+import {InspecDataModule} from '@/store/data_store';
 import {samples, Sample} from '@/utilities/sample_util';
 import {readFileSync} from 'fs';
 
-let filter_store = getModule(FilteredDataModule, Store);
-let data_store = getModule(InspecDataModule, Store);
-let status_count = getModule(StatusCountModule, Store);
-
-let results = read_files('src/assets/samples/');
-let raw = populate_hash(results);
-//let raw = populate_hash(results);
-let intake = getModule(ReportIntakeModule, Store);
 let id = 0;
 
 export function loadSample(sampleName: string) {
@@ -31,7 +22,7 @@ export function loadSample(sampleName: string) {
   if (sample.name === '') {
     return;
   }
-  return intake.loadText({
+  return InspecIntakeModule.loadText({
     filename: sampleName,
     unique_id: next_free_file_ID(),
     text: JSON.stringify(sample.sample)
@@ -45,7 +36,7 @@ export function loadAll(): void {
     id += 1;
 
     // Do intake
-    return intake.loadText({
+    return InspecIntakeModule.loadText({
       filename: file_result.name,
       unique_id: id,
       text: file_result.content
@@ -54,26 +45,26 @@ export function loadAll(): void {
 }
 
 export function removeAllFiles(): void {
-  let ids = data_store.allFiles.map(f => f.unique_id);
+  let ids = InspecDataModule.allFiles.map(f => f.unique_id);
   for (let id of ids) {
-    data_store.removeFile(id);
+    InspecDataModule.removeFile(id);
   }
 }
 
 export function selectAllFiles(): void {
-  for (let file of data_store.allFiles) {
-    filter_store.set_toggle_file_on(file.unique_id);
+  for (let file of InspecDataModule.allFiles) {
+    FilteredDataModule.set_toggle_file_on(file.unique_id);
   }
 }
 
 export function fileCompliance(id: number) {
   let filter = {fromFile: [id]};
-  let passed = status_count.countOf(filter, 'Passed');
+  let passed = StatusCountModule.countOf(filter, 'Passed');
   let total =
     passed +
-    status_count.countOf(filter, 'Failed') +
-    status_count.countOf(filter, 'Profile Error') +
-    status_count.countOf(filter, 'Not Reviewed');
+    StatusCountModule.countOf(filter, 'Failed') +
+    StatusCountModule.countOf(filter, 'Profile Error') +
+    StatusCountModule.countOf(filter, 'Not Reviewed');
   if (total == 0) {
     return 0;
   }
@@ -86,10 +77,9 @@ export function expectedCount(status: string) {
   let notReviewed = 0;
   let notApplicable = 0;
   let profileError = 0;
-  let exec_files = data_store.executionFiles;
 
   // For each, we will filter then count
-  exec_files.forEach(file => {
+  InspecDataModule.executionFiles.forEach(file => {
     // Get the corresponding count file
     let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
     let count_file_content = readFileSync(count_filename, 'utf-8');

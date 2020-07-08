@@ -1,13 +1,9 @@
 import 'jest';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
-import {getModule} from 'vuex-module-decorators';
 import {shallowMount, Wrapper} from '@vue/test-utils';
-import Store from '../../src/store/store';
-import FilteredDataModule from '@/store/data_filters';
-import StatusCountModule, {StatusHash} from '@/store/status_counts';
-import {readFileSync} from 'fs';
-import InspecDataModule from '@/store/data_store';
+import {FilteredDataModule} from '@/store/data_filters';
+import {StatusCountModule} from '@/store/status_counts';
 import {
   removeAllFiles,
   selectAllFiles,
@@ -55,10 +51,6 @@ wrapper = shallowMount(Results, {
   propsData: {}
 });
 
-let filter_store = getModule(FilteredDataModule, Store);
-let data_store = getModule(InspecDataModule, Store);
-let status_count = getModule(StatusCountModule, Store);
-
 loadSample('Acme Overlay Example');
 selectAllFiles();
 
@@ -67,7 +59,7 @@ describe('Profile Info', () => {
     loadAll();
     selectAllFiles();
     expect((wrapper.vm as any).file_filter.length).toBe(
-      filter_store.selected_file_ids.length
+      FilteredDataModule.selected_file_ids.length
     );
   });
 
@@ -345,10 +337,13 @@ describe('Status, Severity, Compliance, chart', () => {
 
     //all counts but profile error
     let expected =
-      status_count.countOf((wrapper.vm as any).all_filter, 'Passed') +
-      status_count.countOf((wrapper.vm as any).all_filter, 'Failed') +
-      status_count.countOf((wrapper.vm as any).all_filter, 'Profile Error') +
-      status_count.countOf((wrapper.vm as any).all_filter, 'Not Reviewed');
+      StatusCountModule.countOf((wrapper.vm as any).all_filter, 'Passed') +
+      StatusCountModule.countOf((wrapper.vm as any).all_filter, 'Failed') +
+      StatusCountModule.countOf(
+        (wrapper.vm as any).all_filter,
+        'Profile Error'
+      ) +
+      StatusCountModule.countOf((wrapper.vm as any).all_filter, 'Not Reviewed');
     expect(recieved).toEqual(expected);
   });
 
@@ -400,11 +395,10 @@ describe('Datatable', () => {
         .map((item: ListElt) => item.control.data.id)
         .sort()
     ).toEqual(
-      filter_store
-        .controls({
-          fromFile: filter_store.selected_file_ids,
-          omit_overlayed_controls: true
-        })
+      FilteredDataModule.controls({
+        fromFile: FilteredDataModule.selected_file_ids,
+        omit_overlayed_controls: true
+      })
         .map(c => c.data.id)
         .sort()
     );

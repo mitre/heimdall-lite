@@ -36,12 +36,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import {getModule} from 'vuex-module-decorators';
-import ServerModule from '@/store/server';
-import AppInfoModule from '@/store/app_info';
+import {ServerModule} from '@/store/server';
+import {AppInfoModule} from '@/store/app_info';
 import {plainToClass} from 'class-transformer';
 import {LocalStorageVal} from '@/utilities/helper_util';
-import InspecIntakeModule, {
+import {
+  InspecIntakeModule,
   FileID,
   next_free_file_ID
 } from '@/store/report_intake';
@@ -93,9 +93,8 @@ export default class DatabaseReader extends Props {
   }
 
   get items(): Evaluation[] {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.user_evaluations) {
-      let eval_obj = Array.from(mod.user_evaluations) || [];
+    if (ServerModule.user_evaluations) {
+      let eval_obj = Array.from(ServerModule.user_evaluations) || [];
       const evals: Evaluation[] = eval_obj.map((x: any) =>
         plainToClass(Evaluation, x)
       );
@@ -109,9 +108,8 @@ export default class DatabaseReader extends Props {
   }
 
   get personal_evaluations(): Evaluation[] {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.user_evaluations) {
-      let eval_obj = Array.from(mod.user_evaluations) || [];
+    if (ServerModule.user_evaluations) {
+      let eval_obj = Array.from(ServerModule.user_evaluations) || [];
       const evals: Evaluation[] = eval_obj.map((x: any) =>
         plainToClass(Evaluation, x)
       );
@@ -138,9 +136,7 @@ export default class DatabaseReader extends Props {
     // Generate an id
     let unique_id = next_free_file_ID();
 
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect(host)
+    await ServerModule.connect(host)
       .catch(bad => {
         console.error('Unable to connect to ' + host);
       })
@@ -149,7 +145,7 @@ export default class DatabaseReader extends Props {
           unique_id: unique_id,
           eva: evaluation
         };
-        return mod.retrieve_evaluation(eva_hash);
+        return ServerModule.retrieve_evaluation(eva_hash);
       })
       .catch(bad => {
         console.error(`bad login ${bad}`);

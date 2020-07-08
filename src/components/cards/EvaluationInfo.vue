@@ -52,10 +52,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import InspecDataModule from '@/store/data_store';
-import {getModule} from 'vuex-module-decorators';
-import ServerModule from '@/store/server';
-import FilteredDataModule, {Filter} from '../../store/data_filters';
+import {InspecDataModule} from '@/store/data_store';
+import {ServerModule} from '@/store/server';
+import {FilteredDataModule, Filter} from '../../store/data_filters';
 import {InspecFile, EvaluationFile} from '../../store/report_intake';
 import {context} from 'inspecjs';
 import {plainToClass} from 'class-transformer';
@@ -105,8 +104,9 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   updated() {
-    let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+    let file = InspecDataModule.allFiles.find(
+      f => f.unique_id === this.file_filter
+    );
     if (file) {
       let eva = file as EvaluationFile;
       this.version = eva.evaluation.data.version;
@@ -153,22 +153,21 @@ export default class EvaluationInfo extends EvaluationInfoProps {
 
   //gets file to retrieve corresponding data
   get file(): EvaluationFile {
-    let filter_module = getModule(FilteredDataModule, this.$store);
-    return filter_module.evaluations([this.file_filter])[0].from_file;
+    return FilteredDataModule.evaluations([this.file_filter])[0].from_file;
   }
 
   //gives more room for actual info when the "tags" button is not displayed
   get info_cols(): number {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.serverMode) {
+    if (ServerModule.serverMode) {
       return 5;
     }
     return 12;
   }
 
   load_file() {
-    let store = getModule(InspecDataModule, this.$store);
-    let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+    let file = InspecDataModule.allFiles.find(
+      f => f.unique_id === this.file_filter
+    );
     if (file) {
       let eva = file as EvaluationFile;
       this.filename2 = eva.filename;
@@ -212,14 +211,12 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       };
       (this.$refs.form as any).reset();
       // Get server module
-      let mod = getModule(ServerModule, this.$store);
-      await mod
-        .connect(host)
+      await ServerModule.connect(host)
         .catch(bad => {
           console.error('Unable to connect to ' + host);
         })
         .then(() => {
-          return mod.save_tag(tag_hash);
+          return ServerModule.save_tag(tag_hash);
         })
         .catch(bad => {
           console.error(`bad save ${bad}`);
@@ -239,14 +236,12 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       id: tag.id
     };
     // Get server module
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect(host)
+    await ServerModule.connect(host)
       .catch(bad => {
         console.error('Unable to connect to ' + host);
       })
       .then(() => {
-        return mod.delete_tag(tag_hash);
+        return ServerModule.delete_tag(tag_hash);
       })
       .catch(bad => {
         console.error(`bad delete ${bad}`);
@@ -261,9 +256,8 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   watches() {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.tags) {
-      let tags_obj = Array.from(mod.tags) || [];
+    if (ServerModule.tags) {
+      let tags_obj = Array.from(ServerModule.tags) || [];
       const eva_tags: Tag[] = tags_obj.map((x: any) => plainToClass(Tag, x));
       this.tags = eva_tags;
       return this.tags;
@@ -273,9 +267,8 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   }
 
   update_tags() {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.tags) {
-      let tags_obj = Array.from(mod.tags) || [];
+    if (ServerModule.tags) {
+      let tags_obj = Array.from(ServerModule.tags) || [];
       const eva_tags: Tag[] = tags_obj.map((x: any) => plainToClass(Tag, x));
       this.tags = eva_tags;
     }
@@ -285,15 +278,12 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     if (file_id) {
       const host = process.env.VUE_APP_API_URL!;
 
-      // Get server module
-      let mod = getModule(ServerModule, this.$store);
-      await mod
-        .connect(host)
+      await ServerModule.connect(host)
         .catch(bad => {
           console.error('Unable to connect to ' + host);
         })
         .then(() => {
-          return mod.retrieve_tags(file_id);
+          return ServerModule.retrieve_tags(file_id);
         })
         .catch(bad => {
           console.error(`bad retrieve ${bad}`);

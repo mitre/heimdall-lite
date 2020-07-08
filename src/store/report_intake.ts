@@ -4,7 +4,7 @@
 
 import {parse, context} from 'inspecjs';
 import {Module, VuexModule, getModule, Action} from 'vuex-module-decorators';
-import DataModule from '@/store/data_store';
+import {InspecDataModule} from '@/store/data_store';
 import Store from '@/store/store';
 import {read_file_async} from '@/utilities/async_util';
 import {Evaluation, Tag} from '@/types/models.ts';
@@ -86,7 +86,7 @@ export type TextLoadOptions = {
   store: Store,
   name: 'intake'
 })
-class InspecIntakeModule extends VuexModule {
+export class InspecIntake extends VuexModule {
   /**
    * Load a file with the specified options. Promises an error message on failure
    */
@@ -112,9 +112,6 @@ class InspecIntakeModule extends VuexModule {
    */
   @Action
   async loadText(options: TextLoadOptions): Promise<Error | null> {
-    // Fetch our data store
-    const data = getModule(DataModule, Store);
-
     // Convert it
     let result: parse.ConversionResult;
     try {
@@ -147,7 +144,7 @@ class InspecIntakeModule extends VuexModule {
       // Set and freeze
       eval_file.evaluation = evaluation;
       Object.freeze(evaluation);
-      data.addExecution(eval_file);
+      InspecDataModule.addExecution(eval_file);
     } else if (result['1_0_ProfileJson']) {
       // Handle as profile
       let profile_file = {
@@ -164,7 +161,7 @@ class InspecIntakeModule extends VuexModule {
       // Set and freeze
       profile_file.profile = profile;
       Object.freeze(profile);
-      data.addProfile(profile_file);
+      InspecDataModule.addProfile(profile_file);
     } else {
       return new Error("Couldn't parse data");
     }
@@ -172,7 +169,7 @@ class InspecIntakeModule extends VuexModule {
   }
 }
 
-export default InspecIntakeModule;
+export const InspecIntakeModule = getModule(InspecIntake);
 
 // Track granted file ids
 let last_granted_unique_id: number = 0;

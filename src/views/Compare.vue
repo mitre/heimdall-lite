@@ -211,24 +211,21 @@ import Modal from '@/components/global/Modal.vue';
 import UploadNexus from '@/components/global/UploadNexus.vue';
 import CompareRow from '@/components/cards/comparison/CompareRow.vue';
 
-import FilteredDataModule, {Filter} from '@/store/data_filters';
+import {FilteredDataModule, Filter} from '@/store/data_filters';
 import {ControlStatus, Severity, context} from 'inspecjs';
-import SeverityCountModule from '@/store/severity_counts';
+import {SeverityCountModule} from '@/store/severity_counts';
 import {FileID} from '@/store/report_intake';
 import {
   ComparisonContext,
   ControlDelta,
   ControlSeries
-} from '../utilities/delta_util';
-import {getModule} from 'vuex-module-decorators';
-import InspecDataModule from '../store/data_store';
+} from '@/utilities/delta_util';
 import ApexPieChart, {Category} from '@/components/generic/ApexPieChart.vue';
-import StatusCountModule from '@/store/status_counts';
+import {StatusCountModule} from '@/store/status_counts';
 import ProfileRow from '@/components/cards/comparison/ProfileRow.vue';
 import StatusChart from '@/components/cards/StatusChart.vue';
 import {EvaluationFile} from '@/store/report_intake';
 import {SourcedContextualizedEvaluation} from '@/store/report_intake';
-import ServerModule from '@/store/server';
 import {isFromProfileFile} from '@/store/data_store';
 import ApexLineChart, {
   SeriesItem
@@ -301,9 +298,8 @@ export default class Compare extends Props {
 
   /** Yields the current two selected reports as an ExecDelta,  */
   get curr_delta(): ComparisonContext {
-    let filter_store = getModule(FilteredDataModule, this.$store);
-    let selected_data = filter_store.evaluations(
-      filter_store.selected_file_ids
+    let selected_data = FilteredDataModule.evaluations(
+      FilteredDataModule.selected_file_ids
     );
     return new ComparisonContext(selected_data);
   }
@@ -424,20 +420,21 @@ export default class Compare extends Props {
   }
 
   get files(): EvaluationFile[] {
-    let filter_module = getModule(FilteredDataModule, this.$store);
     let fileArr = [];
-    let fileList = filter_module.evaluations(filter_module.selected_file_ids);
+    let fileList = FilteredDataModule.evaluations(
+      FilteredDataModule.selected_file_ids
+    );
     for (let i = 0; i < fileList.length; i++) {
       fileArr.push(fileList[i].from_file);
     }
 
     fileArr = fileArr.sort((a, b) => {
       let a_date = new Date(
-        filter_module.controls({fromFile: [a.unique_id]})[0].root.hdf
+        FilteredDataModule.controls({fromFile: [a.unique_id]})[0].root.hdf
           .start_time || 0
       );
       let b_date = new Date(
-        filter_module.controls({fromFile: [b.unique_id]})[0].root.hdf
+        FilteredDataModule.controls({fromFile: [b.unique_id]})[0].root.hdf
           .start_time || 0
       );
       return a_date.valueOf() - b_date.valueOf();
@@ -451,34 +448,30 @@ export default class Compare extends Props {
     var medCounts = [];
     var highCounts = [];
     var critCounts = [];
-    let totalSevCounts: SeverityCountModule = getModule(
-      SeverityCountModule,
-      this.$store
-    );
     for (let file of this.files) {
       lowCounts.push(
-        totalSevCounts.low({
+        SeverityCountModule.low({
           fromFile: [file.unique_id],
           status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       medCounts.push(
-        totalSevCounts.medium({
+        SeverityCountModule.medium({
           fromFile: [file.unique_id],
           status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       highCounts.push(
-        totalSevCounts.high({
+        SeverityCountModule.high({
           fromFile: [file.unique_id],
           status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       critCounts.push(
-        totalSevCounts.critical({
+        SeverityCountModule.critical({
           fromFile: [file.unique_id],
           status: 'Failed',
           omit_overlayed_controls: true
@@ -509,13 +502,12 @@ export default class Compare extends Props {
     var series = [];
     for (let file of this.files) {
       let filter = {fromFile: [file.unique_id]};
-      let counts = getModule(StatusCountModule, this.$store);
-      let passed = counts.countOf(filter, 'Passed');
+      let passed = StatusCountModule.countOf(filter, 'Passed');
       let total =
         passed +
-        counts.countOf(filter, 'Failed') +
-        counts.countOf(filter, 'Profile Error') +
-        counts.countOf(filter, 'Not Reviewed');
+        StatusCountModule.countOf(filter, 'Failed') +
+        StatusCountModule.countOf(filter, 'Profile Error') +
+        StatusCountModule.countOf(filter, 'Not Reviewed');
       if (total == 0) {
         series.push(0);
       } else {
@@ -526,7 +518,6 @@ export default class Compare extends Props {
   }
 
   get fileTimes(): (string | undefined)[] {
-    let data_store = getModule(FilteredDataModule, this.$store);
     var names = [];
     for (let file of this.files) {
       let time = get_eval_start_time(file.evaluation) || undefined;
@@ -540,10 +531,9 @@ export default class Compare extends Props {
       return 0;
     }
     let highest_failed = 0;
-    let counts = getModule(StatusCountModule, this.$store);
     for (let file of this.files) {
       let filter = {fromFile: [file.unique_id]};
-      let failed = counts.countOf(filter, 'Failed');
+      let failed = StatusCountModule.countOf(filter, 'Failed');
       if (failed > highest_failed) {
         highest_failed = failed;
       }
@@ -565,12 +555,6 @@ export default class Compare extends Props {
       return 2;
     }
     return this.files.length;
-  }
-
-  log_out() {
-    getModule(ServerModule, this.$store).clear_token();
-    this.dialog;
-    this.$router.push('/');
   }
 
   on_resize(elt: any) {
@@ -595,9 +579,8 @@ export default class Compare extends Props {
     this.dialog = false;
 
     //enable all uploaded files
-    let filter_module = getModule(FilteredDataModule, this.$store);
     for (let i of ids) {
-      filter_module.set_toggle_file_on(i);
+      FilteredDataModule.set_toggle_file_on(i);
     }
   }
 

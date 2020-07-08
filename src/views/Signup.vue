@@ -106,8 +106,6 @@ import Component from 'vue-class-component';
 import {Filter} from '@/store/data_filters';
 import {FileID} from '@/store/report_intake';
 import {LocalStorageVal} from '@/utilities/helper_util';
-import {getModule} from 'vuex-module-decorators';
-import ServerModule from '@/store/server';
 import VeeValidate from 'vee-validate';
 import VuePassword from 'vue-password';
 import zxcvbn from 'zxcvbn';

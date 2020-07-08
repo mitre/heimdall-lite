@@ -53,12 +53,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import {getModule} from 'vuex-module-decorators';
-import InspecIntakeModule, {
+import UploadButton from '@/components/global/UploadButton.vue';
+import {
+  InspecIntakeModule,
   FileID,
   next_free_file_ID
 } from '@/store/report_intake';
-import AppInfoModule from '@/store/app_info';
+import {AppInfoModule} from '@/store/app_info';
 import vueFileAgent from 'vue-file-agent';
 import 'vue-file-agent/dist/vue-file-agent.css';
 
@@ -94,8 +95,7 @@ export default class FileReader extends Props {
       let unique_id = next_free_file_ID();
 
       // Submit it to be loaded, and display an error if it fails
-      let intake_module = getModule(InspecIntakeModule, this.$store);
-      return intake_module.loadFile({file, unique_id}).then(err => {
+      return InspecIntakeModule.loadFile({file, unique_id}).then(err => {
         if (err) {
           console.error(`Error loading file ${file.name}`);
           this.$toasted.global.error({
@@ -127,7 +127,7 @@ export default class FileReader extends Props {
   }
 
   get version(): string {
-    return getModule(AppInfoModule, this.$store).version;
+    return AppInfoModule.version;
   }
 }
 </script>

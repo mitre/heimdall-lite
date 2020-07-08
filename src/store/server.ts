@@ -7,13 +7,12 @@ import {
 } from 'vuex-module-decorators';
 import Store from '@/store/store';
 import {LocalStorageVal} from '@/utilities/helper_util';
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios from 'axios';
 import {plainToClass} from 'class-transformer';
-import InspecIntakeModule, {
+import {
+  InspecIntakeModule,
   EvaluationFile,
-  ProfileFile,
-  FileID,
-  next_free_file_ID
+  FileID
 } from '@/store/report_intake';
 import {Evaluation, UserProfile, Usergroup} from '@/types/models.ts';
 
@@ -98,9 +97,9 @@ export class HSConnectionConfig {
   namespaced: true,
   dynamic: true,
   store: Store,
-  name: 'heimdallServer'
+  name: 'Server'
 })
-class HeimdallServerModule extends VuexModule {
+export class Server extends VuexModule {
   /** Our current target server parameters */
   connection: HSConnectionConfig | null = null;
   serverMode: boolean = false;
@@ -407,8 +406,7 @@ class HeimdallServerModule extends VuexModule {
         }
       })
       .then((v: any) => {
-        let intake_module = getModule(InspecIntakeModule, Store);
-        intake_module.loadText({
+        InspecIntakeModule.loadText({
           text: JSON.stringify(v.data),
           unique_id: eval_hash.unique_id,
           filename: eval_hash.eva.filename,
@@ -572,4 +570,4 @@ class HeimdallServerModule extends VuexModule {
   }
 }
 
-export default HeimdallServerModule;
+export const ServerModule = getModule(Server);

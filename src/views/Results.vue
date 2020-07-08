@@ -185,21 +185,21 @@ import ExportNist from '@/components/global/ExportNist.vue';
 import ExportJson from '@/components/global/ExportJson.vue';
 import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
 
-import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
+import {FilteredDataModule, Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
-import InspecIntakeModule, {
+import {
+  InspecIntakeModule,
   FileID,
   SourcedContextualizedEvaluation,
   SourcedContextualizedProfile
 } from '@/store/report_intake';
-import {getModule} from 'vuex-module-decorators';
-import InspecDataModule, {isFromProfileFile} from '../store/data_store';
+import {InspecDataModule, isFromProfileFile} from '@/store/data_store';
 import {need_redirect_file} from '@/utilities/helper_util';
-import ServerModule from '@/store/server';
 import ProfData from '@/components/cards/ProfData.vue';
 import {context} from 'inspecjs';
 import {profile_unique_key} from '../utilities/format_util';
 import UserMenu from '@/components/global/UserMenu.vue';
+import {BackendModule} from '@/store/backend';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -261,13 +261,12 @@ export default class Results extends ResultsProps {
    */
 
   get file_filter(): FileID[] {
-    let data_module = getModule(FilteredDataModule, this.$store);
-    return data_module.selected_file_ids;
+    return FilteredDataModule.selected_file_ids;
   }
 
   // Returns true if no files are uploaded
   get no_files(): boolean {
-    let data = getModule(InspecDataModule, this.$store).allFiles.length === 0;
+    let data = InspecDataModule.allFiles.length === 0;
     return data;
   }
 
@@ -330,8 +329,7 @@ export default class Results extends ResultsProps {
     }
 
     // Logic to check: are any files actually visible?
-    let filter = getModule(FilteredDataModule, this.$store);
-    if (filter.controls(this.all_filter).length === 0) {
+    if (FilteredDataModule.controls(this.all_filter).length === 0) {
       this.filter_snackbar = true;
     } else {
       this.filter_snackbar = false;
@@ -346,8 +344,9 @@ export default class Results extends ResultsProps {
    */
   get curr_title(): string | undefined {
     if (this.file_filter.length == 1) {
-      let store = getModule(InspecDataModule, this.$store);
-      let file = store.allFiles.find(f => f.unique_id === this.file_filter[0]);
+      let file = InspecDataModule.allFiles.find(
+        f => f.unique_id === this.file_filter[0]
+      );
       if (file) {
         return file.filename;
       }
@@ -361,11 +360,7 @@ export default class Results extends ResultsProps {
 
   //changes width of eval info if it is in server mode and needs more room for tags
   get info_width(): number {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.serverMode == undefined) {
-      mod.server_mode();
-    }
-    if (mod.serverMode) {
+    if (BackendModule.serverMode) {
       return 500;
     }
     return 300;
@@ -373,8 +368,7 @@ export default class Results extends ResultsProps {
 
   /** Flat representation of all profiles that ought to be visible  */
   get visible_profiles(): Readonly<context.ContextualizedProfile[]> {
-    let filtered = getModule(FilteredDataModule, this.$store);
-    return filtered.profiles(this.all_filter.fromFile);
+    return FilteredDataModule.profiles(this.all_filter.fromFile);
   }
 
   get root_profiles(): context.ContextualizedProfile[] {

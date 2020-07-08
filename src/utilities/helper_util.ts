@@ -1,4 +1,4 @@
-import InspecDataModule from '@/store/data_store';
+import {InspecData} from '@/store/data_store';
 import axios from 'axios';
 
 /** For helper functions that don't belong anywhere else */
@@ -39,7 +39,7 @@ export function compare_arrays<T>(
 /** Returns two values: if we need to redirect, and if so to where  */
 export function need_redirect_file(
   curr_target: number | null,
-  data: InspecDataModule
+  data: InspecData
 ): 'ok' | number | 'root' {
   // If we have no files, always exit
   if (data.allFiles.length === 0) {

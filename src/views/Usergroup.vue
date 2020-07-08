@@ -100,14 +100,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
-import InspecIntakeModule, {
-  FileID,
-  next_free_file_ID
-} from '@/store/report_intake';
+import {FileID, next_free_file_ID} from '@/store/report_intake';
 import {plainToClass} from 'class-transformer';
-import {getModule} from 'vuex-module-decorators';
-import InspecDataModule from '../store/data_store';
-import ServerModule from '@/store/server';
+import {ServerModule} from '@/store/server';
 import {UserProfile, Evaluation, Usergroup} from '@/types/models.ts';
 import UserMenu from '@/components/global/UserMenu.vue';
 
@@ -188,28 +183,25 @@ export default class UsergroupView extends UsergroupProps {
   }
 
   get user(): UserProfile {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.profile) {
-      this.user_id = mod.profile.id;
-      return mod.profile;
+    if (ServerModule.profile) {
+      this.user_id = ServerModule.profile.id;
+      return ServerModule.profile;
     } else {
       return new UserProfile();
     }
   }
 
   get users(): UserProfile[] {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.users) {
-      return mod.users;
+    if (ServerModule.users) {
+      return ServerModule.users;
     } else {
       return [];
     }
   }
 
   get usergroup(): Usergroup {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.usergroup) {
-      return mod.usergroup;
+    if (ServerModule.usergroup) {
+      return ServerModule.usergroup;
     } else {
       return new Usergroup();
     }
@@ -233,14 +225,12 @@ export default class UsergroupView extends UsergroupProps {
       group_id: Number(this.$route.params.id)
     };
 
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect(host)
+    await ServerModule.connect(host)
       .catch(bad => {
         console.error('Unable to connect to ' + host);
       })
       .then(() => {
-        return mod.retrieve_usergroup(group_hash);
+        return ServerModule.retrieve_usergroup(group_hash);
       })
       .catch(bad => {
         console.error(`bad login ${bad}`);
@@ -251,14 +241,12 @@ export default class UsergroupView extends UsergroupProps {
   async load_users(): Promise<void> {
     const host = process.env.VUE_APP_API_URL!;
 
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect(host)
+    await ServerModule.connect(host)
       .catch(bad => {
         console.error('Unable to connect to ' + host);
       })
       .then(() => {
-        return mod.retrieve_users();
+        return ServerModule.retrieve_users();
       })
       .catch(bad => {
         console.error(`bad login ${bad}`);
@@ -285,14 +273,13 @@ export default class UsergroupView extends UsergroupProps {
         user_id: this.selected_user
       };
       (this.$refs.form as any).reset();
-      let mod = getModule(ServerModule, this.$store);
-      await mod
-        .connect(host)
+
+      await ServerModule.connect(host)
         .catch(bad => {
           console.error('Unable to connect to ' + host);
         })
         .then(() => {
-          return mod.add_team_member(group_hash);
+          return ServerModule.add_team_member(group_hash);
         })
         .catch(bad => {
           console.error(`bad save ${bad}`);
@@ -305,9 +292,7 @@ export default class UsergroupView extends UsergroupProps {
     // Generate an id
     let unique_id = next_free_file_ID();
 
-    let mod = getModule(ServerModule, this.$store);
-    await mod
-      .connect(host)
+    await ServerModule.connect(host)
       .catch(bad => {
         console.error('Unable to connect to ' + host);
       })
@@ -316,7 +301,7 @@ export default class UsergroupView extends UsergroupProps {
           unique_id: unique_id,
           eva: evaluation
         };
-        return mod.retrieve_evaluation(eva_hash);
+        return ServerModule.retrieve_evaluation(eva_hash);
       })
       .catch(bad => {
         console.error(`bad login ${bad}`);

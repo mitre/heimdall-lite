@@ -17,10 +17,6 @@
         <!-- Define our tabs -->
         <v-tab href="#uploadtab-local">Local Files</v-tab>
 
-        <!--v-tab v-if="is_logged_in" href="#uploadtab-database">
-          {{ user }} Files
-        </v-tab-->
-
         <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
 
         <v-tab href="#uploadtab-splunk">Splunk</v-tab>
@@ -57,8 +53,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import {getModule} from 'vuex-module-decorators';
-import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import {InspecIntakeModule, FileID} from '@/store/report_intake';
 import Modal from '@/components/global/Modal.vue';
 import FileReader from '@/components/global/upload_tabs/FileReader.vue';
 //import DatabaseReader from "@/components/global/upload_tabs/DatabaseReader.vue";
@@ -66,20 +61,7 @@ import HelpFooter from '@/components/global/upload_tabs/HelpFooter.vue';
 import S3Reader from '@/components/global/upload_tabs/aws/S3Reader.vue';
 import SplunkReader from '@/components/global/upload_tabs/splunk/SplunkReader.vue';
 import SampleList from '@/components/global/upload_tabs/SampleList.vue';
-import ServerModule from '@/store/server';
 import {LocalStorageVal} from '@/utilities/helper_util';
-import {BackendModule} from '@/store/backend';
-
-export class UserProfile {
-  id?: number;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  image?: string;
-  phone_number?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 const local_tab = new LocalStorageVal<string>('nexus_curr_tab');
 
@@ -99,7 +81,6 @@ const Props = Vue.extend({
   components: {
     Modal,
     FileReader,
-    //DatabaseReader,
     HelpFooter,
     S3Reader,
     SplunkReader,
@@ -107,34 +88,7 @@ const Props = Vue.extend({
   }
 })
 export default class UploadNexus extends Props {
-  active_tab: string = ''; // Set in mounted
-
-  // Loads the last open tab
-  mounted() {
-    this.active_tab = local_tab.get_default('uploadtab-local');
-  }
-
-  get is_logged_in(): boolean {
-    if (BackendModule.serverMode && BackendModule.token) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  get token(): string {
-    let mod = getModule(ServerModule, this.$store);
-    return mod.token || '';
-  }
-
-  get user(): string {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.profile) {
-      return mod.profile.email || 'pending';
-    } else {
-      return 'pending';
-    }
-  }
+  active_tab: string = local_tab.get_default('uploadtab-local');
 
   // Handles change in tab
   selected_tab(new_tab: string) {
