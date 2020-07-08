@@ -116,9 +116,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
       this.duration = eva.evaluation.data.statistics.duration;
       this.database_id = eva.database_id || null;
     }
-    console.log(
-      "updated ID: " + this.file_filter + ", DBID: " + this.database_id
-    );
     if (!this.database_id) {
       this.show_tags = false;
       this.edit_tags = false;
