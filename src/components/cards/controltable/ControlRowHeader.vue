@@ -65,6 +65,8 @@ import { HDFControl, ControlStatus, Severity } from "inspecjs";
 import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
 import { context } from "inspecjs";
 import { NIST_DESCRIPTIONS } from "@/utilities/nist_util";
+import { CCI_DESCRIPTIONS } from "@/utilities/cci_util";
+import { Tags } from "../../../types/models";
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -135,7 +137,12 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   // Get NIST tag description for NIST tag, this is pulled from the 800-53 xml
   // and relies on a script not contained in the project
   descriptionForTag(tag: string): string {
-    return NIST_DESCRIPTIONS[tag] || "Unrecognized tag";
+    if (NIST_DESCRIPTIONS[tag]) {
+      return NIST_DESCRIPTIONS[tag];
+    } else if (CCI_DESCRIPTIONS[tag]) {
+      return CCI_DESCRIPTIONS[tag].def;
+    }
+    return "Unrecognized Tag";
   }
 }
 </script>
