@@ -61,8 +61,7 @@
             <ProfData
               class="my-4 mx-10"
               v-if="eval_info != null"
-              :filter="all_filter"
-              :selected_prof="prof_ids[eval_info]"
+              :selected_prof="root_profiles[eval_info]"
             ></ProfData>
           </v-col>
           <v-col
@@ -81,8 +80,7 @@
           <ProfData
             class="my-4 mx-10"
             v-if="eval_info != null && file_filter.length <= 3"
-            :filter="all_filter"
-            :selected_prof="prof_ids[eval_info]"
+            :selected_prof="root_profiles[eval_info]"
           ></ProfData>
         </v-row>
         <!-- Count Cards -->
@@ -424,7 +422,7 @@ export default class Results extends ResultsProps {
   get root_profiles(): context.ContextualizedProfile[] {
     // Strip to roots
     let profiles = this.visible_profiles.filter(
-      p => p.extends_from.length === 0
+      p => p.extended_by.length === 0
     );
     return profiles;
   }
