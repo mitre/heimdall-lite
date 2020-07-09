@@ -1,6 +1,49 @@
 <template>
-  <v-card>
+  <v-card :watcher="selected_watch">
     <v-row class="pa-4" justify="space-between">
+      <v-col cols="3">
+        <v-card-text>
+          Parent Profile
+        </v-card-text>
+        <v-treeview
+          :items="root_tree"
+          :active="active"
+          @update:active="setActive"
+          hoverable
+          dense
+          activatable
+          color="info"
+          selection-type="independent"
+          transition
+        >
+          <template v-slot:prepend="{ item, active }">
+            <v-icon>mdi-note</v-icon>
+          </template>
+        </v-treeview>
+        <div v-if="items.length > 0">
+          <v-card-text>
+            Overlayed Profiles
+          </v-card-text>
+          <v-treeview
+            :items="items"
+            :active="child_active"
+            @update:active="setChildActive"
+            hoverable
+            dense
+            activatable
+            color="info"
+            selection-type="independent"
+            transition
+          >
+            <template v-slot:prepend="{ item, child_active }">
+              <v-icon>mdi-note</v-icon>
+            </template>
+          </v-treeview>
+        </div>
+      </v-col>
+
+      <v-divider vertical></v-divider>
+
       <v-col class="d-flex text-center">
         <v-scroll-y-transition mode="out-in">
           <div
@@ -67,7 +110,7 @@ class TreeItem {
     // Base information
     this.id = profile_unique_key(profile);
     this.name = profile.data.name;
-    this.children = profile.extended_by.map(p => new TreeItem(p));
+    this.children = profile.extends_from.map(p => new TreeItem(p));
   }
 }
 
@@ -75,8 +118,7 @@ class TreeItem {
 // to make props types inferrable.
 const Props = Vue.extend({
   props: {
-    filter: Object, // Of type Filer from filteredData
-    selected_prof: String
+    selected_prof: { type: Object, required: true }
   }
 });
 
@@ -84,31 +126,32 @@ const Props = Vue.extend({
   components: {}
 })
 export default class ProfileData extends Props {
+  mounted() {
+    this.active = [profile_unique_key(this.selected_prof)];
+  }
+
+  get selected_watch(): string {
+    this.active = [profile_unique_key(this.selected_prof)];
+    return profile_unique_key(this.selected_prof);
+  }
+
+  /** Models selected item ids */
+  active: string[] = [];
+  child_active: string[] = [];
   /** Models all loaded profiles */
   get items(): TreeItem[] {
-    return this.root_profiles.map(p => new TreeItem(p));
-  }
-
-  /** Flat representation of all profiles that ought to be visible  */
-  get visible_profiles(): Readonly<context.ContextualizedProfile[]> {
-    let filtered = getModule(FilteredDataModule, this.$store);
-    return filtered.profiles(this.filter.fromFile);
-  }
-
-  /** Strips visible profiles down to those that are not extended from any others. The "Top" profiles */
-  get root_profiles(): context.ContextualizedProfile[] {
-    // Strip to roots
-    let profiles = this.visible_profiles.filter(
-      p => p.extends_from.length === 0
-    );
-    return profiles;
+    let root_tree = new TreeItem(this.selected_prof);
+    return root_tree.children;
   }
 
   /** Get the most recently selected */
   get selected(): context.ContextualizedProfile | undefined {
-    const id = this.selected_prof;
-    const selected_profile = this.visible_profiles.find(
-      prof => profile_unique_key(prof) === id
+    if (this.true_active == undefined) {
+      return this.selected_prof;
+    }
+    let data = getModule(InspecDataModule, this.$store);
+    let selected_profile = data.contextualProfiles.find(
+      p => profile_unique_key(p) == this.true_active
     );
     return selected_profile;
   }
@@ -193,6 +236,45 @@ export default class ProfileData extends Props {
     });
 
     return output;
+  }
+
+  get root_tree(): TreeItem[] {
+    let tree = new TreeItem(this.selected_prof);
+    tree.children = [];
+    return [tree];
+  }
+
+  setActive(active: string[]) {
+    if (active.length == 0) {
+      if (this.active.length != 1) {
+        this.active = [];
+      } else {
+        this.active = [profile_unique_key(this.selected_prof)];
+      }
+    } else {
+      if (this.child_active.length > 0) {
+        this.child_active = [];
+      }
+      this.active = [active[0]];
+    }
+    console.log(this.true_active);
+  }
+
+  setChildActive(active: string[]) {
+    if (active.length == 0) {
+      this.child_active = [];
+      this.active = [profile_unique_key(this.selected_prof)];
+    } else {
+      if (this.active.length > 0) {
+        this.active = [];
+      }
+      this.child_active = [active[0]];
+    }
+    console.log(this.true_active);
+  }
+
+  get true_active(): string | undefined {
+    return this.active[0] || this.child_active[0];
   }
 }
 
