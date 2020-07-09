@@ -5,6 +5,7 @@
         <v-card-text>
           Parent Profile
         </v-card-text>
+        <!-- literally of just the one root item -->
         <v-treeview
           :items="root_tree"
           :active="active"
@@ -24,6 +25,7 @@
           <v-card-text>
             Overlayed Profiles
           </v-card-text>
+          <!-- for the children of the root -->
           <v-treeview
             :items="items"
             :active="child_active"
@@ -126,10 +128,12 @@ const Props = Vue.extend({
   components: {}
 })
 export default class ProfileData extends Props {
+  //auto select the root prof
   mounted() {
     this.active = [profile_unique_key(this.selected_prof)];
   }
 
+  //auto select the root prof when data changes
   get selected_watch(): string {
     this.active = [profile_unique_key(this.selected_prof)];
     return profile_unique_key(this.selected_prof);
@@ -238,31 +242,36 @@ export default class ProfileData extends Props {
     return output;
   }
 
+  //the single root tree item
   get root_tree(): TreeItem[] {
     let tree = new TreeItem(this.selected_prof);
     tree.children = [];
     return [tree];
   }
 
+  //acts as sort of v-model for root
   setActive(active: string[]) {
     if (active.length == 0) {
+      //unselects root prof when looking at other prof bu does not let the user just unselect the root prof
       if (this.active.length != 1) {
         this.active = [];
       } else {
         this.active = [profile_unique_key(this.selected_prof)];
       }
     } else {
+      //clears other synced array to make sure one prof is selected at a time
       if (this.child_active.length > 0) {
         this.child_active = [];
       }
       this.active = [active[0]];
     }
-    console.log(this.true_active);
   }
 
+  //acts as sort of v-model for children
   setChildActive(active: string[]) {
     if (active.length == 0) {
       this.child_active = [];
+      //default to root prof when unselected
       this.active = [profile_unique_key(this.selected_prof)];
     } else {
       if (this.active.length > 0) {
@@ -270,9 +279,9 @@ export default class ProfileData extends Props {
       }
       this.child_active = [active[0]];
     }
-    console.log(this.true_active);
   }
 
+  //combines synced items
   get true_active(): string | undefined {
     return this.active[0] || this.child_active[0];
   }
