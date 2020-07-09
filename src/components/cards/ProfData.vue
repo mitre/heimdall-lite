@@ -23,7 +23,7 @@
         </v-treeview>
         <div v-if="items.length > 0">
           <v-card-text>
-            Overlayed Profiles
+            Depends On These Profiles:
           </v-card-text>
           <!-- for the children of the root -->
           <v-treeview

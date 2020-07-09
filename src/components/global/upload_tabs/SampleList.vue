@@ -48,6 +48,7 @@ import sonarqube_java_sample from "../../../assets/samples/sonarqube_java_sample
 import ubuntu_1604_baseline_results from "../../../assets/samples/ubuntu-16.04-baseline-results.json";
 import red_hat_bad from "../../../assets/samples/red_hat_bad.json";
 import red_hat_good from "../../../assets/samples/red_hat_good.json";
+import triple_overlay_profile from "../../../assets/samples/triple_overlay_profile_example.json";
 
 interface Sample {
   name: string;
@@ -122,6 +123,10 @@ export default class SampleList extends Props {
       {
         name: "Red Hat Clean Sample",
         sample: red_hat_good
+      },
+      {
+        name: "Triple Overlay Example",
+        sample: triple_overlay_profile
       }
     ];
   }
