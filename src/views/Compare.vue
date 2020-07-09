@@ -474,18 +474,31 @@ export default class Compare extends Props {
     );
     for (let file of this.files) {
       lowCounts.push(
-        totalSevCounts.low({ fromFile: [file.unique_id], status: "Failed" })
+        totalSevCounts.low({
+          fromFile: [file.unique_id],
+          status: "Failed",
+          omit_overlayed_controls: true
+        })
       );
       medCounts.push(
-        totalSevCounts.medium({ fromFile: [file.unique_id], status: "Failed" })
+        totalSevCounts.medium({
+          fromFile: [file.unique_id],
+          status: "Failed",
+          omit_overlayed_controls: true
+        })
       );
       highCounts.push(
-        totalSevCounts.high({ fromFile: [file.unique_id], status: "Failed" })
+        totalSevCounts.high({
+          fromFile: [file.unique_id],
+          status: "Failed",
+          omit_overlayed_controls: true
+        })
       );
       critCounts.push(
         totalSevCounts.critical({
           fromFile: [file.unique_id],
-          status: "Failed"
+          status: "Failed",
+          omit_overlayed_controls: true
         })
       );
     }
