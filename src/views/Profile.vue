@@ -145,7 +145,6 @@ import InspecDataModule from "../store/data_store";
 import ServerModule from "@/store/server";
 import { UserProfile, Evaluation, Usergroup } from "@/types/models.ts";
 import UserMenu from "@/components/global/UserMenu.vue";
-
 export interface RetrieveHash {
   unique_id: number;
   eva: Evaluation;
