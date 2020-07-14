@@ -10,26 +10,7 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <v-menu open-on-hover offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            class="mx-2"
-            v-on="on"
-          >
-            <v-icon>
-              mdi-account
-            </v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item @click="profile_page">
-            <v-list-item-title>Profile</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="log_out">
-            <v-list-item-title>Logout</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+      <UserMenu />
     </template>
 
     <!-- The main content: cards, etc -->
@@ -145,6 +126,7 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import ServerModule from "@/store/server";
 import { UserProfile, Evaluation, Usergroup } from "@/types/models.ts";
+import UserMenu from "@/components/global/UserMenu.vue";
 export interface RetrieveHash {
   unique_id: number;
   eva: Evaluation;
@@ -174,7 +156,8 @@ const UsergroupProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus
+    UploadNexus,
+    UserMenu
   }
 })
 export default class UsergroupView extends UsergroupProps {

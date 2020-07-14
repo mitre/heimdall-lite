@@ -20,27 +20,8 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <v-menu open-on-hover offset-y v-if="is_server_mode">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            class="mx-2"
-            v-on="on"
-          >
-            <v-icon>
-              mdi-account
-            </v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item @click="profile_page">
-            <v-list-item-title>Profile</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="log_out">
-            <v-list-item-title>Logout</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-     </template>
+      <UserMenu />
+    </template>
 
     <!-- Custom sidebar content -->
     <template #sidebar-content-tools>
@@ -181,6 +162,7 @@ import { getModule } from "vuex-module-decorators";
 import InspecDataModule from "../store/data_store";
 import { need_redirect_file } from "@/utilities/helper_util";
 import ServerModule from "@/store/server";
+import UserMenu from "@/components/global/UserMenu.vue";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -202,7 +184,8 @@ const ResultsProps = Vue.extend({
     ExportCaat,
     ExportNist,
     ExportJson,
-    EvaluationInfo
+    EvaluationInfo,
+    UserMenu
   }
 })
 export default class Results extends ResultsProps {
