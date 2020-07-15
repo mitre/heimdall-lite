@@ -87,6 +87,7 @@ describe('Parsing', () => {
         notReviewedTests,
         erroredOutOf,
         erroredTests,
+        totalTests,
         ...actual_stripped
       } = actual;
 
