@@ -11,7 +11,7 @@
         <v-card-text class="pa-2 font-weight-bold">
           {{ control.root.hdf.status }}
           <v-icon class="float-right">
-            {{ expanded ? "mdi-chevron-down" : "mdi-chevron-up" }}
+            {{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up' }}
           </v-icon>
         </v-card-text>
       </v-card>
@@ -46,7 +46,7 @@
           v-for="(tag, i) in control.hdf.raw_nist_tags"
           :key="i"
         >
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator="{on}">
             <v-chip v-on="on" active-class="NONE">
               {{ tag }}
             </v-chip>
@@ -59,15 +59,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { HDFControl, ControlStatus, Severity, nist } from "inspecjs";
-import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
-import { context } from "inspecjs";
-import { NIST_DESCRIPTIONS, nist_canon_config } from "@/utilities/nist_util";
-import { CCI_DESCRIPTIONS } from "@/utilities/cci_util";
-import { Tags } from "../../../types/models";
-import { is_control } from "inspecjs/dist/nist";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {HDFControl, ControlStatus, Severity, nist} from 'inspecjs';
+import ResponsiveRowSwitch from '@/components/cards/controltable/ResponsiveRowSwitch.vue';
+import {context} from 'inspecjs';
+import {NIST_DESCRIPTIONS, nist_canon_config} from '@/utilities/nist_util';
+import {CCI_DESCRIPTIONS} from '@/utilities/cci_util';
+import {Tags} from '../../../types/models';
+import {is_control} from 'inspecjs/dist/nist';
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -104,35 +104,35 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
 
   get truncated_title(): string {
     if (this._control.data.title && this._control.data.title.length > 80) {
-      return this._control.data.title.substr(0, 80) + "...";
+      return this._control.data.title.substr(0, 80) + '...';
     } else {
-      return this._control.data.title || "Untitled";
+      return this._control.data.title || 'Untitled';
     }
   }
 
   get status_color(): string {
     // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
-    return `status${this._control.root.hdf.status.replace(" ", "")}`;
+    return `status${this._control.root.hdf.status.replace(' ', '')}`;
   }
 
   get severity_arrow_count(): number {
     switch (this._control.hdf.severity) {
       default:
-      case "none":
+      case 'none':
         return 0;
-      case "low":
+      case 'low':
         return 1;
-      case "medium":
+      case 'medium':
         return 2;
-      case "high":
+      case 'high':
         return 3;
-      case "critical":
+      case 'critical':
         return 4;
     }
   }
 
   fmtNist(nist: string[]): string {
-    return nist.join(", ");
+    return nist.join(', ');
   }
 
   // Get NIST tag description for NIST tag, this is pulled from the 800-53 xml
@@ -148,7 +148,7 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
     } else if (CCI_DESCRIPTIONS[tag.toUpperCase()]) {
       return CCI_DESCRIPTIONS[tag.toUpperCase()].def;
     }
-    return "Unrecognized Tag";
+    return 'Unrecognized Tag';
   }
 }
 </script>
