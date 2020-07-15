@@ -61,12 +61,13 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { HDFControl, ControlStatus, Severity } from "inspecjs";
+import { HDFControl, ControlStatus, Severity, nist } from "inspecjs";
 import ResponsiveRowSwitch from "@/components/cards/controltable/ResponsiveRowSwitch.vue";
 import { context } from "inspecjs";
-import { NIST_DESCRIPTIONS } from "@/utilities/nist_util";
+import { NIST_DESCRIPTIONS, nist_canon_config } from "@/utilities/nist_util";
 import { CCI_DESCRIPTIONS } from "@/utilities/cci_util";
 import { Tags } from "../../../types/models";
+import { is_control } from "inspecjs/dist/nist";
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -137,10 +138,15 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   // Get NIST tag description for NIST tag, this is pulled from the 800-53 xml
   // and relies on a script not contained in the project
   descriptionForTag(tag: string): string {
-    if (NIST_DESCRIPTIONS[tag]) {
-      return NIST_DESCRIPTIONS[tag];
-    } else if (CCI_DESCRIPTIONS[tag]) {
-      return CCI_DESCRIPTIONS[tag].def;
+    let nisted = nist.parse_nist(tag);
+    if (is_control(nisted)) {
+      let canon = nisted.canonize(nist_canon_config);
+      let found = NIST_DESCRIPTIONS[canon];
+      if (found) {
+        return found;
+      }
+    } else if (CCI_DESCRIPTIONS[tag.toUpperCase()]) {
+      return CCI_DESCRIPTIONS[tag.toUpperCase()].def;
     }
     return "Unrecognized Tag";
   }
