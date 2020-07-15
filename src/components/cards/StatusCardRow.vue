@@ -76,14 +76,16 @@ export default class StatusCardRow extends StatusCardRowProps {
       {
         icon: "check-circle",
         title: "Passed",
-        subtitle: `All ${counts.passedTests(filter)} tests passed`,
+        subtitle: `Has ${counts.passedTests(
+          filter
+        )} tests passed out of ${counts.totalTests(filter)}`,
         color: "statusPassed",
         number: counts.passed(filter)
       },
       {
         icon: "close-circle",
         title: "Failed",
-        subtitle: `Has ${counts.failedTests(filter)} of ${counts.failedOutOf(
+        subtitle: `Has ${counts.failedTests(filter)} of ${counts.totalTests(
           filter
         )} tests that failed`,
         color: "statusFailed",

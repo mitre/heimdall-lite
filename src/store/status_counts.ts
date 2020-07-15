@@ -19,6 +19,7 @@ type StatusHash = ControlStatusHash & {
   notReviewedTests: number;
   erroredOutOf: number;
   erroredTests: number;
+  totalTests: number;
 };
 
 // Helper function for counting a status in a list of controls
@@ -46,12 +47,14 @@ function count_statuses(data: FilteredData, filter: Filter): StatusHash {
     notApplicableTests: 0,
     notReviewedTests: 0,
     erroredOutOf: 0,
-    erroredTests: 0
+    erroredTests: 0,
+    totalTests: 0
   };
   controls.forEach(c => {
     c = c.root;
     let status: ControlStatus = c.hdf.status;
     hash[status] += 1;
+    hash.totalTests += (c.hdf.segments || []).length;
     if (status == "Passed") {
       hash.passedTests += (c.hdf.segments || []).length;
     } else if (status == "Failed") {
@@ -111,6 +114,10 @@ class StatusCountModule extends VuexModule {
       cache.set(id, result);
       return result;
     };
+  }
+
+  get totalTests(): (filter: Filter) => number {
+    return filter => this.hash(filter)["totalTests"];
   }
 
   get passed(): (filter: Filter) => number {
