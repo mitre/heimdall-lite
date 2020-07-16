@@ -19,10 +19,10 @@
 
     <template #severity>
       <v-card-text class="pa-2">
-        <v-icon small v-for="i in severity_arrow_count" :key="i"
+        <v-icon small v-for="i in severity_arrow_count" :key="'sev0' + i"
           >mdi-checkbox-blank-circle</v-icon
         >
-        <v-icon small v-for="i in 4 - severity_arrow_count" :key="5 - i"
+        <v-icon small v-for="i in 4 - severity_arrow_count" :key="'sev1' + i"
           >mdi-checkbox-blank-circle-outline</v-icon
         >
         <br />
@@ -32,26 +32,34 @@
     </template>
 
     <template #title>
-      <v-card-text class="pa-2">{{ truncated_title }}</v-card-text>
+      <v-clamp class="pa-2 title" autoresize :max-lines="4">
+        <template slot="default">{{ control.data.title }}</template>
+        <template slot="after" slot-scope="{toggle, expanded, clamped}">
+          <v-icon fab v-if="!expanded && clamped" right medium @click="toggle"
+            >mdi-plus-box</v-icon
+          >
+          <v-icon fab v-if="expanded" right medium @click="toggle"
+            >mdi-minus-box</v-icon
+          >
+        </template>
+      </v-clamp>
     </template>
 
     <!-- ID and Tags -->
     <template #id>
-      <v-card-text class="pa-2">{{ control.data.id }}</v-card-text>
+      <v-card-text class="pa-2 title font-weight-bold">
+        {{ control.data.id }}
+      </v-card-text>
     </template>
     <template #tags>
       <v-chip-group column active-class="NONE">
-        <v-tooltip
-          bottom
-          v-for="(tag, i) in control.hdf.raw_nist_tags"
-          :key="i"
-        >
+        <v-tooltip bottom v-for="(tag, i) in all_tags" :key="'chip' + i">
           <template v-slot:activator="{on}">
             <v-chip v-on="on" active-class="NONE">
               {{ tag }}
             </v-chip>
           </template>
-          <span>{{ tooltip(tag) }}</span>
+          <span>{{ descriptionForTag(tag) }}</span>
         </v-tooltip>
       </v-chip-group>
     </template>
@@ -68,6 +76,8 @@ import {NIST_DESCRIPTIONS, nist_canon_config} from '@/utilities/nist_util';
 import {CCI_DESCRIPTIONS} from '@/utilities/cci_util';
 import {Tags} from '../../../types/models';
 import {is_control} from 'inspecjs/dist/nist';
+//@ts-ignore
+import VClamp from 'vue-clamp/dist/vue-clamp.js';
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -85,21 +95,14 @@ const ControlRowHeaderProps = Vue.extend({
 
 @Component({
   components: {
-    ResponsiveRowSwitch
+    ResponsiveRowSwitch,
+    VClamp
   }
 })
 export default class ControlRowHeader extends ControlRowHeaderProps {
   /** Typed getter for control */
   get _control(): context.ContextualizedControl {
     return this.control;
-  }
-
-  // Get NIST tag description for NIST tag, this is pulled from the 800-53 xml
-  // and relies on a script not contained in the project
-  get tooltip(): (tag: string) => string {
-    return (tag: string) => {
-      return this.descriptionForTag(tag);
-    };
   }
 
   get truncated_title(): string {
@@ -149,6 +152,18 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
       return CCI_DESCRIPTIONS[tag.toUpperCase()].def;
     }
     return 'Unrecognized Tag';
+  }
+
+  get all_tags(): string[] {
+    let nist_tags = this._control.hdf.raw_nist_tags;
+    nist_tags = nist_tags.filter(tag => tag.search(/Rev.*\d/i) != 0);
+    let cci_tags = this._control.data.tags.cci;
+    if (!cci_tags) {
+      return this._control.hdf.raw_nist_tags;
+    } else if (typeof cci_tags == 'string') {
+      cci_tags = cci_tags.split(' ');
+    }
+    return [...this._control.hdf.raw_nist_tags, ...cci_tags];
   }
 }
 </script>
