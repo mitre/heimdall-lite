@@ -10,7 +10,7 @@
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
-                <v-form ref="form">
+                <v-form name="signup_form" ref="form">
                   <v-text-field
                     label="Email"
                     name="email"
@@ -47,6 +47,7 @@
                       type="password"
                       v-model="password"
                       label="password"
+                      name="password"
                       v-validate="'required'"
                       id="password"
                       :strength-meter-only="true"

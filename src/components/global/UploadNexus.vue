@@ -15,14 +15,14 @@
       >
         <v-tabs-slider></v-tabs-slider>
         <!-- Define our tabs -->
-        <v-tab href="#uploadtab-local">Local Files</v-tab>
+        <v-tab id="local_files_tab" href="#uploadtab-local">Local Files</v-tab>
 
         <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
 
         <v-tab href="#uploadtab-splunk">Splunk</v-tab>
         <v-spacer />
         <v-divider />
-        <v-tab href="#uploadtab-samples">Samples</v-tab>
+        <v-tab id="sample_tab" href="#uploadtab-samples">Samples</v-tab>
 
         <!-- Include those components -->
         <v-tab-item value="uploadtab-local">
