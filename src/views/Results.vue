@@ -213,7 +213,7 @@ export default class Results extends ResultsProps {
    * The current search term, as modeled by the search bar
    * Never empty - should in that case be null
    */
-  search_term: string = "";
+  search_term: string = '';
 
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
@@ -235,7 +235,7 @@ export default class Results extends ResultsProps {
    */
   get file_filter(): FileID | null {
     let id_string: string = this.$route.params.id;
-    console.log("file_filter: " + id_string);
+    console.log('file_filter: ' + id_string);
     let as_int = parseInt(id_string);
     let result: FileID | null;
     if (isNaN(as_int)) {
@@ -243,17 +243,17 @@ export default class Results extends ResultsProps {
     } else {
       result = as_int as FileID;
     }
-    console.log("file_filter result: " + result);
+    console.log('file_filter result: ' + result);
 
     // Route if necessary
     let redir = need_redirect_file(
       result,
       getModule(InspecDataModule, this.$store)
     );
-    console.log("redir: " + redir);
-    if (redir !== "ok") {
-      if (redir === "root") {
-        this.$router.push("/home");
+    console.log('redir: ' + redir);
+    if (redir !== 'ok') {
+      if (redir === 'root') {
+        this.$router.push('/home');
       } else {
         this.$router.push(`/results/${redir}`);
         result = redir;
@@ -299,7 +299,7 @@ export default class Results extends ResultsProps {
     this.severity_filter = null;
     this.status_filter = null;
     this.control_selection = null;
-    this.search_term = "";
+    this.search_term = '';
     this.tree_filters = [];
   }
 
@@ -311,7 +311,7 @@ export default class Results extends ResultsProps {
   log_out() {
     getModule(ServerModule, this.$store).clear_token();
     this.dialog = false;
-    this.$router.push("/");
+    this.$router.push('/');
   }
 
   /**
@@ -324,7 +324,7 @@ export default class Results extends ResultsProps {
     if (
       this.severity_filter ||
       this.status_filter ||
-      this.search_term !== "" ||
+      this.search_term !== '' ||
       this.tree_filters.length
     ) {
       result = true;
