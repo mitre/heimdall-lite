@@ -178,9 +178,7 @@ export default class Signup extends SignupProps {
       BackendModule.Register(creds)
         .then(() => {
           this.$router.push('/login');
-          this.$toasted.global.success({
-            message: 'You have successfully registered, please sign in'
-          });
+          this.$toasted.show( 'You have successfully registered, please sign in', { type: 'success'}
         })
         .catch(error => {
           this.$toasted.global.error({
