@@ -76,30 +76,25 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import {
-  context,
-  HDFControl,
-  HDFControlSegment,
-  SegmentStatus
-} from "inspecjs";
-import { ControlDelta, ControlChangeGroup } from "@/utilities/delta_util";
-import { diffArrays, ArrayOptions } from "diff";
-import ChangeItem from "@/components/cards/comparison/ChangeItem.vue";
-import TruncatedText from "@/components/generic/TruncatedText.vue";
-import ControlRowCol from "@/components/cards/controltable/ControlRowCol.vue";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {context, HDFControl, HDFControlSegment, SegmentStatus} from 'inspecjs';
+import {ControlDelta, ControlChangeGroup} from '@/utilities/delta_util';
+import {diffArrays, ArrayOptions} from 'diff';
+import ChangeItem from '@/components/cards/comparison/ChangeItem.vue';
+import TruncatedText from '@/components/generic/TruncatedText.vue';
+import ControlRowCol from '@/components/cards/controltable/ControlRowCol.vue';
 //import vueCodeDiff from 'vue-code-diff';
 
 //TODO: add line numbers
-import "prismjs";
-import "prismjs/components/prism-makefile.js";
-import "prismjs/components/prism-ruby.js";
+import 'prismjs';
+import 'prismjs/components/prism-makefile.js';
+import 'prismjs/components/prism-ruby.js';
 //@ts-ignore
-import Prism from "vue-prism-component";
-Vue.component("prism", Prism);
+import Prism from 'vue-prism-component';
+Vue.component('prism', Prism);
 
-import "prismjs/components/prism-ruby.js";
+import 'prismjs/components/prism-ruby.js';
 
 // Define our props
 const Props = Vue.extend({
@@ -168,7 +163,7 @@ export default class DeltaView extends Props {
 
   //creates backround zebra affect
   zebra(ix: number): string {
-    return ix % 2 ? "" : "zebra-table";
+    return ix % 2 ? '' : 'zebra-table';
   }
 }
 </script>

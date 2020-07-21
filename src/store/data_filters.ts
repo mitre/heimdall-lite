@@ -2,22 +2,17 @@
  * This module provides a cached, reusable method for filtering data from data_store.
  */
 
-import {
-  Module,
-  VuexModule,
-  getModule,
-  Mutation
-} from "vuex-module-decorators";
+import {Module, VuexModule, getModule, Mutation} from 'vuex-module-decorators';
 import {
   SourcedContextualizedProfile,
   SourcedContextualizedEvaluation
-} from "@/store/report_intake";
-import DataModule, { isFromProfileFile } from "@/store/data_store";
-import { ControlStatus, Severity } from "inspecjs";
-import { FileID } from "@/store/report_intake";
-import Store from "@/store/store";
-import LRUCache from "lru-cache";
-import { context, nist } from "inspecjs";
+} from '@/store/report_intake';
+import DataModule, {isFromProfileFile} from '@/store/data_store';
+import {ControlStatus, Severity} from 'inspecjs';
+import {FileID} from '@/store/report_intake';
+import Store from '@/store/store';
+import LRUCache from 'lru-cache';
+import {context, nist} from 'inspecjs';
 
 const MAX_CACHE_ENTRIES = 20;
 
@@ -85,7 +80,7 @@ function contains_term(
   namespaced: true,
   dynamic: true,
   store: Store,
-  name: "filteredData"
+  name: 'filteredData'
 })
 class FilteredDataModule extends VuexModule {
   selected_file_ids: FileID[] = [];
@@ -262,7 +257,7 @@ export function filter_cache_key(f: Filter) {
   if (f.search_term !== undefined) {
     new_search = f.search_term.trim();
   } else {
-    new_search = "";
+    new_search = '';
   }
 
   let new_f: Filter = {

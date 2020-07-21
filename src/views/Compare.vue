@@ -121,9 +121,9 @@
                 <toggle-button
                   :width="150"
                   :height="35"
-                  :color="{ checked: '#2C98F0', unchecked: '#2C98F0' }"
+                  :color="{checked: '#2C98F0', unchecked: '#2C98F0'}"
                   v-model="expanded_view"
-                  :labels="{ checked: 'All Data', unchecked: 'Changed Data' }"
+                  :labels="{checked: 'All Data', unchecked: 'Changed Data'}"
                   :font-size="15"
                 ></toggle-button>
               </div>
@@ -220,39 +220,39 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import BaseView from "@/views/BaseView.vue";
-import Modal from "@/components/global/Modal.vue";
-import UploadNexus from "@/components/global/UploadNexus.vue";
-import CompareRow from "@/components/cards/comparison/CompareRow.vue";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import BaseView from '@/views/BaseView.vue';
+import Modal from '@/components/global/Modal.vue';
+import UploadNexus from '@/components/global/UploadNexus.vue';
+import CompareRow from '@/components/cards/comparison/CompareRow.vue';
 
-import FilteredDataModule, { Filter } from "@/store/data_filters";
-import { ControlStatus, Severity, context } from "inspecjs";
-import SeverityCountModule from "@/store/severity_counts";
-import { FileID } from "@/store/report_intake";
+import FilteredDataModule, {Filter} from '@/store/data_filters';
+import {ControlStatus, Severity, context} from 'inspecjs';
+import SeverityCountModule from '@/store/severity_counts';
+import {FileID} from '@/store/report_intake';
 import {
   ComparisonContext,
   ControlDelta,
   ControlSeries
-} from "../utilities/delta_util";
-import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "../store/data_store";
-import ApexPieChart, { Category } from "@/components/generic/ApexPieChart.vue";
-import StatusCountModule from "@/store/status_counts";
-import ProfileRow from "@/components/cards/comparison/ProfileRow.vue";
-import StatusChart from "@/components/cards/StatusChart.vue";
-import { EvaluationFile } from "@/store/report_intake";
-import { SourcedContextualizedEvaluation } from "@/store/report_intake";
-import ServerModule from "@/store/server";
-import { isFromProfileFile } from "@/store/data_store";
+} from '../utilities/delta_util';
+import {getModule} from 'vuex-module-decorators';
+import InspecDataModule from '../store/data_store';
+import ApexPieChart, {Category} from '@/components/generic/ApexPieChart.vue';
+import StatusCountModule from '@/store/status_counts';
+import ProfileRow from '@/components/cards/comparison/ProfileRow.vue';
+import StatusChart from '@/components/cards/StatusChart.vue';
+import {EvaluationFile} from '@/store/report_intake';
+import {SourcedContextualizedEvaluation} from '@/store/report_intake';
+import ServerModule from '@/store/server';
+import {isFromProfileFile} from '@/store/data_store';
 import ApexLineChart, {
   SeriesItem
-} from "@/components/generic/ApexLineChart.vue";
+} from '@/components/generic/ApexLineChart.vue';
 //@ts-ignore
-import resize from "vue-resize-directive";
-import { get_eval_start_time } from "@/utilities/delta_util";
-import { ToggleButton } from "vue-js-toggle-button";
+import resize from 'vue-resize-directive';
+import {get_eval_start_time} from '@/utilities/delta_util';
+import {ToggleButton} from 'vue-js-toggle-button';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -278,29 +278,29 @@ const Props = Vue.extend({
 export default class Compare extends Props {
   categories: Category<ControlStatus>[] = [
     {
-      label: "Passed",
-      value: "Passed",
-      color: "statusPassed"
+      label: 'Passed',
+      value: 'Passed',
+      color: 'statusPassed'
     },
     {
-      label: "Failed",
-      value: "Failed",
-      color: "statusFailed"
+      label: 'Failed',
+      value: 'Failed',
+      color: 'statusFailed'
     },
     {
-      label: "Not Applicable",
-      value: "Not Applicable",
-      color: "statusNotApplicable"
+      label: 'Not Applicable',
+      value: 'Not Applicable',
+      color: 'statusNotApplicable'
     },
     {
-      label: "Not Reviewed",
-      value: "Not Reviewed",
-      color: "statusNotReviewed"
+      label: 'Not Reviewed',
+      value: 'Not Reviewed',
+      color: 'statusNotReviewed'
     },
     {
-      label: "Profile Error",
-      value: "Profile Error",
-      color: "statusProfileError"
+      label: 'Profile Error',
+      value: 'Profile Error',
+      color: 'statusProfileError'
     }
   ];
 
@@ -313,7 +313,7 @@ export default class Compare extends Props {
   start_index: number = 0;
   ascending: boolean = true;
   chartsOpen: boolean = true;
-  search_term: string = "";
+  search_term: string = '';
   ableTab: boolean = true;
   expansion: number = 0;
 
@@ -335,7 +335,7 @@ export default class Compare extends Props {
   get delta_sets(): ControlSeries[] {
     function get_status_safe(ctrl: null | context.ContextualizedControl) {
       if (ctrl == null) {
-        return "No Data";
+        return 'No Data';
       }
       return ctrl.hdf.status;
     }
@@ -343,7 +343,7 @@ export default class Compare extends Props {
       // Get the first status. If no change, all should equal this
       let first;
       for (let i = 0; i < series.length; i++) {
-        if (get_status_safe(series[i]) !== "No Data") {
+        if (get_status_safe(series[i]) !== 'No Data') {
           first = get_status_safe(series[i]);
           break;
         }
@@ -352,7 +352,7 @@ export default class Compare extends Props {
         // Check if the status has changed. If so, keep
         if (
           get_status_safe(series[i]) !== first &&
-          get_status_safe(series[i]) !== "No Data"
+          get_status_safe(series[i]) !== 'No Data'
         ) {
           return true;
         }
@@ -368,8 +368,8 @@ export default class Compare extends Props {
   }
 
   get searched_sets(): ControlSeries[] {
-    let term = (this.search_term || "").toLowerCase().trim();
-    if (term == "") {
+    let term = (this.search_term || '').toLowerCase().trim();
+    if (term == '') {
       return this.control_sets;
     }
     function contains_term(
@@ -466,11 +466,11 @@ export default class Compare extends Props {
 
     fileArr = fileArr.sort((a, b) => {
       let a_date = new Date(
-        filter_module.controls({ fromFile: [a.unique_id] })[0].root.hdf
+        filter_module.controls({fromFile: [a.unique_id]})[0].root.hdf
           .start_time || 0
       );
       let b_date = new Date(
-        filter_module.controls({ fromFile: [b.unique_id] })[0].root.hdf
+        filter_module.controls({fromFile: [b.unique_id]})[0].root.hdf
           .start_time || 0
       );
       return a_date.valueOf() - b_date.valueOf();
@@ -492,28 +492,28 @@ export default class Compare extends Props {
       lowCounts.push(
         totalSevCounts.low({
           fromFile: [file.unique_id],
-          status: "Failed",
+          status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       medCounts.push(
         totalSevCounts.medium({
           fromFile: [file.unique_id],
-          status: "Failed",
+          status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       highCounts.push(
         totalSevCounts.high({
           fromFile: [file.unique_id],
-          status: "Failed",
+          status: 'Failed',
           omit_overlayed_controls: true
         })
       );
       critCounts.push(
         totalSevCounts.critical({
           fromFile: [file.unique_id],
-          status: "Failed",
+          status: 'Failed',
           omit_overlayed_controls: true
         })
       );
@@ -527,10 +527,10 @@ export default class Compare extends Props {
 
   get line_sev_series(): SeriesItem[] {
     var series = [];
-    var low = { name: "Failed Low Severity", data: this.sev_series[0] };
-    var med = { name: "Failed Medium Severity", data: this.sev_series[1] };
-    var high = { name: "Failed High Severity", data: this.sev_series[2] };
-    var crit = { name: "Failed Critical Severity", data: this.sev_series[3] };
+    var low = {name: 'Failed Low Severity', data: this.sev_series[0]};
+    var med = {name: 'Failed Medium Severity', data: this.sev_series[1]};
+    var high = {name: 'Failed High Severity', data: this.sev_series[2]};
+    var crit = {name: 'Failed Critical Severity', data: this.sev_series[3]};
     series.push(low);
     series.push(med);
     series.push(high);
@@ -541,7 +541,7 @@ export default class Compare extends Props {
   get compliance_series(): SeriesItem[] {
     var series = [];
     for (let file of this.files) {
-      let filter = { fromFile: [file.unique_id] };
+      let filter = {fromFile: [file.unique_id]};
       let counts = getModule(StatusCountModule, this.$store);
       let passed = counts.passed(filter);
       let total =
@@ -555,7 +555,7 @@ export default class Compare extends Props {
         series.push(Math.round((100.0 * passed) / total));
       }
     }
-    return [{ name: "Compliance", data: series }];
+    return [{name: 'Compliance', data: series}];
   }
 
   get fileTimes(): (string | undefined)[] {
@@ -575,7 +575,7 @@ export default class Compare extends Props {
     let highest_failed = 0;
     let counts = getModule(StatusCountModule, this.$store);
     for (let file of this.files) {
-      let filter = { fromFile: [file.unique_id] };
+      let filter = {fromFile: [file.unique_id]};
       let failed = counts.failed(filter);
       if (failed > highest_failed) {
         highest_failed = failed;
@@ -585,12 +585,12 @@ export default class Compare extends Props {
   }
 
   get num_shown_files(): number {
-    if (this.$vuetify.breakpoint.name == "xs") {
+    if (this.$vuetify.breakpoint.name == 'xs') {
       if (this.files.length > 2) {
         return 2;
       }
       return this.files.length;
-    } else if (this.$vuetify.breakpoint.name == "sm") {
+    } else if (this.$vuetify.breakpoint.name == 'sm') {
       if (this.files.length > 3) {
         return 3;
       }
@@ -603,7 +603,7 @@ export default class Compare extends Props {
   log_out() {
     getModule(ServerModule, this.$store).clear_token();
     this.dialog;
-    this.$router.push("/");
+    this.$router.push('/');
   }
 
   on_resize(elt: any) {

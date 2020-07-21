@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 const Props = Vue.extend({
   props: {
     name: String,

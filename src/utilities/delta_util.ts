@@ -2,19 +2,19 @@
  * Provides utlities for comparing executions
  */
 
-import { SourcedContextualizedEvaluation } from "@/store/report_intake";
-import { HDFControlSegment, context } from "inspecjs";
+import {SourcedContextualizedEvaluation} from '@/store/report_intake';
+import {HDFControlSegment, context} from 'inspecjs';
 import {
   structuredPatch,
   createPatch,
   diffArrays,
   Change as DiffChange,
   diffJson
-} from "diff";
-import { exec } from "child_process";
-import { EvaluationFile } from "@/store/report_intake";
-import { getModule } from "vuex-module-decorators";
-import { ContextualizedEvaluation } from "inspecjs/dist/context";
+} from 'diff';
+import {exec} from 'child_process';
+import {EvaluationFile} from '@/store/report_intake';
+import {getModule} from 'vuex-module-decorators';
+import {ContextualizedEvaluation} from 'inspecjs/dist/context';
 
 /**
  * Represents a change in a property.
@@ -37,7 +37,7 @@ export class ControlChange {
   get valid(): boolean {
     let first_selected = -1;
     for (let i = 0; i < this.values.length; i++) {
-      if (this.values[i] != "not selected") {
+      if (this.values[i] != 'not selected') {
         first_selected = i;
         break;
       }
@@ -48,7 +48,7 @@ export class ControlChange {
     for (let i = first_selected + 1; i < this.values.length; i++) {
       if (
         this.values[i] != this.values[first_selected] &&
-        this.values[i] != "not selected"
+        this.values[i] != 'not selected'
       ) {
         return true;
       }
@@ -88,12 +88,12 @@ export class ControlChangeGroup {
 function changelog_segments(items: HDFControlSegment[]): ControlChange[] {
   // Get all the keys we care about
   let all_keys: Array<keyof HDFControlSegment>;
-  all_keys = ["status", "code_desc", "exception", "message", "resource"]; // determines output order, which are displayed, etc.
+  all_keys = ['status', 'code_desc', 'exception', 'message', 'resource']; // determines output order, which are displayed, etc.
 
   // Map them to changes
   let changes: ControlChange[] = [];
   all_keys.forEach(key => {
-    let versions: string[] = items.map(i => i[key] + "" || "");
+    let versions: string[] = items.map(i => i[key] + '' || '');
     changes.push(new ControlChange(key, versions));
   });
 
@@ -165,10 +165,10 @@ export class ControlDelta {
     // Change in... ID? Theoretically possible!
     header_changes.push(
       new ControlChange(
-        "ID",
+        'ID',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return "not selected";
+            return 'not selected';
           }
           return c!.data.id;
         })
@@ -178,10 +178,10 @@ export class ControlDelta {
     // Change in status, obviously.
     header_changes.push(
       new ControlChange(
-        "Status",
+        'Status',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return "not selected";
+            return 'not selected';
           }
           return c!.hdf.status;
         })
@@ -191,10 +191,10 @@ export class ControlDelta {
     // And severity! Why not
     header_changes.push(
       new ControlChange(
-        "Severity",
+        'Severity',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return "not selected";
+            return 'not selected';
           }
           return c!.hdf.severity;
         })
@@ -204,18 +204,18 @@ export class ControlDelta {
     // Change in nist tags!
     header_changes.push(
       new ControlChange(
-        "NIST Tags",
+        'NIST Tags',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return "not selected";
+            return 'not selected';
           }
-          return c!.hdf.raw_nist_tags.join(", ");
+          return c!.hdf.raw_nist_tags.join(', ');
         })
       )
     );
 
     // Make the group and clean it
-    let result = new ControlChangeGroup("Control Details", header_changes);
+    let result = new ControlChangeGroup('Control Details', header_changes);
     result.clean();
     return result;
   }
@@ -308,7 +308,7 @@ function extract_top_level_controls(
 export type ControlSeries = Array<context.ContextualizedControl | null>;
 
 /** Matches ControlID keys to Arrays of Controls, sorted by time */
-export type ControlSeriesLookup = { [key: string]: ControlSeries };
+export type ControlSeriesLookup = {[key: string]: ControlSeries};
 
 /** Helps manage comparing change(s) between one or more profile executions */
 export class ComparisonContext {

@@ -85,15 +85,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { context } from "inspecjs";
-import { HDFControl } from "inspecjs";
-import { ControlDelta } from "@/utilities/delta_util";
-import DeltaView from "@/components/cards/comparison/DeltaView.vue";
-import ControlRowDetails from "@/components/cards/controltable/ControlRowDetails.vue";
-import FilteredDataModule from "../../../store/data_filters";
-import { getModule } from "vuex-module-decorators";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {context} from 'inspecjs';
+import {HDFControl} from 'inspecjs';
+import {ControlDelta} from '@/utilities/delta_util';
+import DeltaView from '@/components/cards/comparison/DeltaView.vue';
+import ControlRowDetails from '@/components/cards/controltable/ControlRowDetails.vue';
+import FilteredDataModule from '../../../store/data_filters';
+import {getModule} from 'vuex-module-decorators';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -114,7 +114,7 @@ const Props = Vue.extend({
 export default class CompareRow extends Props {
   /** Models the currently selected chips. If it's a number */
   selection: boolean[] = [];
-  tab: string = "tab-test";
+  tab: string = 'tab-test';
 
   /** Initialize our selection */
   mounted() {
@@ -148,7 +148,7 @@ export default class CompareRow extends Props {
         return ctrl.wraps.id;
       }
     }
-    return "Error";
+    return 'Error';
   }
 
   /** Provides actual data about which controls we have selected */
@@ -260,7 +260,7 @@ export default class CompareRow extends Props {
   get file_num_watch(): string {
     let filter_module = getModule(FilteredDataModule, this.$store);
     this.selection = filter_module.selected_file_ids.map(x => false);
-    return filter_module.selected_file_ids.length + "";
+    return filter_module.selected_file_ids.length + '';
   }
   /** If more than one row selected */
 }

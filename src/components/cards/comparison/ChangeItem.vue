@@ -23,9 +23,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { ControlDelta } from "@/utilities/delta_util";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {ControlDelta} from '@/utilities/delta_util';
 
 const Props = Vue.extend({
   props: {
@@ -39,10 +39,10 @@ const Props = Vue.extend({
 })
 export default class ChangeItem extends Props {
   color(status: string): string {
-    if (this.change.name.toLowerCase() == "status") {
-      return `status${status.replace(" ", "")}`;
+    if (this.change.name.toLowerCase() == 'status') {
+      return `status${status.replace(' ', '')}`;
     }
-    return "";
+    return '';
   }
 
   get values(): string[] {

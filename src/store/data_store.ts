@@ -8,7 +8,7 @@ import {
   Mutation,
   Action,
   getModule
-} from "vuex-module-decorators";
+} from 'vuex-module-decorators';
 import {
   HDFControl,
   parse,
@@ -16,7 +16,7 @@ import {
   hdfWrapControl,
   ControlStatus,
   context
-} from "inspecjs";
+} from 'inspecjs';
 import {
   FileID,
   EvaluationFile,
@@ -24,9 +24,9 @@ import {
   InspecFile,
   SourcedContextualizedProfile,
   SourcedContextualizedEvaluation
-} from "@/store/report_intake";
-import Store from "@/store/store";
-import FilteredDataModule from "./data_filters";
+} from '@/store/report_intake';
+import Store from '@/store/store';
+import FilteredDataModule from './data_filters';
 
 /** We make some new variant types of the Contextual types, to include their files*/
 export function isFromProfileFile(
@@ -39,7 +39,7 @@ export function isFromProfileFile(
   namespaced: true,
   dynamic: true,
   store: Store,
-  name: "data"
+  name: 'data'
 })
 class InspecDataModule extends VuexModule {
   /** State var containing all execution files that have been added */

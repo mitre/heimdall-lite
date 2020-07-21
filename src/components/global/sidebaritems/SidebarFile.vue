@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "@/store/data_store";
-import FilteredDataModule from "@/store/data_filters";
-import { EvaluationFile, ProfileFile, FileID } from "@/store/report_intake";
-import ServerModule from "@/store/server";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {getModule} from 'vuex-module-decorators';
+import InspecDataModule from '@/store/data_store';
+import FilteredDataModule from '@/store/data_filters';
+import {EvaluationFile, ProfileFile, FileID} from '@/store/report_intake';
+import ServerModule from '@/store/server';
 
 // We declare the props separately to make props types inferable.
 const FileItemProps = Vue.extend({
@@ -46,7 +46,7 @@ const FileItemProps = Vue.extend({
   components: {}
 })
 export default class FileItem extends FileItemProps {
-  host: string = "http://localhost:8050";
+  host: string = 'http://localhost:8050';
 
   select_file(evt: Event) {
     evt.stopPropagation();
@@ -86,14 +86,14 @@ export default class FileItem extends FileItemProps {
   save_this_file(evt: Event) {
     evt.stopPropagation();
     evt.preventDefault();
-    console.log("save this file");
+    console.log('save this file');
     let data_store = getModule(InspecDataModule, this.$store);
     let file = data_store.allFiles.find(
       f => f.unique_id === this.file.unique_id
     );
-    console.log("got file");
+    console.log('got file');
     if (file) {
-      if (file.hasOwnProperty("execution")) {
+      if (file.hasOwnProperty('execution')) {
         this.save_evaluation(file as EvaluationFile);
       } else {
         this.save_profile(file as ProfileFile);
@@ -102,17 +102,17 @@ export default class FileItem extends FileItemProps {
   }
 
   async save_evaluation(file?: EvaluationFile): Promise<void> {
-    console.log("Save evaluation to " + this.host);
+    console.log('Save evaluation to ' + this.host);
     // checking if the input is valid
     if (file) {
       let mod = getModule(ServerModule, this.$store);
       await mod
         .connect(this.host)
         .catch(bad => {
-          console.error("Unable to connect to " + this.host);
+          console.error('Unable to connect to ' + this.host);
         })
         .then(() => {
-          console.log("mode.save_evaluation");
+          console.log('mode.save_evaluation');
           return mod.save_evaluation(file);
         })
         .catch(bad => {
@@ -127,7 +127,7 @@ export default class FileItem extends FileItemProps {
     if (file) {
       let decontextualized = file.profile.data;
       let blob = new Blob([JSON.stringify(decontextualized)], {
-        type: "application/json"
+        type: 'application/json'
       });
     }
   }
@@ -135,9 +135,9 @@ export default class FileItem extends FileItemProps {
   //gives different icons for a file if it is just a profile
   get icon(): string {
     if (this.file.profile !== undefined) {
-      return "note";
+      return 'note';
     } else {
-      return "mdi-google-analytics";
+      return 'mdi-google-analytics';
     }
   }
 

@@ -22,7 +22,7 @@
             ></v-text-field>
           </v-toolbar>
         </template>
-        <template v-slot:item.action="{ item }">
+        <template v-slot:item.action="{item}">
           <v-icon @click="load_event(item)">
             mdi-plus-circle
           </v-icon>
@@ -40,22 +40,22 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { getModule } from "vuex-module-decorators";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {getModule} from 'vuex-module-decorators';
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID,
   EvaluationFile,
   SourcedContextualizedEvaluation
-} from "@/store/report_intake";
+} from '@/store/report_intake';
 import {
   SplunkEndpoint,
   ExecutionMetaInfo,
   SplunkErrorCode
-} from "../../../../utilities/splunk_util";
-import InspecDataModule from "../../../../store/data_store";
-import { contextualizeEvaluation } from "inspecjs/dist/context";
+} from '../../../../utilities/splunk_util';
+import InspecDataModule from '../../../../store/data_store';
+import {contextualizeEvaluation} from 'inspecjs/dist/context';
 
 const SEARCH_INTERVAL = 10000;
 
@@ -70,23 +70,23 @@ const Props = Vue.extend({
 })
 export default class FileList extends Props {
   /** The name written in the form */
-  search: string = "";
+  search: string = '';
 
   /** Table info */
   headers = [
     {
-      text: "Filename",
-      value: "filename",
+      text: 'Filename',
+      value: 'filename',
       filterable: true,
-      align: "start"
+      align: 'start'
     },
     {
-      text: "Time",
-      value: "start_time"
+      text: 'Time',
+      value: 'start_time'
     },
     {
-      text: "Action",
-      value: "action",
+      text: 'Action',
+      value: 'action',
       sortable: false
     }
   ];
@@ -127,10 +127,10 @@ export default class FileList extends Props {
         Object.freeze(contextualized);
 
         getModule(InspecDataModule, this.$store).addExecution(file);
-        this.$emit("got-files", [unique_id]);
+        this.$emit('got-files', [unique_id]);
       })
       .catch(fail => {
-        this.$emit("error", fail);
+        this.$emit('error', fail);
       });
   }
 
@@ -174,13 +174,13 @@ export default class FileList extends Props {
         .catch(error => {
           this.items = [];
           this.already_searching = false;
-          this.$emit("error", error);
+          this.$emit('error', error);
         });
     }
   }
 
   logout() {
-    this.$emit("exit-list");
+    this.$emit('exit-list');
     this.items = [];
   }
 

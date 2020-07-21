@@ -10,13 +10,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import VueApexCharts from "vue-apexcharts";
-import { ApexOptions, exec } from "apexcharts";
-import { install } from "vuetify/es5/install";
-import { getModule } from "vuex-module-decorators";
-import ColorHackModule from "@/store/color_hack";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import VueApexCharts from 'vue-apexcharts';
+import {ApexOptions, exec} from 'apexcharts';
+import {install} from 'vuetify/es5/install';
+import {getModule} from 'vuex-module-decorators';
+import ColorHackModule from '@/store/color_hack';
 
 // We declare the props separately to make props types inferable.
 const ApexLineChartProps = Vue.extend({
@@ -55,12 +55,12 @@ export default class ApexLineChart extends ApexLineChartProps {
   get _categories(): string[] {
     // Ensure it's an array
     if (!(this.categories instanceof Array)) {
-      throw new Error("series must be an array of strings");
+      throw new Error('series must be an array of strings');
     }
 
     // Ensure all of its elements are numbers
     this.categories.forEach(element => {
-      if (typeof element !== "string") {
+      if (typeof element !== 'string') {
         throw new Error(`Invalid series item ${element}`);
       }
     });
@@ -78,12 +78,12 @@ export default class ApexLineChart extends ApexLineChartProps {
   get _series(): SeriesItem[] {
     // Ensure it's an array
     if (!(this.series instanceof Array)) {
-      throw new Error("series must be an array of objects");
+      throw new Error('series must be an array of objects');
     }
 
     // Ensure all of its elements are numbers
     for (let element of this.series) {
-      if (typeof element !== "object") {
+      if (typeof element !== 'object') {
         throw new Error(`Invalid series item ${element}`);
       }
     }
@@ -98,7 +98,7 @@ export default class ApexLineChart extends ApexLineChartProps {
   get label_colors(): string[] {
     let colors = [];
     for (let i = 0; i < this._categories.length; i++) {
-      colors.push("#FFFFFF");
+      colors.push('#FFFFFF');
     }
     return colors;
   }
@@ -117,10 +117,10 @@ export default class ApexLineChart extends ApexLineChartProps {
   //gives apex charts the severity colors
   get sev_colors(): string[] {
     let colors = [];
-    colors.push("#FFEB3B");
-    colors.push("#FF9800");
-    colors.push("#FF5722");
-    colors.push("#F44336");
+    colors.push('#FFEB3B');
+    colors.push('#FF9800');
+    colors.push('#FF5722');
+    colors.push('#F44336');
     return colors;
   }
 
@@ -136,9 +136,9 @@ export default class ApexLineChart extends ApexLineChartProps {
   get white_black(): string {
     var whiteBlack;
     if (this.$vuetify.theme.dark) {
-      return "#FFFFFF";
+      return '#FFFFFF';
     }
-    return "#000000";
+    return '#000000';
   }
 
   // Generate the chart options based on _categories
@@ -149,7 +149,7 @@ export default class ApexLineChart extends ApexLineChartProps {
     return {
       chart: {
         height: 350,
-        type: "line",
+        type: 'line',
         zoom: {
           enabled: false
         }
@@ -161,14 +161,14 @@ export default class ApexLineChart extends ApexLineChartProps {
       },
       stroke: {
         width: 5,
-        curve: "straight"
+        curve: 'straight'
       },
       title: {
         text: this.title,
-        align: "left",
+        align: 'left',
         style: {
-          fontFamily: "Arial Black",
-          fontSize: "14px",
+          fontFamily: 'Arial Black',
+          fontSize: '14px',
           color: this.white_black
         }
       },
@@ -190,7 +190,7 @@ export default class ApexLineChart extends ApexLineChartProps {
         max: this.upper_range,
         tickAmount: this.y_axis_tick,
         axisTicks: {
-          color: "#FF0000"
+          color: '#FF0000'
         },
         axisBorder: {
           show: true,
@@ -211,7 +211,7 @@ export default class ApexLineChart extends ApexLineChartProps {
         }
       },
       grid: {
-        borderColor: "#f1f1f1"
+        borderColor: '#f1f1f1'
       }
     };
   }
