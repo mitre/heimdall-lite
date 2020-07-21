@@ -20,14 +20,7 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <v-btn v-if="is_server_mode" @click="log_out" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Logout
-        </span>
-        <v-icon>
-          mdi-logout
-        </v-icon>
-      </v-btn>
+      <UserMenu />
     </template>
 
     <!-- Custom sidebar content -->
@@ -48,7 +41,7 @@
                 v-for="(file, i) in file_filter"
                 :key="i"
                 class="mx-2"
-                v-slot:default="{ active, toggle }"
+                v-slot:default="{active, toggle}"
               >
                 <v-card :width="info_width" @click="toggle">
                   <EvaluationInfo :file_filter="file" />
@@ -184,32 +177,34 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import BaseView from "@/views/BaseView.vue";
-import UploadNexus from "@/components/global/UploadNexus.vue";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import BaseView from '@/views/BaseView.vue';
+import UploadNexus from '@/components/global/UploadNexus.vue';
 
-import StatusCardRow from "@/components/cards/StatusCardRow.vue";
-import ControlTable from "@/components/cards/controltable/ControlTable.vue";
-import Treemap from "@/components/cards/treemap/Treemap.vue";
-import StatusChart from "@/components/cards/StatusChart.vue";
-import SeverityChart from "@/components/cards/SeverityChart.vue";
-import ComplianceChart from "@/components/cards/ComplianceChart.vue";
-import ExportCaat from "@/components/global/ExportCaat.vue";
-import ExportNist from "@/components/global/ExportNist.vue";
-import ExportJson from "@/components/global/ExportJson.vue";
-import EvaluationInfo from "@/components/cards/EvaluationInfo.vue";
+import StatusCardRow from '@/components/cards/StatusCardRow.vue';
+import ControlTable from '@/components/cards/controltable/ControlTable.vue';
+import Treemap from '@/components/cards/treemap/Treemap.vue';
+import StatusChart from '@/components/cards/StatusChart.vue';
+import SeverityChart from '@/components/cards/SeverityChart.vue';
+import ComplianceChart from '@/components/cards/ComplianceChart.vue';
+import ProfileData from '@/components/cards/ProfileData.vue';
+import ExportCaat from '@/components/global/ExportCaat.vue';
+import ExportNist from '@/components/global/ExportNist.vue';
+import ExportJson from '@/components/global/ExportJson.vue';
+import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
 
-import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
-import { ControlStatus, Severity } from "inspecjs";
-import InspecIntakeModule, { FileID } from "@/store/report_intake";
-import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "../store/data_store";
-import { need_redirect_file } from "@/utilities/helper_util";
-import ServerModule from "@/store/server";
-import ProfData from "@/components/cards/ProfData.vue";
-import { context } from "inspecjs";
-import { profile_unique_key } from "../utilities/format_util";
+import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
+import {ControlStatus, Severity} from 'inspecjs';
+import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import {getModule} from 'vuex-module-decorators';
+import InspecDataModule from '../store/data_store';
+import {need_redirect_file} from '@/utilities/helper_util';
+import ServerModule from '@/store/server';
+import ProfData from '@/components/cards/ProfData.vue';
+import {context} from 'inspecjs';
+import {profile_unique_key} from '../utilities/format_util';
+import UserMenu from '@/components/global/UserMenu.vue';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -231,7 +226,8 @@ const ResultsProps = Vue.extend({
     ExportNist,
     ExportJson,
     EvaluationInfo,
-    ProfData
+    ProfData,
+    UserMenu
   }
 })
 export default class Results extends ResultsProps {
@@ -259,7 +255,7 @@ export default class Results extends ResultsProps {
    * The current search term, as modeled by the search bar
    * Never empty - should in that case be null
    */
-  search_term: string = "";
+  search_term: string = '';
 
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
@@ -328,14 +324,19 @@ export default class Results extends ResultsProps {
     this.severity_filter = null;
     this.status_filter = null;
     this.control_selection = null;
-    this.search_term = "";
+    this.search_term = '';
     this.tree_filters = [];
+  }
+
+  profile_page() {
+    this.dialog = false;
+    this.$router.push('/profile');
   }
 
   log_out() {
     getModule(ServerModule, this.$store).clear_token();
     this.dialog = false;
-    this.$router.push("/");
+    this.$router.push('/');
   }
 
   /**
@@ -348,7 +349,7 @@ export default class Results extends ResultsProps {
     if (
       this.severity_filter ||
       this.status_filter ||
-      this.search_term !== "" ||
+      this.search_term !== '' ||
       this.tree_filters.length
     ) {
       result = true;
@@ -381,9 +382,9 @@ export default class Results extends ResultsProps {
       }
     }
     if (this.file_filter.length > 1) {
-      return this.file_filter.length + " files selected";
+      return this.file_filter.length + ' files selected';
     } else {
-      return "No files selected";
+      return 'No files selected';
     }
   }
 
