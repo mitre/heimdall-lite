@@ -1,38 +1,37 @@
 <!-- Visualizes a delta between two controls -->
 <template>
-  <v-card>
-    <v-container fluid>
-      <!-- Header stuff -->
-      <v-row v-if="head_changes" justify="center">
-        <v-col cols="12">
-          <span class="font-weight-black"> Header changes: </span>
-        </v-col>
-      </v-row>
+  <v-container fluid>
+    <!-- Header stuff -->
+    <v-row v-if="head_changes" justify="center">
+      <v-col cols="12">
+        <span class="font-weight-black"> Metadata changes: </span>
+      </v-col>
+    </v-row>
 
-      <ChangeItem
-        v-for="change in header_changes.changes"
-        :key="change.name"
-        :change="change"
-        :shift="shift"
-      >
-      </ChangeItem>
+    <ChangeItem
+      v-for="change in header_changes.changes"
+      :key="change.name"
+      :change="change"
+      :shift="shift"
+    >
+    </ChangeItem>
 
-      <!-- <ChangeItem 
+    <!-- <ChangeItem 
         v-for="change in code_changes.changes" 
         :key="change.name"
         :change="change"
       >
       </ChangeItem> -->
 
-      <!-- Result stuff -->
-      <v-row justify="center">
+    <!-- Result stuff -->
+    <!-- <v-row justify="center">
         <v-col cols="12">
           <span class="font-weight-black"> Result changes: </span>
         </v-col>
-      </v-row>
+      </v-row> -->
 
-      <!-- A title per changed segment. We truncate these -->
-      <!-- <v-row class="background lighten-2">
+    <!-- A title per changed segment. We truncate these -->
+    <!-- <v-row class="background lighten-2">
         <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"> </v-col>
         <v-col
           v-for="(name, i) in shifted_names"
@@ -47,7 +46,7 @@
           {{ name }}
         </v-col>
       </v-row> -->
-      <v-row>
+    <!-- <v-row>
         <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"> </v-col>
         <v-col
           v-for="(control, i) in shown_tests"
@@ -70,9 +69,8 @@
             </ControlRowCol>
           </div>
         </v-col>
-      </v-row>
-    </v-container>
-  </v-card>
+      </v-row> -->
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -126,7 +124,7 @@ export default class DeltaView extends Props {
     let shown = [];
     for (
       let i = this.shift;
-      i < this._delta.controlsandnull.length && i < this.shift + 3;
+      i < this._delta.controlsandnull.length && i < this.shift + 2;
       i++
     ) {
       shown.push(this._delta.controlsandnull[i]);

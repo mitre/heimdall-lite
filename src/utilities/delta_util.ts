@@ -177,19 +177,6 @@ export class ControlDelta {
       )
     );
 
-    // Change in status, obviously.
-    header_changes.push(
-      new ControlChange(
-        'Status',
-        this.controlsandnull.map(c => {
-          if (c === null) {
-            return NOT_SELECTED;
-          }
-          return c!.hdf.status;
-        })
-      )
-    );
-
     // And severity! Why not
     header_changes.push(
       new ControlChange(

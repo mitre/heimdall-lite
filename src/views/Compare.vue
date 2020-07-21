@@ -58,9 +58,13 @@
               <keep-alive>
                 <v-col v-if="tab == 0 && ableTab" cols="12">
                   <v-row>
-                    <v-sheet class="mx-auto" elevation="8" max-width="100%">
+                    <v-sheet color="#303030" class="mx-auto" max-width="100%">
                       <v-slide-group :show-arrows="true" :elevation="0">
-                        <v-slide-item v-for="(file, i) in files" :key="i">
+                        <v-slide-item
+                          v-for="(file, i) in files"
+                          :key="i"
+                          class="mx-2 my-2"
+                        >
                           <v-card class="fill-height">
                             <v-card-title class="justify-center">
                               <div style="text-align:center;">
@@ -116,18 +120,6 @@
             <v-col cols="4" xs="4" sm="3" md="2" lg="2" xl="2">
               <v-card-title>Test Results</v-card-title>
             </v-col>
-            <v-col cols="2">
-              <div style="padding-top:13px;">
-                <toggle-button
-                  :width="150"
-                  :height="35"
-                  :color="{checked: '#2C98F0', unchecked: '#2C98F0'}"
-                  v-model="expanded_view"
-                  :labels="{checked: 'All Data', unchecked: 'Changed Data'}"
-                  :font-size="15"
-                ></toggle-button>
-              </div>
-            </v-col>
             <v-col>
               <v-checkbox
                 color="blue"
@@ -138,7 +130,7 @@
           </v-row>
           <hr />
           <v-row>
-            <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1">
+            <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1">
               <br />
               <v-row>
                 <v-col cols="8">
@@ -149,15 +141,15 @@
                       style="float: left; padding-bottom: 8px; padding-left: 7px;"
                       @click="changeSort"
                     >
-                      <v-icon v-if="ascending"
-                        >mdi-sort-alphabetical-ascending</v-icon
-                      >
-                      <v-icon v-else>mdi-sort-alphabetical-descending</v-icon>
+                      <v-icon v-if="ascending">mdi-sort-descending</v-icon>
+                      <v-icon v-else>mdi-sort-ascending</v-icon>
                     </v-btn>
                     <strong
                       v-if="
-                        (width > 960 && $vuetify.breakpoint.name != 'lg') ||
-                          width > 1700
+                        (width > 960 &&
+                          $vuetify.breakpoint.name != 'md' &&
+                          $vuetify.breakpoint.name != 'lg') ||
+                          width > 1800
                       "
                       >Test ID</strong
                     >
@@ -591,11 +583,11 @@ export default class Compare extends Props {
       }
       return this.files.length;
     } else if (this.$vuetify.breakpoint.name == 'sm') {
-      if (this.files.length > 3) {
-        return 3;
+      if (this.files.length > 2) {
+        return 2;
       }
-    } else if (this.files.length > 3) {
-      return 3;
+    } else if (this.files.length > 2) {
+      return 2;
     }
     return this.files.length;
   }

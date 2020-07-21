@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="4" xs="4" sm="3" md="3" lg="3" xl="3">
+  <v-col cols="4" xs="4" sm="4" md="5" lg="5" xl="5">
     <div style="text-align:center;">
       <i v-if="show_index">{{ index }} </i> <br />
       {{ name }} <br />

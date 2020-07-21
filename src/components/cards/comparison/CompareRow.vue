@@ -2,7 +2,7 @@
   <div :watcher="file_num_watch">
     <v-row @click="viewAll">
       <!-- Control ID -->
-      <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
+      <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
           {{ control_id }}
         </div>
@@ -12,10 +12,10 @@
       <v-col
         cols="4"
         xs="4"
-        sm="3"
-        md="3"
-        lg="3"
-        xl="3"
+        sm="4"
+        md="5"
+        lg="5"
+        xl="5"
         v-for="index in shown_files"
         filter
         :key="index - 1"
@@ -50,36 +50,38 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row v-if="!expanded && num_selected > 0">
-      <!-- Depending on selection, more details -->
-      <!-- <transition-group> -->
-      <!--v-col cols="12" v-if="delta" key="delta">
+    <div v-if="num_selected > 0">
+      <v-row>
+        <!-- Depending on selection, more details -->
+        <!-- <transition-group> -->
+        <!--v-col cols="12" v-if="delta" key="delta">
         <DeltaView :delta="delta" />
       </v-col-->
-      <v-col cols="12" key="delta">
-        <DeltaView :delta="delta" :shift="shift" />
-      </v-col>
-    </v-row>
-    <v-row v-else-if="num_selected > 0">
-      <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"></v-col>
-      <v-col
-        cols="4"
-        xs="4"
-        sm="3"
-        md="3"
-        lg="3"
-        xl="3"
-        v-for="index in shown_files"
-        :key="index - 1"
-      >
-        <ControlRowDetails
-          :tab.sync="tab"
-          v-if="selection[index - 1 + shift]"
-          :control="controls[index - 1 + shift]"
-        />
-      </v-col>
-      <!-- </transition-group> -->
-    </v-row>
+        <v-col cols="12" key="delta">
+          <DeltaView :delta="delta" :shift="shift" />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1"></v-col>
+        <v-col
+          cols="4"
+          xs="4"
+          sm="4"
+          md="5"
+          lg="5"
+          xl="5"
+          v-for="index in shown_files"
+          :key="index - 1"
+        >
+          <ControlRowDetails
+            :tab.sync="tab"
+            v-if="selection[index - 1 + shift]"
+            :control="controls[index - 1 + shift]"
+          />
+        </v-col>
+        <!-- </transition-group> -->
+      </v-row>
+    </div>
     <v-divider dark></v-divider>
   </div>
 </template>
