@@ -20,6 +20,10 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
+      <v-btn @click="clear" :disabled="!can_clear">
+        Clear
+        <v-icon class="px-1">mdi-filter-remove</v-icon>
+      </v-btn>
       <UserMenu />
     </template>
 
