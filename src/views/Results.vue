@@ -289,7 +289,8 @@ export default class Results extends ResultsProps {
 
   // Returns true if no files are uploaded
   get no_files(): boolean {
-    return getModule(InspecDataModule, this.$store).allFiles.length === 0;
+    let data = getModule(InspecDataModule, this.$store).allFiles.length === 0;
+    return data;
   }
 
   /**
