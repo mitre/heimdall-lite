@@ -3,7 +3,7 @@
   <v-card>
     <v-container fluid>
       <!-- Header stuff -->
-      <v-row justify="center">
+      <v-row v-if="head_changes" justify="center">
         <v-col cols="12">
           <span class="font-weight-black"> Header changes: </span>
         </v-col>
@@ -25,7 +25,7 @@
       </ChangeItem> -->
 
       <!-- Result stuff -->
-      <v-row v-if="result_changes.length > 0" justify="center">
+      <v-row justify="center">
         <v-col cols="12">
           <span class="font-weight-black"> Result changes: </span>
         </v-col>
@@ -79,7 +79,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {context, HDFControl, HDFControlSegment, SegmentStatus} from 'inspecjs';
-import {ControlDelta, ControlChangeGroup} from '@/utilities/delta_util';
+import {
+  ControlDelta,
+  ControlChangeGroup,
+  NOT_SELECTED
+} from '@/utilities/delta_util';
 import {diffArrays, ArrayOptions} from 'diff';
 import ChangeItem from '@/components/cards/comparison/ChangeItem.vue';
 import TruncatedText from '@/components/generic/TruncatedText.vue';
@@ -128,6 +132,17 @@ export default class DeltaView extends Props {
       shown.push(this._delta.controlsandnull[i]);
     }
     return shown;
+  }
+
+  get head_changes(): boolean {
+    for (let change of this.header_changes.changes) {
+      for (let value of change.values) {
+        if (value != NOT_SELECTED) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   // get names(): string[] {

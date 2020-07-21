@@ -16,6 +16,8 @@ import {EvaluationFile} from '@/store/report_intake';
 import {getModule} from 'vuex-module-decorators';
 import {ContextualizedEvaluation} from 'inspecjs/dist/context';
 
+export const NOT_SELECTED = 'not selected';
+
 /**
  * Represents a change in a property.
  * We assume that the "old" property is the name to use for both.
@@ -37,7 +39,7 @@ export class ControlChange {
   get valid(): boolean {
     let first_selected = -1;
     for (let i = 0; i < this.values.length; i++) {
-      if (this.values[i] != 'not selected') {
+      if (this.values[i] != NOT_SELECTED) {
         first_selected = i;
         break;
       }
@@ -48,7 +50,7 @@ export class ControlChange {
     for (let i = first_selected + 1; i < this.values.length; i++) {
       if (
         this.values[i] != this.values[first_selected] &&
-        this.values[i] != 'not selected'
+        this.values[i] != NOT_SELECTED
       ) {
         return true;
       }
@@ -168,7 +170,7 @@ export class ControlDelta {
         'ID',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return 'not selected';
+            return NOT_SELECTED;
           }
           return c!.data.id;
         })
@@ -181,7 +183,7 @@ export class ControlDelta {
         'Status',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return 'not selected';
+            return NOT_SELECTED;
           }
           return c!.hdf.status;
         })
@@ -194,7 +196,7 @@ export class ControlDelta {
         'Severity',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return 'not selected';
+            return NOT_SELECTED;
           }
           return c!.hdf.severity;
         })
@@ -207,7 +209,7 @@ export class ControlDelta {
         'NIST Tags',
         this.controlsandnull.map(c => {
           if (c === null) {
-            return 'not selected';
+            return NOT_SELECTED;
           }
           return c!.hdf.raw_nist_tags.join(', ');
         })
@@ -226,9 +228,9 @@ export class ControlDelta {
    */
   // get segment_changes(): ControlChangeGroup[] {
   //   // Change in individual control segments
-  //   let control_segments = this.controls.map(c => {
+  //   let control_segments = this.controlsandnull.map(c => {
   //     if (c === null) {
-  //       return ["not selected", "not selected", "not selected", "not selected", "not selected"];
+  //       new
   //     }
   //     return c!.root.hdf.segments || [];
   //   });
