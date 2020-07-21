@@ -18,7 +18,7 @@
       </v-list-item>
     </v-list>
     <v-btn block class="px-2" @click="load_selected_samps">
-      Upload
+      Load
       <v-icon class="pl-2"> mdi-file-upload</v-icon>
     </v-btn>
   </v-card>

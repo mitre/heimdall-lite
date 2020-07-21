@@ -14,7 +14,7 @@
       ></v-text-field>
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
         <span class="d-none d-md-inline pr-2">
-          Upload
+          Load
         </span>
         <v-icon>
           mdi-cloud-upload
@@ -169,7 +169,7 @@
         filters and show all.
       </span>
       <span class="subtitle-2" v-else-if="no_files">
-        No files are currently loaded. Press the <strong>UPLOAD</strong>
+        No files are currently loaded. Press the <strong>LOAD</strong>
         <v-icon class="mx-1"> mdi-cloud-upload</v-icon> button above to load
         some.
       </span>
