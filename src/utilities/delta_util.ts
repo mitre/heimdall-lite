@@ -22,22 +22,38 @@ import { ContextualizedEvaluation } from "inspecjs/dist/context";
  * IE that they are the same property value.
  */
 export class ControlChange {
-  name: string;
-  old: string;
-  new: string;
+  name: string; // the key/title of these values
+  values: string[]; // values over controls sorted by time
 
   /** Trivial constructor */
-  constructor(name: string, old: string, new_: string) {
+  constructor(name: string, values: string[]) {
+    this.values = values;
     this.name = name;
-    this.old = old;
-    this.new = new_;
   }
 
   /** Checks if this actually changes anything.
    * Returns true iff old !== new
    */
   get valid(): boolean {
-    return this.old !== this.new;
+    let first_selected = -1;
+    for (let i = 0; i < this.values.length; i++) {
+      if (this.values[i] != "not selected") {
+        first_selected = i;
+        break;
+      }
+    }
+    if (first_selected == -1) {
+      return false;
+    }
+    for (let i = first_selected + 1; i < this.values.length; i++) {
+      if (
+        this.values[i] != this.values[first_selected] &&
+        this.values[i] != "not selected"
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -69,22 +85,16 @@ export class ControlChangeGroup {
  * If any keys are missing from the first/second, they are treated as the empty string.
  * Note that these "changes" might not necessarily be valid.
  */
-function changelog_segments(
-  old: HDFControlSegment,
-  new_: HDFControlSegment
-): ControlChange[] {
+function changelog_segments(items: HDFControlSegment[]): ControlChange[] {
   // Get all the keys we care about
-  let all_keys: Array<
-    "code_desc" | "status" | "message" | "resource" | "exception"
-  >;
+  let all_keys: Array<keyof HDFControlSegment>;
   all_keys = ["status", "code_desc", "exception", "message", "resource"]; // determines output order, which are displayed, etc.
 
   // Map them to changes
   let changes: ControlChange[] = [];
   all_keys.forEach(key => {
-    let ov: string = old[key] || "";
-    let nv: string = new_[key] || "";
-    changes.push(new ControlChange(key, ov, nv));
+    let versions: string[] = items.map(i => i[key] + "" || "");
+    changes.push(new ControlChange(key, versions));
   });
 
   return changes;
@@ -94,57 +104,58 @@ function changelog_segments(
  * Holds/computes the differences between two runs of the same control.
  */
 export class ControlDelta {
-  /** The older control */
-  old: context.ContextualizedControl;
+  controls: context.ContextualizedControl[] = [];
+  controlsandnull: (context.ContextualizedControl | null)[] = [];
+  numNull: number = 0;
 
-  /** The newer control */
-  new: context.ContextualizedControl;
-
-  constructor(
-    old: context.ContextualizedControl,
-    _new: context.ContextualizedControl
-  ) {
-    this.old = old;
-    this.new = _new;
+  constructor(controls: (context.ContextualizedControl | null)[]) {
+    this.controlsandnull = controls;
+    for (let i = 0; i < controls.length; i++) {
+      if (controls[i] === null) {
+        this.numNull += 1;
+      } else {
+        this.controls.push(controls[i]!);
+      }
+    }
   }
 
   /* More specific deltas we handle as getters, so that they are only generated on-demand by vue */
 
   /** Compute the diff in lines-of-code  */
-  get code_changes(): ControlChangeGroup {
-    let old_code = this.old.data.code || "";
-    let new_code = this.old.data.code || "";
+  // get code_changes(): ControlChangeGroup {
+  //   let old_code = this.old.data.code || "";
+  //   let new_code = this.old.data.code || "";
 
-    // Compute the changes in the lines
-    let line_diff = structuredPatch(
-      "old_filename",
-      "new_filename",
-      old_code,
-      new_code
-    );
+  //   // Compute the changes in the lines
+  //   let line_diff = structuredPatch(
+  //     "old_filename",
+  //     "new_filename",
+  //     old_code,
+  //     new_code
+  //   );
 
-    // Convert them to change objects
-    let changes: ControlChange[] = line_diff.hunks.map(hunk => {
-      // Find the original line span
-      let lines = `line ${hunk.oldStart} - ${hunk.oldStart + hunk.oldLines}`;
+  //   // Convert them to change objects
+  //   let changes: ControlChange[] = line_diff.hunks.map(hunk => {
+  //     // Find the original line span
+  //     let lines = `line ${hunk.oldStart} - ${hunk.oldStart + hunk.oldLines}`;
 
-      // Form the complete chunks
-      let o = hunk.lines
-        .filter(l => l[0] !== "+")
-        .map(l => l.substr(1))
-        .join("\n");
-      let n = hunk.lines
-        .filter(l => l[0] !== "-")
-        .map(l => l.substr(1))
-        .join("\n");
-      return new ControlChange(lines, o, n);
-    });
+  //     // Form the complete chunks
+  //     let o = hunk.lines
+  //       .filter(l => l[0] !== "+")
+  //       .map(l => l.substr(1))
+  //       .join("\n");
+  //     let n = hunk.lines
+  //       .filter(l => l[0] !== "-")
+  //       .map(l => l.substr(1))
+  //       .join("\n");
+  //     return new ControlChange(lines, o, n);
+  //   });
 
-    // Clean and return the result
-    let result = new ControlChangeGroup("Code", changes);
-    result.clean();
-    return result;
-  }
+  //   // Clean and return the result
+  //   let result = new ControlChangeGroup("Code", changes);
+  //   result.clean();
+  //   return result;
+  // }
 
   /** Returns the changes in "header" elements of a control. E.g. name, status, etc. */
   get header_changes(): ControlChangeGroup {
@@ -153,15 +164,27 @@ export class ControlDelta {
 
     // Change in... ID? Theoretically possible!
     header_changes.push(
-      new ControlChange("Status", this.old.data.id, this.new.data.id)
+      new ControlChange(
+        "ID",
+        this.controlsandnull.map(c => {
+          if (c === null) {
+            return "not selected";
+          }
+          return c!.data.id;
+        })
+      )
     );
 
     // Change in status, obviously.
     header_changes.push(
       new ControlChange(
         "Status",
-        this.old.root.hdf.status,
-        this.new.root.hdf.status
+        this.controlsandnull.map(c => {
+          if (c === null) {
+            return "not selected";
+          }
+          return c!.hdf.status;
+        })
       )
     );
 
@@ -169,8 +192,12 @@ export class ControlDelta {
     header_changes.push(
       new ControlChange(
         "Severity",
-        this.old.root.hdf.severity,
-        this.new.root.hdf.severity
+        this.controlsandnull.map(c => {
+          if (c === null) {
+            return "not selected";
+          }
+          return c!.hdf.severity;
+        })
       )
     );
 
@@ -178,8 +205,12 @@ export class ControlDelta {
     header_changes.push(
       new ControlChange(
         "NIST Tags",
-        this.old.root.hdf.raw_nist_tags.join(", "),
-        this.new.root.hdf.raw_nist_tags.join(", ")
+        this.controlsandnull.map(c => {
+          if (c === null) {
+            return "not selected";
+          }
+          return c!.hdf.raw_nist_tags.join(", ");
+        })
       )
     );
 
@@ -193,39 +224,31 @@ export class ControlDelta {
    * Get the changes in the controls individual segments.
    * They are returned as a list of change groups, with each group encoding a segment.
    */
-  get segment_changes(): ControlChangeGroup[] {
-    // Change in individual control segments
-    let old_segs = this.old.root.hdf.segments;
-    let new_segs = this.new.root.hdf.segments;
-    if (old_segs === undefined || new_segs === undefined) {
-      // Oh well
-      return [];
-    }
+  // get segment_changes(): ControlChangeGroup[] {
+  //   // Change in individual control segments
+  //   let control_segments = this.controls.map(c => {
+  //     if (c === null) {
+  //       return ["not selected", "not selected", "not selected", "not selected", "not selected"];
+  //     }
+  //     return c!.root.hdf.segments || [];
+  //   });
 
-    // Pair them by position. Crude but hopefully fine
-    // Abort if they aren't the same length
-    if (old_segs.length !== new_segs.length) {
-      console.warn("Unable to match control segments for delta");
-      return [];
-    }
+  //   // Do the actual pairing/diff finging
+  //   let results: ControlChangeGroup[] = [];
+  //   for (let i = 0; i < control_segments.length; i++) {
+  //     let segs = control_segments[i];
+  //     let changes = changelog_segments(segs);
+  //     let group = new ControlChangeGroup(segs[0].code_desc, changes);
 
-    // Do the actual pairing/diff fingind
-    let results: ControlChangeGroup[] = [];
-    for (let i = 0; i < old_segs.length; i++) {
-      let old_seg = old_segs[i];
-      let new_seg = new_segs[i];
-      let changes = changelog_segments(old_seg, new_seg);
-      let group = new ControlChangeGroup(old_seg.code_desc, changes);
+  //     // Clean it up and store if not empty
+  //     group.clean();
+  //     if (group.any) {
+  //       results.push(group);
+  //     }
+  //   }
 
-      // Clean it up and store if not empty
-      group.clean();
-      if (group.any) {
-        results.push(group);
-      }
-    }
-
-    return results;
-  }
+  //   return results;
+  // }
 }
 
 export function get_eval_start_time(

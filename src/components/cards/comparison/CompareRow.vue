@@ -1,6 +1,6 @@
 <template>
   <div :watcher="file_num_watch">
-    <v-row>
+    <v-row @click="viewAll">
       <!-- Control ID -->
       <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
@@ -13,9 +13,9 @@
         cols="4"
         xs="4"
         sm="3"
-        md="2"
-        lg="2"
-        xl="1"
+        md="3"
+        lg="3"
+        xl="3"
         v-for="index in shown_files"
         filter
         :key="index - 1"
@@ -28,7 +28,7 @@
             `status${hdf_controls[index - 1 + shift].status.replace(' ', '')}`
           "
           centered
-          @click="view(index - 1 + shift)"
+          @click="view(index - 1 + shift, $event)"
           :depressed="selection[index - 1 + shift]"
           :outlined="selection[index - 1 + shift]"
         >
@@ -49,14 +49,34 @@
           </template>
         </v-btn>
       </v-col>
-
+    </v-row>
+    <v-row v-if="!expanded && num_selected > 0">
       <!-- Depending on selection, more details -->
       <!-- <transition-group> -->
-      <v-col cols="12" v-if="delta" key="delta">
+      <!--v-col cols="12" v-if="delta" key="delta">
         <DeltaView :delta="delta" />
+      </v-col-->
+      <v-col cols="12" key="delta">
+        <DeltaView :delta="delta" :shift="shift" />
       </v-col>
-      <v-col cols="12" v-if="num_selected == 1" key="detail">
-        <ControlRowDetails :control="detail_control" />
+    </v-row>
+    <v-row v-else-if="num_selected > 0">
+      <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"></v-col>
+      <v-col
+        cols="4"
+        xs="4"
+        sm="3"
+        md="3"
+        lg="3"
+        xl="3"
+        v-for="index in shown_files"
+        :key="index - 1"
+      >
+        <ControlRowDetails
+          :tab.sync="tab"
+          v-if="selection[index - 1 + shift]"
+          :control="controls[index - 1 + shift]"
+        />
       </v-col>
       <!-- </transition-group> -->
     </v-row>
@@ -80,7 +100,8 @@ const Props = Vue.extend({
   props: {
     controls: Array, // Of type Array<ContextualizedControl>
     shown_files: Number,
-    shift: Number
+    shift: Number,
+    expanded: Boolean
   }
 });
 
@@ -93,6 +114,7 @@ const Props = Vue.extend({
 export default class CompareRow extends Props {
   /** Models the currently selected chips. If it's a number */
   selection: boolean[] = [];
+  tab: string = "tab-test";
 
   /** Initialize our selection */
   mounted() {
@@ -109,6 +131,16 @@ export default class CompareRow extends Props {
       }
     }
   }
+
+  // get shown_details(): number[] {
+  //   let det_ind = []
+  //   for (let i = 0; i < this.selection.length; i++) {
+  //     if (this.selection[i]) {
+  //       det_ind.push(i);
+  //     }
+  //   }
+  //   return det_ind;
+  // }
 
   get control_id(): string {
     for (let ctrl of this.hdf_controls) {
@@ -149,13 +181,17 @@ export default class CompareRow extends Props {
 
   /** If exactly two controls selected, provides a delta. Elsewise gives null */
   get delta(): ControlDelta | null {
-    if (this.num_selected === 2) {
-      return new ControlDelta(
-        this.selected_controls[0],
-        this.selected_controls[1]
-      );
+    let delt_data = [];
+    let parse = 0;
+    for (let i = 0; i < this.selection.length; i++) {
+      if (this.selection[i]) {
+        delt_data.push(this.selected_controls[parse]);
+        parse++;
+      } else {
+        delt_data.push(null);
+      }
     }
-    return null;
+    return new ControlDelta(delt_data);
   }
 
   /** Returns the HDF control that we want to show details for iff it is the only selected control */
@@ -177,14 +213,24 @@ export default class CompareRow extends Props {
   }
 
   //This is used to SELECT controls to view their data
-  view(index: number) {
+  view(index: number, evt: Event) {
+    evt.stopPropagation();
+    evt.preventDefault();
     Vue.set(this.selection, index, !this.selection[index]);
-    if (this.selection.length == 2) {
-      Vue.set(
-        this.selection,
-        Math.abs(index - 1),
-        !this.selection[Math.abs(index - 1)]
-      );
+  }
+
+  viewAll(evt: Event) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    let allTrue = true;
+    for (let i = 0; i < this.selection.length; i++) {
+      if (!this.selection[i]) {
+        allTrue = false;
+        break;
+      }
+    }
+    for (let i = 0; i < this.selection.length; i++) {
+      Vue.set(this.selection, i, !allTrue);
     }
   }
 
@@ -198,14 +244,6 @@ export default class CompareRow extends Props {
       }
     }
     return selected;
-  }
-
-  color(status: String) {
-    if (status == "Passed") {
-      return "green";
-    } else if (status == "Failed") {
-      return "red";
-    }
   }
 
   //returns the control select

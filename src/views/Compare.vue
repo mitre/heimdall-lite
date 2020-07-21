@@ -13,7 +13,7 @@
         clearable
       ></v-text-field>
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
-        <span class="d-none d-md-inline pr-2">Upload</span>
+        <span class="d-none d-md-inline pr-2">Load</span>
         <v-icon>mdi-cloud-upload</v-icon>
       </v-btn>
       <v-btn @click="log_out" class="mx-2">
@@ -32,7 +32,7 @@
             </div>
           </v-col>
         </v-row>
-        <v-tabs fixed-tabs v-model="tab" icons-and-text>
+        <v-tabs fixed-tabs v-model="tab" icons-and-text show-arrows>
           <v-tab key="status" @click="changeTab(0)">
             <v-flex style="padding-top: 28px;">
               Status by Results File
@@ -116,7 +116,19 @@
             <v-col cols="4" xs="4" sm="3" md="2" lg="2" xl="2">
               <v-card-title>Test Results</v-card-title>
             </v-col>
-            <v-col cols="8" xs="8" sm="9" md="10" lg="10" xl="10">
+            <v-col cols="2">
+              <div style="padding-top:13px;">
+                <toggle-button
+                  :width="150"
+                  :height="35"
+                  :color="{ checked: '#2C98F0', unchecked: '#2C98F0' }"
+                  v-model="expanded_view"
+                  :labels="{ checked: 'All Data', unchecked: 'Changed Data' }"
+                  :font-size="15"
+                ></toggle-button>
+              </div>
+            </v-col>
+            <v-col>
               <v-checkbox
                 color="blue"
                 v-model="checkbox"
@@ -196,6 +208,7 @@
             class="my-4"
             :key="i"
             :shift="start_index"
+            :expanded="expanded_view"
           />
         </v-card>
       </v-container>
@@ -239,6 +252,7 @@ import ApexLineChart, {
 //@ts-ignore
 import resize from "vue-resize-directive";
 import { get_eval_start_time } from "@/utilities/delta_util";
+import { ToggleButton } from "vue-js-toggle-button";
 
 // We declare the props separately
 // to make props types inferrable.
@@ -254,7 +268,8 @@ const Props = Vue.extend({
     CompareRow,
     ProfileRow,
     StatusChart,
-    ApexLineChart
+    ApexLineChart,
+    ToggleButton
   },
   directives: {
     resize
@@ -292,6 +307,7 @@ export default class Compare extends Props {
   /** Whether or not the model is showing */
   dialog: boolean = false;
   checkbox: boolean = true;
+  expanded_view: boolean = true;
   tab: number = 0;
   width: number = window.innerWidth;
   start_index: number = 0;
@@ -578,18 +594,8 @@ export default class Compare extends Props {
       if (this.files.length > 3) {
         return 3;
       }
-    } else if (this.$vuetify.breakpoint.name == "md") {
-      if (this.files.length > 4) {
-        return 4;
-      }
-      return this.files.length;
-    } else if (this.$vuetify.breakpoint.name == "lg") {
-      if (this.files.length > 5) {
-        return 5;
-      }
-      return this.files.length;
-    } else if (this.files.length > 10) {
-      return 10;
+    } else if (this.files.length > 3) {
+      return 3;
     }
     return this.files.length;
   }

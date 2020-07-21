@@ -3,7 +3,7 @@
   <v-card>
     <v-container fluid>
       <!-- Header stuff -->
-      <v-row v-if="header_changes.any" justify="center">
+      <v-row justify="center">
         <v-col cols="12">
           <span class="font-weight-black"> Header changes: </span>
         </v-col>
@@ -12,31 +12,17 @@
       <ChangeItem
         v-for="change in header_changes.changes"
         :key="change.name"
-        :colorNew="colorNew"
-        :colorOld="colorOld"
+        :change="change"
+        :shift="shift"
       >
-        <template #name>
-          {{ change.name }}
-        </template>
-        <template #old>
-          {{ change.old }}
-        </template>
-        <template #new>
-          {{ change.new }}
-        </template>
       </ChangeItem>
 
-      <ChangeItem v-for="change in code_changes.changes" :key="change.name">
-        <template #name>
-          {{ change.name }}
-        </template>
-        <template #old>
-          {{ change.old }}
-        </template>
-        <template #new>
-          {{ change.new }}
-        </template>
-      </ChangeItem>
+      <!-- <ChangeItem 
+        v-for="change in code_changes.changes" 
+        :key="change.name"
+        :change="change"
+      >
+      </ChangeItem> -->
 
       <!-- Result stuff -->
       <v-row v-if="result_changes.length > 0" justify="center">
@@ -46,38 +32,43 @@
       </v-row>
 
       <!-- A title per changed segment. We truncate these -->
-      <v-row class="background lighten-2">
-        <v-col cols="1"> </v-col>
-        <v-col cols="5">
-          {{ old_name }}
+      <!-- <v-row class="background lighten-2">
+        <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"> </v-col>
+        <v-col
+          v-for="(name, i) in shifted_names"
+          :key="i"
+          cols="4"
+          xs="4"
+          sm="3"
+          md="3"
+          lg="3"
+          xl="3"
+        >
+          {{ name }}
         </v-col>
-        <v-col cols="1"> </v-col>
-        <v-col cols="5">
-          {{ new_name }}
-        </v-col>
-      </v-row>
+      </v-row> -->
       <v-row>
-        <v-col cols="1"> </v-col>
-        <v-col cols="5">
-          <ControlRowCol
-            v-for="(result, index) in _delta.old.root.data.results"
-            :key="index"
-            :class="zebra(index)"
-            :result="result"
-            :statusCode="result.status"
-          >
-          </ControlRowCol>
-        </v-col>
-        <v-col cols="1"> </v-col>
-        <v-col cols="5">
-          <ControlRowCol
-            v-for="(result, index) in _delta.new.root.data.results"
-            :key="index"
-            :class="zebra(index)"
-            :result="result"
-            :statusCode="result.status"
-          >
-          </ControlRowCol>
+        <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1"> </v-col>
+        <v-col
+          v-for="(control, i) in shown_tests"
+          :key="i"
+          cols="4"
+          xs="4"
+          sm="3"
+          md="3"
+          lg="3"
+          xl="3"
+        >
+          <div v-if="control">
+            <ControlRowCol
+              v-for="(result, index) in control.root.data.results"
+              :key="index"
+              :class="zebra(index)"
+              :result="result"
+              :statusCode="result.status"
+            >
+            </ControlRowCol>
+          </div>
         </v-col>
       </v-row>
     </v-container>
@@ -113,7 +104,8 @@ import "prismjs/components/prism-ruby.js";
 // Define our props
 const Props = Vue.extend({
   props: {
-    delta: Object // Of type ControlDelta
+    delta: Object, // Of type ControlDelta
+    shift: Number
   }
 });
 
@@ -131,15 +123,26 @@ export default class DeltaView extends Props {
     return this.delta as ControlDelta;
   }
 
-  /** Formatted name for our older control */
-  get old_name(): string {
-    return this._delta.old.root.hdf.start_time || "Old";
+  get shown_tests(): (context.ContextualizedControl | null)[] {
+    let shown = [];
+    for (
+      let i = this.shift;
+      i < this._delta.controlsandnull.length && i < this.shift + 3;
+      i++
+    ) {
+      shown.push(this._delta.controlsandnull[i]);
+    }
+    return shown;
   }
 
-  /** Formatted name for our newer control */
-  get new_name(): string {
-    return this._delta.new.root.hdf.start_time || "New";
-  }
+  // get names(): string[] {
+  //   return this._delta.controlsandnull.map(c => {
+  //     if (c === null) {
+  //       return "";
+  //     }
+  //     return c!.root.hdf.start_time || "No Start Time"
+  //   });
+  // }
 
   /**
    * Wrapped getters to utilize vue caching, and also just make things easier in the template.
@@ -148,35 +151,20 @@ export default class DeltaView extends Props {
     return this._delta.header_changes;
   }
 
-  //color of newer control
-  get colorNew(): String {
-    if (this._delta.new.root.hdf.status == "Failed") {
-      return "red";
-    } else if (this._delta.new.root.hdf.status == "Passed") {
-      return "green";
-    }
-    return "clear";
-  }
-
-  //color of older control
-  get colorOld(): String {
-    if (this._delta.old.root.hdf.status == "Failed") {
-      return "red";
-    } else if (this._delta.old.root.hdf.status == "Passed") {
-      return "green";
-    }
-    return "clear";
-  }
+  // get shifted_names(): string[] {
+  //   console.log("here");
+  //   return this.names.splice(0, this.shift);
+  // }
 
   //TODO: Code Diff
-  get code_changes(): ControlChangeGroup | undefined {
-    return this._delta.code_changes;
-  }
+  // get code_changes(): ControlChangeGroup | undefined {
+  //   return this._delta.code_changes;
+  // }
 
   //returns changes in results
-  get result_changes(): ControlChangeGroup[] | undefined {
-    return this._delta.segment_changes;
-  }
+  // get result_changes(): ControlChangeGroup[] | undefined {
+  //   return this._delta.segment_changes;
+  // }
 
   //creates backround zebra affect
   zebra(ix: number): string {

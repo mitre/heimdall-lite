@@ -1,22 +1,22 @@
 <!-- Visualizes a delta between two controls -->
 <template>
   <v-row>
-    <v-col class="pa-0" cols="1">
-      <v-card class="pa-2">
-        <slot name="name" />
-      </v-card>
+    <v-col cols="3" xs="3" sm="2" md="2" lg="1" xl="1" class="pa-0">
+      <slot name="name" />
     </v-col>
-    <v-col class="pa-0" cols="5">
-      <v-card class="pa-2" :color="colorOld">
-        <slot name="old" />
-      </v-card>
-    </v-col>
-    <v-col class="pa-1" cols="1" align-self="center">
-      <v-icon> arrow_forward </v-icon>
-    </v-col>
-    <v-col class="pa-0" cols="5">
-      <v-card class="pa-2" :color="colorNew">
-        <slot name="new" />
+    <v-col
+      class="pa-0"
+      v-for="(value, i) in values"
+      :key="i"
+      cols="4"
+      xs="4"
+      sm="3"
+      md="3"
+      lg="3"
+      xl="3"
+    >
+      <v-card v-if="value != 'not selected'" class="pa-2" :color="color(value)">
+        {{ value }}
       </v-card>
     </v-col>
   </v-row>
@@ -24,10 +24,38 @@
 
 <script lang="ts">
 import Vue from "vue";
-export default Vue.extend({
+import Component from "vue-class-component";
+import { ControlDelta } from "@/utilities/delta_util";
+
+const Props = Vue.extend({
   props: {
-    colorNew: String,
-    colorOld: String
+    change: Object,
+    shift: Number
   }
 });
+
+@Component({
+  components: {}
+})
+export default class ChangeItem extends Props {
+  color(status: string): string {
+    if (this.change.name.toLowerCase() == "status") {
+      return `status${status.replace(" ", "")}`;
+    }
+    return "";
+  }
+
+  get values(): string[] {
+    let values = [];
+    for (
+      let i = this.shift;
+      i < this.change.values.length && i < this.shift + 3;
+      i++
+    ) {
+      values.push(this.change.values[i]);
+    }
+    console.log(values);
+    return values;
+  }
+}
 </script>
