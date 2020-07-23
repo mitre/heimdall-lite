@@ -18,6 +18,6 @@ beforeEach(() => {
 
 describe('Modal.vue', () => {
   it('should show dialog', () => {
-    expect(wrapper.find('#modal')).toBeTruthy();
+    expect(wrapper.find('#modal').exists()).toBeTruthy();
   });
 });
