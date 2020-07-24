@@ -155,7 +155,6 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   }
 
   get all_tags(): string[] {
-    console.log('here');
     let nist_tags = this._control.hdf.raw_nist_tags;
     nist_tags = nist_tags.filter(tag => tag.search(/Rev.*\d/i) == -1);
     let cci_tags = this._control.data.tags.cci;
