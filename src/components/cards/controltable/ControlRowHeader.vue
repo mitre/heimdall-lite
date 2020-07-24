@@ -55,11 +55,16 @@
       <v-chip-group column active-class="NONE">
         <v-tooltip bottom v-for="(tag, i) in all_tags" :key="'chip' + i">
           <template v-slot:activator="{on}">
-            <v-chip v-on="on" active-class="NONE">
-              {{ tag }}
+            <v-chip
+              v-on="on"
+              :href="tag.url"
+              target="_blank"
+              active-class="NONE"
+            >
+              {{ tag.label }}
             </v-chip>
           </template>
-          <span>{{ descriptionForTag(tag) }}</span>
+          <span>{{ tag.description }}</span>
         </v-tooltip>
       </v-chip-group>
     </template>
@@ -75,9 +80,15 @@ import {context} from 'inspecjs';
 import {NIST_DESCRIPTIONS, nist_canon_config} from '@/utilities/nist_util';
 import {CCI_DESCRIPTIONS} from '@/utilities/cci_util';
 import {Tags} from '../../../types/models';
-import {is_control} from 'inspecjs/dist/nist';
+import {is_control, NistControl} from 'inspecjs/dist/nist';
 //@ts-ignore
 import VClamp from 'vue-clamp/dist/vue-clamp.js';
+
+interface Tag {
+  label: string;
+  url: string;
+  description: string;
+}
 
 // We declare the props separately to make props types inferable.
 const ControlRowHeaderProps = Vue.extend({
@@ -154,16 +165,33 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
     return 'Unrecognized Tag';
   }
 
-  get all_tags(): string[] {
+  get all_tags(): Tag[] {
     let nist_tags = this._control.hdf.raw_nist_tags;
     nist_tags = nist_tags.filter(tag => tag.search(/Rev.*\d/i) == -1);
-    let cci_tags = this._control.data.tags.cci;
+    let nist_tag_objects = nist_tags.map(tag => {
+      let nisted = nist.parse_nist(tag);
+      let url = '';
+      if (nist.is_control(nisted)) {
+        url = nisted.canonize({
+          max_specifiers: 2,
+          pad_zeros: false,
+          add_spaces: false,
+          allow_letters: false
+        });
+        url = 'https://nvd.nist.gov/800-53/Rev4/control/' + url;
+      }
+      return {label: tag, url: url, description: this.descriptionForTag(tag)};
+    });
+    let cci_tags: string | string[] = this._control.data.tags.cci || '';
     if (!cci_tags) {
-      return nist_tags;
+      return nist_tag_objects;
     } else if (typeof cci_tags == 'string') {
       cci_tags = cci_tags.split(' ');
     }
-    return [...nist_tags, ...cci_tags];
+    let cci_tag_objects = cci_tags.map(cci => {
+      return {label: cci, url: '', description: this.descriptionForTag(cci)};
+    });
+    return [...nist_tag_objects, ...cci_tag_objects];
   }
 }
 </script>
