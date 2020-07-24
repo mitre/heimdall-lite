@@ -12,7 +12,12 @@
     <!-- Our customizable content -->
     <slot></slot>
 
-    <v-btn @click="uploadModal = true" :disabled="uploadModal" class="mx-2">
+    <v-btn
+      @click="uploadModal = true"
+      :disabled="uploadModal"
+      class="mx-2"
+      id="upload-btn"
+    >
       <span class="d-none d-md-inline pr-2">
         Load
       </span>
@@ -20,7 +25,7 @@
         mdi-cloud-upload
       </v-icon>
     </v-btn>
-    <v-btn v-if="serverMode" @click="logOut" class="mx-2">
+    <v-btn v-if="serverMode" @click="logOut" class="mx-2" id="logout">
       <span class="d-none d-md-inline pr-2">
         Logout
       </span>

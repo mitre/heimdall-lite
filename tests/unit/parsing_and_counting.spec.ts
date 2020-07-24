@@ -3,16 +3,14 @@ import chai_as_promised from 'chai-as-promised';
 chai.use(chai_as_promised);
 const expect = chai.expect;
 
-import {InspecIntakeModule} from '../../src/store/report_intake';
-import {InspecDataModule} from '../../src/store/data_store';
+import {InspecIntakeModule} from '@/store/report_intake';
+import {InspecDataModule} from '@/store/data_store';
 import {AllRaw} from '../util/fs';
-import {StatusCountModule, ControlStatusHash} from '@/store/status_counts';
+import {ControlStatusHash, StatusCountModule} from '@/store/status_counts';
 import {readFileSync} from 'fs';
 
 describe('Parsing', () => {
   it('Report intake can read every raw file in hdf_data', function() {
-    // Give it time!
-    jest.setTimeout(0);
     let raw = AllRaw();
     let id = 0;
 
