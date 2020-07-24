@@ -155,15 +155,16 @@ export default class ControlRowHeader extends ControlRowHeaderProps {
   }
 
   get all_tags(): string[] {
+    console.log('here');
     let nist_tags = this._control.hdf.raw_nist_tags;
-    nist_tags = nist_tags.filter(tag => tag.search(/Rev.*\d/i) != 0);
+    nist_tags = nist_tags.filter(tag => tag.search(/Rev.*\d/i) == -1);
     let cci_tags = this._control.data.tags.cci;
     if (!cci_tags) {
-      return this._control.hdf.raw_nist_tags;
+      return nist_tags;
     } else if (typeof cci_tags == 'string') {
       cci_tags = cci_tags.split(' ');
     }
-    return [...this._control.hdf.raw_nist_tags, ...cci_tags];
+    return [...nist_tags, ...cci_tags];
   }
 }
 </script>
