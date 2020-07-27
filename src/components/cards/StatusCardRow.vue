@@ -76,38 +76,42 @@ export default class StatusCardRow extends StatusCardRowProps {
       {
         icon: 'check-circle',
         title: 'Passed',
-        subtitle: `Has ${counts.passedTests(
-          filter
-        )} tests passed out of ${counts.totalTests(filter)}`,
+        subtitle: `Has ${counts.countOf(
+          this.filter,
+          'PassedTests'
+        )} tests passed out of ${counts.countOf(this.filter, 'TotalTests')}`,
         color: 'statusPassed',
-        number: counts.passed(filter)
+        number: counts.countOf(this.filter, 'Passed')
       },
       {
         icon: 'close-circle',
         title: 'Failed',
-        subtitle: `Has ${counts.failedTests(filter)} of ${counts.totalTests(
-          filter
-        )} tests that failed`,
+        subtitle: `Has ${counts.countOf(
+          this.filter,
+          'FailedTests'
+        )} of ${counts.countOf(this.filter, 'TotalTests')} tests that failed`,
         color: 'statusFailed',
-        number: counts.failed(filter)
+        number: counts.countOf(this.filter, 'Failed')
       },
       {
         icon: 'minus-circle',
         title: 'Not Applicable',
-        subtitle: `System exception or absent component (${counts.notApplicableTests(
-          filter
+        subtitle: `System exception or absent component (${counts.countOf(
+          this.filter,
+          'NotApplicableTests'
         )} tests)`,
         color: 'statusNotApplicable',
-        number: counts.notApplicable(filter)
+        number: counts.countOf(this.filter, 'Not Applicable')
       },
       {
         icon: 'alert-circle',
         title: 'Not Reviewed',
-        subtitle: `Can only be tested manually at this time (${counts.notReviewedTests(
-          filter
+        subtitle: `Can only be tested manually at this time (${counts.countOf(
+          this.filter,
+          'NotReviewedTests'
         )} tests)`,
         color: 'statusNotReviewed',
-        number: counts.notReviewed(filter)
+        number: counts.countOf(this.filter, 'Not Reviewed')
       }
     ];
   }
@@ -127,7 +131,7 @@ export default class StatusCardRow extends StatusCardRowProps {
         filter
       )} tests)`,
       color: 'statusProfileError',
-      number: counts.profileError(filter)
+      number: counts.countOf(this.filter, 'Profile Error')
     };
   }
 }

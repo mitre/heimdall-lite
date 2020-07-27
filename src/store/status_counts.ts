@@ -12,14 +12,14 @@ import InspecDataModule from '@/store/data_store';
 // The hash that we will generally be working with herein
 export type ControlStatusHash = {[key in ControlStatus]: number};
 export type StatusHash = ControlStatusHash & {
-  passedTests: number; // from passed controls
-  failedTests: number;
-  failedOutOf: number; // total tests from failed controls
-  notApplicableTests: number;
-  notReviewedTests: number;
-  erroredOutOf: number;
-  erroredTests: number;
-  totalTests: number;
+  PassedTests: number; // from passed controls
+  FailedTests: number;
+  FailedOutOf: number; // total tests from failed controls
+  NotApplicableTests: number;
+  NotReviewedTests: number;
+  ErroredOutOf: number;
+  ErroredTests: number;
+  TotalTests: number;
 };
 
 // Helper function for counting a status in a list of controls
@@ -41,34 +41,34 @@ function count_statuses(data: FilteredData, filter: Filter): StatusHash {
     'Not Reviewed': 0,
     Passed: 0,
     'Profile Error': 0,
-    passedTests: 0,
-    failedTests: 0,
-    failedOutOf: 0,
-    notApplicableTests: 0,
-    notReviewedTests: 0,
-    erroredOutOf: 0,
-    erroredTests: 0,
-    totalTests: 0
+    PassedTests: 0,
+    FailedTests: 0,
+    FailedOutOf: 0,
+    NotApplicableTests: 0,
+    NotReviewedTests: 0,
+    ErroredOutOf: 0,
+    ErroredTests: 0,
+    TotalTests: 0
   };
   controls.forEach(c => {
     c = c.root;
     let status: ControlStatus = c.hdf.status;
     hash[status] += 1;
-    hash.totalTests += (c.hdf.segments || []).length;
+    hash.TotalTests += (c.hdf.segments || []).length;
     if (status == 'Passed') {
-      hash.passedTests += (c.hdf.segments || []).length;
+      hash.PassedTests += (c.hdf.segments || []).length;
     } else if (status == 'Failed') {
-      hash.failedOutOf += (c.hdf.segments || []).length;
-      hash.failedTests += (c.hdf.segments || []).filter(
+      hash.FailedOutOf += (c.hdf.segments || []).length;
+      hash.FailedTests += (c.hdf.segments || []).filter(
         s => s.status == 'failed'
       ).length;
     } else if (status == 'Not Applicable') {
-      hash.notApplicableTests += (c.hdf.segments || []).length;
+      hash.NotApplicableTests += (c.hdf.segments || []).length;
     } else if (status == 'Not Reviewed') {
-      hash.notReviewedTests += (c.hdf.segments || []).length;
+      hash.NotReviewedTests += (c.hdf.segments || []).length;
     } else if (status == 'Profile Error') {
-      hash.erroredOutOf += (c.hdf.segments || []).length;
-      hash.erroredTests += (c.hdf.segments || []).filter(
+      hash.ErroredOutOf += (c.hdf.segments || []).length;
+      hash.ErroredTests += (c.hdf.segments || []).filter(
         s => s.status == 'error'
       ).length;
     }
@@ -116,8 +116,12 @@ class StatusCountModule extends VuexModule {
     };
   }
 
+  get countOf(): (filter: Filter, category: keyof StatusHash) => number {
+    return (filter, category) => this.hash(filter)[category];
+  }
+
   get totalTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['totalTests'];
+    return filter => this.hash(filter)['TotalTests'];
   }
 
   get passed(): (filter: Filter) => number {
@@ -145,31 +149,31 @@ class StatusCountModule extends VuexModule {
   }
 
   get passedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['passedTests'];
+    return filter => this.hash(filter)['PassedTests'];
   }
 
   get failedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['failedTests'];
+    return filter => this.hash(filter)['FailedTests'];
   }
 
   get failedOutOf(): (filter: Filter) => number {
-    return filter => this.hash(filter)['failedOutOf'];
+    return filter => this.hash(filter)['FailedOutOf'];
   }
 
   get notApplicableTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['notApplicableTests'];
+    return filter => this.hash(filter)['NotApplicableTests'];
   }
 
   get notReviewedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['notReviewedTests'];
+    return filter => this.hash(filter)['NotReviewedTests'];
   }
 
   get erroredTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['erroredTests'];
+    return filter => this.hash(filter)['ErroredTests'];
   }
 
   get erroredOutOf(): (filter: Filter) => number {
-    return filter => this.hash(filter)['erroredOutOf'];
+    return filter => this.hash(filter)['ErroredOutOf'];
   }
 }
 
