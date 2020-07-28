@@ -80,14 +80,14 @@ describe('Parsing', () => {
       });
 
       let {
-        passedTests,
-        failedOutOf,
-        failedTests,
-        notApplicableTests,
-        notReviewedTests,
-        erroredOutOf,
-        erroredTests,
-        totalTests,
+        PassedTests,
+        FailedOutOf,
+        FailedTests,
+        NotApplicableTests,
+        NotReviewedTests,
+        ErroredOutOf,
+        ErroredTests,
+        TotalTests,
         ...actual_stripped
       } = actual;
 
