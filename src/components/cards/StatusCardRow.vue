@@ -127,8 +127,9 @@ export default class StatusCardRow extends StatusCardRowProps {
     return {
       icon: 'alert-circle',
       title: 'Profile Errors',
-      subtitle: `Errors running test - check profile run privileges or check with the author of profile (${counts.erroredTests(
-        filter
+      subtitle: `Errors running test - check profile run privileges or check with the author of profile (${counts.countOf(
+        filter,
+        'ErroredTests'
       )} tests)`,
       color: 'statusProfileError',
       number: counts.countOf(this.filter, 'Profile Error')

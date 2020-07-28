@@ -119,62 +119,6 @@ class StatusCountModule extends VuexModule {
   get countOf(): (filter: Filter, category: keyof StatusHash) => number {
     return (filter, category) => this.hash(filter)[category];
   }
-
-  get totalTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['TotalTests'];
-  }
-
-  get passed(): (filter: Filter) => number {
-    return filter => this.hash(filter)['Passed'];
-  }
-
-  get failed(): (filter: Filter) => number {
-    return filter => this.hash(filter)['Failed'];
-  }
-
-  get notApplicable(): (filter: Filter) => number {
-    return filter => this.hash(filter)['Not Applicable'];
-  }
-
-  get notReviewed(): (filter: Filter) => number {
-    return filter => this.hash(filter)['Not Reviewed'];
-  }
-
-  get profileError(): (filter: Filter) => number {
-    return filter => this.hash(filter)['Profile Error'];
-  }
-
-  get fromProfile(): (filter: Filter) => number {
-    return filter => this.hash(filter)['From Profile'];
-  }
-
-  get passedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['PassedTests'];
-  }
-
-  get failedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['FailedTests'];
-  }
-
-  get failedOutOf(): (filter: Filter) => number {
-    return filter => this.hash(filter)['FailedOutOf'];
-  }
-
-  get notApplicableTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['NotApplicableTests'];
-  }
-
-  get notReviewedTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['NotReviewedTests'];
-  }
-
-  get erroredTests(): (filter: Filter) => number {
-    return filter => this.hash(filter)['ErroredTests'];
-  }
-
-  get erroredOutOf(): (filter: Filter) => number {
-    return filter => this.hash(filter)['ErroredOutOf'];
-  }
 }
 
 export default StatusCountModule;
