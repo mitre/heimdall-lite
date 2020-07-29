@@ -4,7 +4,7 @@
       <slot v-on="data.on" />
     </template>
     <ul>
-      <li><strong>Errors encountered:</strong></li>
+      <li class="nobull"><strong>Errors encountered:</strong></li>
       <li v-for="item in errors" :key="item.key" v-text="item.text" />
     </ul>
   </v-tooltip>
@@ -44,7 +44,7 @@ export default class ErrorTooltip extends Props {
       text: message,
       key: this.counter
     });
-    setTimeout(() => this.errors.shift(), 12000);
+    setTimeout(() => this.errors.shift(), 3000);
   }
 }
 </script>
