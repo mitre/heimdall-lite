@@ -396,21 +396,6 @@ export default class Compare extends Props {
     return searched;
   }
 
-  get profile_diff(): boolean {
-    let data_store = getModule(InspecDataModule, this.$store);
-    let filtered_module = getModule(FilteredDataModule, this.$store);
-    let file_ids = [];
-    for (let file of this.files) {
-      file_ids.push(file.unique_id);
-    }
-    let profiles = filtered_module.profiles(file_ids);
-    for (let i = 0; i < profiles.length - 1; i++) {
-      if (profiles[i].data.name != profiles[i + 1].data.name) {
-        return true;
-      }
-    }
-    return false;
-  }
   get show_sets(): ControlSeries[] {
     let sorted = [];
     if (this.checkbox) {

@@ -102,8 +102,7 @@ const Props = Vue.extend({
   props: {
     controls: Array, // Of type Array<ContextualizedControl>
     shown_files: Number,
-    shift: Number,
-    expanded: Boolean
+    shift: Number
   }
 });
 
