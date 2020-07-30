@@ -27,7 +27,7 @@ let options: ToastOptions = {
     }
   ],
   // icon: 'mdi-alert-octagram',
-  duration: 3000 // effectively infinite.
+  duration: 10000 // only feels infinite.
 };
 
 // register the toast with the custom message
