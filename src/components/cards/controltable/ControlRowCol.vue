@@ -2,9 +2,17 @@
   <v-row>
     <v-col cols="12" sm="12" md="12" lg="1" xl="1">
       <v-layout class="pl-2" fill-height justify-center align-center>
-        <v-btn :color="status_color" block depressed>
-          <h3>{{ result.status.toUpperCase() }}</h3>
-        </v-btn>
+        <table width="100%">
+          <tr>
+            <td style="text-align:center">
+              <v-card :color="status_color">
+                <v-card-text class="pa-2 font-weight-bold">
+                  <h3>{{ result.status.toUpperCase() }}</h3>
+                </v-card-text>
+              </v-card>
+            </td>
+          </tr>
+        </table>
       </v-layout>
     </v-col>
     <v-col
