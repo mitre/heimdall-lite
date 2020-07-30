@@ -2,17 +2,9 @@
   <v-row>
     <v-col cols="12" sm="12" md="12" lg="1" xl="1">
       <v-layout class="pl-2" fill-height justify-center align-center>
-        <table width="100%">
-          <tr>
-            <td style="text-align:center">
-              <v-card :color="status_color">
-                <v-card-text class="pa-2 font-weight-bold">
-                  <h3>{{ result.status.toUpperCase() }}</h3>
-                </v-card-text>
-              </v-card>
-            </td>
-          </tr>
-        </table>
+        <v-btn class="unclickablebutton" :color="status_color" block depressed>
+          <h3>{{ result.status.toUpperCase() }}</h3>
+        </v-btn>
       </v-layout>
     </v-col>
     <v-col
@@ -139,5 +131,10 @@ export default class ControlRowCol extends ControlRowColProps {
 <style lang="scss" scoped>
 .right {
   margin-left: -1px;
+}
+
+button.unclickablebutton {
+  opacity: 1;
+  pointer-events: none;
 }
 </style>
