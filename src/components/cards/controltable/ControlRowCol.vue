@@ -134,7 +134,6 @@ export default class ControlRowCol extends ControlRowColProps {
 }
 
 button.unclickablebutton {
-  opacity: 1;
   pointer-events: none;
 }
 </style>
