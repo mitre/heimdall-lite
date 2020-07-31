@@ -60,12 +60,12 @@
                   </div>
                   <br />
                   <v-text-field
-                    id="password_confirmation"
+                    id="passwordConfirmation"
                     label="Confirm Password"
-                    name="password_confirmation"
+                    name="passwordConfirmation"
                     prepend-icon="lock"
                     type="password"
-                    v-model="password_confirmation"
+                    v-model="passwordConfirmation"
                     v-validate="'required|confirmed:password'"
                     data-vv-name="password confirmation"
                     required
@@ -135,7 +135,7 @@ const SignupProps = Vue.extend({
 export default class Signup extends SignupProps {
   email: string = '';
   password: string = '';
-  password_confirmation: string = '';
+  passwordConfirmation: string = '';
   role: string = '';
   active_tab: string = '';
   strength: number = 0;
@@ -171,7 +171,7 @@ export default class Signup extends SignupProps {
       let creds: SignupHash = {
         email: this.email,
         password: this.password,
-        passwordConfirmation: this.password_confirmation,
+        passwordConfirmation: this.passwordConfirmation,
         role: this.role
       };
 
