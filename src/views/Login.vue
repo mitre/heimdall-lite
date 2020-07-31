@@ -27,7 +27,13 @@
                     type="password"
                     v-model="password"
                   />
-                  <v-btn @click="login" depressed large color="primary">
+                  <v-btn
+                    id="login"
+                    @click="login"
+                    depressed
+                    large
+                    color="primary"
+                  >
                     Login
                   </v-btn>
                 </v-form>
@@ -104,6 +110,9 @@ export default class Login extends LoginProps {
         })
         .catch(error => {
           this.error = error.response.data.message;
+          this.$toasted.global.error({
+            message: this.error
+          });
         });
     }
   }
