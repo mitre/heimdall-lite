@@ -1,6 +1,11 @@
 <template>
   <div class="caption font-weight-medium">
-    <v-btn :small="$vuetify.breakpoint.smAndDown" @click="show_selector">
+    <v-btn
+      :small="$vuetify.breakpoint.smAndDown"
+      @click="show_selector"
+      @dragover.prevent.stop
+      @drop.prevent.stop="uploadFileDrop"
+    >
       Upload
       <v-icon :small="$vuetify.breakpoint.smAndDown" class="pl-2"
         >mdi-file-upload</v-icon
@@ -58,7 +63,33 @@ export default class UploadButton extends Props {
     let file_input = this.$refs['real-input'];
     (file_input as any).click();
   }
+
+  uploadFileDrop(e: DragEvent) {
+    if (e == null) return;
+    let droppedFiles = e.dataTransfer!.files;
+    let files = fix_files(droppedFiles);
+    if (!files) return;
+    if (files.length > 0) {
+      if (
+        // were all files sent in a supported format?
+        files.filter(file => file.type == 'application/json').length ==
+        files.length
+      ) {
+        // Notify we got files
+        this.$emit('files-selected', files);
+      } else {
+        return this.$toasted.global.error({
+          message: String(
+            'One or more files provided is not in a support format.  Please ' +
+              'upload file(s) in a format supported by Heimdall Lite (i.e., JSON)'
+          ),
+          isDark: this.$vuetify.theme.dark
+        });
+      }
+    }
+  }
 }
+
 /** Coerces the types held by a filereader into an array */
 function fix_files(f: FileList | null | undefined): File[] {
   if (f === null || f === undefined) {
