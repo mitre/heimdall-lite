@@ -208,8 +208,12 @@ describe('Status card row', () => {
         number: expectedCount('notReviewed')
       }
     ];
-
-    expect((scrWrapper.vm as any).standardCardProps).toEqual(expected);
+    let expectedNum = expected.map(p => p.number);
+    expect(
+      (scrWrapper.vm as any).standardCardProps.map(
+        (p: {number: any}) => p.number
+      )
+    ).toEqual(expectedNum);
   });
 
   it('count on file with overlays is correct', () => {
@@ -251,8 +255,12 @@ describe('Status card row', () => {
         number: notReviewed
       }
     ];
-
-    expect((scrWrapper.vm as any).standardCardProps).toEqual(expected);
+    let expectedNum = expected.map(p => p.number);
+    expect(
+      (scrWrapper.vm as any).standardCardProps.map(
+        (p: {number: any}) => p.number
+      )
+    ).toEqual(expectedNum);
   });
 
   it('counts errors', () => {
@@ -271,7 +279,7 @@ describe('Status card row', () => {
       number: errors
     };
 
-    expect((scrWrapper.vm as any).errorProps).toEqual(expected);
+    expect((scrWrapper.vm as any).errorProps.number).toEqual(expected.number);
   });
 });
 
@@ -339,10 +347,10 @@ describe('Status, Severity, Compliance, chart', () => {
 
     //all counts but profile error
     let expected =
-      status_count.passed((wrapper.vm as any).all_filter) +
-      status_count.failed((wrapper.vm as any).all_filter) +
-      status_count.profileError((wrapper.vm as any).all_filter) +
-      status_count.notReviewed((wrapper.vm as any).all_filter);
+      status_count.countOf((wrapper.vm as any).all_filter, 'Passed') +
+      status_count.countOf((wrapper.vm as any).all_filter, 'Failed') +
+      status_count.countOf((wrapper.vm as any).all_filter, 'Profile Error') +
+      status_count.countOf((wrapper.vm as any).all_filter, 'Not Reviewed');
     expect(recieved).toEqual(expected);
   });
 

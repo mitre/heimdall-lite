@@ -139,11 +139,30 @@ describe('Compare table data', () => {
         }
       }
     }
-    let expected = status_count.hash({
-      omit_overlayed_controls: true,
-      fromFile: [...filter_store.selected_file_ids]
-    });
-    let actual: StatusHash = {
+    let expected = {
+      Failed: status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: [...filter_store.selected_file_ids]
+      }).Failed,
+      Passed: status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: [...filter_store.selected_file_ids]
+      }).Passed,
+      'From Profile': 0,
+      'Profile Error': status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: [...filter_store.selected_file_ids]
+      })['Profile Error'],
+      'Not Reviewed': status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: [...filter_store.selected_file_ids]
+      })['Not Reviewed'],
+      'Not Applicable': status_count.hash({
+        omit_overlayed_controls: true,
+        fromFile: [...filter_store.selected_file_ids]
+      })['Not Applicable']
+    };
+    let actual = {
       Failed: failed,
       Passed: passed,
       'From Profile': 0,

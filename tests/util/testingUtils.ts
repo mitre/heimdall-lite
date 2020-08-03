@@ -106,12 +106,12 @@ export function selectAllFiles(): void {
 
 export function fileCompliance(id: number) {
   let filter = {fromFile: [id]};
-  let passed = status_count.passed(filter);
+  let passed = status_count.countOf(filter, 'Passed');
   let total =
     passed +
-    status_count.failed(filter) +
-    status_count.profileError(filter) +
-    status_count.notReviewed(filter);
+    status_count.countOf(filter, 'Failed') +
+    status_count.countOf(filter, 'Profile Error') +
+    status_count.countOf(filter, 'Not Reviewed');
   if (total == 0) {
     return 0;
   }

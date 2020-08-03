@@ -520,12 +520,12 @@ export default class Compare extends Props {
     for (let file of this.files) {
       let filter = {fromFile: [file.unique_id]};
       let counts = getModule(StatusCountModule, this.$store);
-      let passed = counts.passed(filter);
+      let passed = counts.countOf(filter, 'Passed');
       let total =
         passed +
-        counts.failed(filter) +
-        counts.profileError(filter) +
-        counts.notReviewed(filter);
+        counts.countOf(filter, 'Failed') +
+        counts.countOf(filter, 'Profile Error') +
+        counts.countOf(filter, 'Not Reviewed');
       if (total == 0) {
         series.push(0);
       } else {
@@ -553,7 +553,7 @@ export default class Compare extends Props {
     let counts = getModule(StatusCountModule, this.$store);
     for (let file of this.files) {
       let filter = {fromFile: [file.unique_id]};
-      let failed = counts.failed(filter);
+      let failed = counts.countOf(filter, 'Failed');
       if (failed > highest_failed) {
         highest_failed = failed;
       }
