@@ -15,6 +15,7 @@ import good_nginxresults from '../hdf_data/compare_data/good_nginxresults.json';
 import bad_nginx from '../hdf_data/compare_data/bad_nginx.json';
 import triple_overlay_profile from '../hdf_data/compare_data/triple_overlay_profile_example.json';
 import acme from '../hdf_data/compare_data/wrapper-acme-run.json';
+import {readFileSync} from 'fs';
 
 let filter_store = getModule(FilteredDataModule, Store);
 let data_store = getModule(InspecDataModule, Store);
@@ -77,7 +78,7 @@ export function loadSample(sampleName: string) {
 
 export function loadAll(): void {
   let data = AllRaw();
-  let promises = Object.values(data).map(file_result => {
+  Object.values(data).map(file_result => {
     // Increment counter
     id += 1;
 
@@ -115,4 +116,41 @@ export function fileCompliance(id: number) {
     return 0;
   }
   return Math.round((100.0 * passed) / total);
+}
+
+export function expectedCount(status: string) {
+  let failed = 0;
+  let passed = 0;
+  let notReviewed = 0;
+  let notApplicable = 0;
+  let profileError = 0;
+  let exec_files = data_store.executionFiles;
+
+  // For each, we will filter then count
+  exec_files.forEach(file => {
+    // Get the corresponding count file
+    let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
+    let count_file_content = readFileSync(count_filename, 'utf-8');
+    let counts: any = JSON.parse(count_file_content);
+
+    failed += counts.failed.total;
+    passed += counts.passed.total;
+    notReviewed += counts.skipped.total;
+    notApplicable += counts.no_impact.total;
+    profileError += counts.error.total;
+  });
+
+  if (status == 'failed') {
+    return failed;
+  } else if (status == 'passed') {
+    return passed;
+  } else if (status == 'notReviewed') {
+    return notReviewed;
+  } else if (status == 'notApplicable') {
+    return notApplicable;
+  } else if (status == 'profileError') {
+    return profileError;
+  } else {
+    return 0;
+  }
 }

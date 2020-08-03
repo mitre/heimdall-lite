@@ -2,40 +2,20 @@ import 'jest';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import {getModule} from 'vuex-module-decorators';
-import {mount, shallowMount, Wrapper} from '@vue/test-utils';
-import Compare from '@/views/Compare.vue';
-import {AllRaw, read_files, populate_hash} from '../util/fs';
+import {shallowMount, Wrapper} from '@vue/test-utils';
 import Store from '../../src/store/store';
-import ReportIntakeModule, {
-  next_free_file_ID
-} from '../../src/store/report_intake';
-import DataStore from '../../src/store/data_store';
 import FilteredDataModule from '@/store/data_filters';
 import StatusCountModule, {StatusHash} from '@/store/status_counts';
 import {readFileSync} from 'fs';
-import {
-  ComparisonContext,
-  ControlDelta,
-  ControlSeries
-} from '../../src/utilities/delta_util';
 import InspecDataModule from '@/store/data_store';
-import red_hat_bad from '../hdf_data/compare_data/red_hat_bad.json';
-import red_hat_good from '../hdf_data/compare_data/red_hat_good.json';
-import good_nginxresults from '../hdf_data/compare_data/good_nginxresults.json';
-import bad_nginx from '../hdf_data/compare_data/bad_nginx.json';
-import triple_overlay_profile from '../hdf_data/compare_data/triple_overlay_profile_example.json';
-import acme from '../hdf_data/compare_data/wrapper-acme-run.json';
 import {
   removeAllFiles,
   selectAllFiles,
-  testSamples,
   loadSample,
   loadAll,
-  Sample,
-  fileCompliance
+  expectedCount
 } from '../util/testingUtils';
 import Results from '@/views/Results.vue';
-import EvalInfo from '@/components/cards/EvaluationInfo.vue';
 import ProfData from '@/components/cards/ProfData.vue';
 import {profile_unique_key} from '../../src/utilities/format_util';
 import StatusCardRow from '../../src/components/cards/StatusCardRow.vue';
@@ -44,7 +24,6 @@ import SeverityChart from '../../src/components/cards/SeverityChart.vue';
 import ComplianceChart from '../../src/components/cards/ComplianceChart.vue';
 import ControlTable from '../../src/components/cards/controltable/ControlTable.vue';
 import {context} from 'inspecjs';
-import {EvaluationFile} from '../../src/store/report_intake';
 interface ListElt {
   // A unique id to be used as a key.
   key: string;
@@ -198,25 +177,6 @@ describe('Status card row', () => {
         filter: (wrapper.vm as any).all_filter
       }
     });
-    let failed = 0;
-    let passed = 0;
-    let notReviewed = 0;
-    let notApplicable = 0;
-    //let profileError = 0;
-    let exec_files = data_store.executionFiles;
-
-    exec_files.forEach(file => {
-      // Get the corresponding count file
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, 'utf-8');
-      let counts: any = JSON.parse(count_file_content);
-
-      failed += counts.failed.total;
-      passed += counts.passed.total;
-      notReviewed += counts.skipped.total;
-      notApplicable += counts.no_impact.total;
-      //profileError += counts.profileError.total;
-    });
 
     let expected = [
       {
@@ -224,28 +184,28 @@ describe('Status card row', () => {
         title: 'Passed',
         subtitle: 'All tests passed',
         color: 'statusPassed',
-        number: passed
+        number: expectedCount('passed')
       },
       {
         icon: 'close-circle',
         title: 'Failed',
         subtitle: 'Has tests that failed',
         color: 'statusFailed',
-        number: failed
+        number: expectedCount('failed')
       },
       {
         icon: 'minus-circle',
         title: 'Not Applicable',
         subtitle: 'System exception or absent component',
         color: 'statusNotApplicable',
-        number: notApplicable
+        number: expectedCount('notApplicable')
       },
       {
         icon: 'alert-circle',
         title: 'Not Reviewed',
         subtitle: 'Can only be tested manually at this time',
         color: 'statusNotReviewed',
-        number: notReviewed
+        number: expectedCount('notReviewed')
       }
     ];
 
@@ -326,27 +286,14 @@ describe('Status, Severity, Compliance, chart', () => {
         filter: (wrapper.vm as any).all_filter
       }
     });
-    let failed = 0;
-    let passed = 0;
-    let notReviewed = 0;
-    let notApplicable = 0;
-    let profileError = 0;
-    let exec_files = data_store.executionFiles;
 
-    exec_files.forEach(file => {
-      // Get the corresponding count file
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, 'utf-8');
-      let counts: any = JSON.parse(count_file_content);
-
-      failed += counts.failed.total;
-      passed += counts.passed.total;
-      notReviewed += counts.skipped.total;
-      notApplicable += counts.no_impact.total;
-      profileError += counts.error.total;
-    });
-
-    let expected = [passed, failed, notApplicable, notReviewed, profileError];
+    let expected = [
+      expectedCount('passed'),
+      expectedCount('failed'),
+      expectedCount('notApplicable'),
+      expectedCount('notReviewed'),
+      expectedCount('profileError')
+    ];
 
     expect((statusChartWrapper.vm as any).series).toEqual(expected);
   });
@@ -409,28 +356,13 @@ describe('Status, Severity, Compliance, chart', () => {
         filter: (wrapper.vm as any).all_filter
       }
     });
-    let failed = 0;
-    let passed = 0;
-    let notReviewed = 0;
-    let notApplicable = 0;
-    let profileError = 0;
-    let exec_files = data_store.executionFiles;
-
-    exec_files.forEach(file => {
-      // Get the corresponding count file
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, 'utf-8');
-      let counts: any = JSON.parse(count_file_content);
-
-      failed += counts.failed.total;
-      passed += counts.passed.total;
-      notReviewed += counts.skipped.total;
-      notApplicable += counts.no_impact.total;
-      profileError += counts.error.total;
-    });
 
     let expected = Math.round(
-      (100.0 * passed) / (passed + failed + notReviewed + profileError)
+      (100.0 * expectedCount('passed')!) /
+        (expectedCount('passed')! +
+          expectedCount('failed')! +
+          expectedCount('notReviewed')! +
+          expectedCount('profileError')!)
     );
     expect((compChartWrapper.vm as any).series[0]).toBe(expected);
   });
@@ -447,21 +379,12 @@ describe('Datatable', () => {
         filter: (wrapper.vm as any).all_filter
       }
     });
-    let expected = 0;
-    let exec_files = data_store.executionFiles;
-    exec_files.forEach(file => {
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, 'utf-8');
-      let counts: any = JSON.parse(count_file_content);
-
-      expected +=
-        counts.passed.total +
-        counts.failed.total +
-        counts.skipped.total +
-        counts.no_impact.total +
-        counts.error.total;
-    });
-
+    let expected =
+      expectedCount('passed') +
+      expectedCount('failed') +
+      expectedCount('notReviewed') +
+      expectedCount('notApplicable') +
+      expectedCount('profileError');
     expect((controlTableWrapper.vm as any).items.length).toBe(expected);
   });
 

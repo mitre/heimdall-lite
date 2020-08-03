@@ -14,11 +14,10 @@ import InspecDataModule from '@/store/data_store';
 import {
   removeAllFiles,
   selectAllFiles,
-  testSamples,
   loadSample,
   loadAll,
-  Sample,
-  fileCompliance
+  fileCompliance,
+  expectedCount
 } from '../util/testingUtils';
 
 const vuetify = new Vuetify();
@@ -204,7 +203,6 @@ describe('compare charts', () => {
     loadAll();
     selectAllFiles();
     let data = getModule(DataStore, Store);
-    let failed = 0;
     let sevFail = 0;
     let exec_files = data.executionFiles;
     for (let i = 0; i < 4; i++) {
@@ -213,16 +211,7 @@ describe('compare charts', () => {
       }
     }
 
-    // For each, we will filter then count
-    exec_files.forEach(file => {
-      // Get the corresponding count file
-      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, 'utf-8');
-      let counts: any = JSON.parse(count_file_content);
-
-      failed += counts.failed.total;
-    });
-    expect(sevFail).toBe(failed);
+    expect(sevFail).toBe(expectedCount('failed'));
   });
 
   it('compliance chart gets correct data with 2 files', () => {
