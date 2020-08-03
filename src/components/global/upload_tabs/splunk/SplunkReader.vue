@@ -113,6 +113,7 @@ export default class SplunkReader extends Props {
    * Sets shown error.
    */
   handle_error(error: SplunkErrorCode): void {
+    this.step = 1;
     switch (error) {
       case SplunkErrorCode.BadNetwork:
         this.error_count += 1;
