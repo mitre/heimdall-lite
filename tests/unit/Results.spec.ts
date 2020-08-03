@@ -43,6 +43,18 @@ import StatusChart from '../../src/components/cards/StatusChart.vue';
 import SeverityChart from '../../src/components/cards/SeverityChart.vue';
 import ComplianceChart from '../../src/components/cards/ComplianceChart.vue';
 import ControlTable from '../../src/components/cards/controltable/ControlTable.vue';
+import {context} from 'inspecjs';
+import {EvaluationFile} from '../../src/store/report_intake';
+interface ListElt {
+  // A unique id to be used as a key.
+  key: string;
+
+  // Computed values for status and severity "value", for sorting
+  status_val: number;
+  severity_val: number;
+
+  control: context.ContextualizedControl;
+}
 
 interface InfoItem {
   label: string;
@@ -424,22 +436,48 @@ describe('Status, Severity, Compliance, chart', () => {
   });
 });
 
-describe('Treemap', () => {});
-
 describe('Datatable', () => {
-  it('displays correct number of controls with one file', () => {
-    expect(true).toBe(true);
-  });
-
   it('displays correct number of controls with many files', () => {
-    expect(true).toBe(true);
+    removeAllFiles();
+    loadAll();
+    selectAllFiles();
+    controlTableWrapper = shallowMount(ControlTable, {
+      vuetify,
+      propsData: {
+        filter: (wrapper.vm as any).all_filter
+      }
+    });
+    let expected = 0;
+    let exec_files = data_store.executionFiles;
+    exec_files.forEach(file => {
+      let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
+      let count_file_content = readFileSync(count_filename, 'utf-8');
+      let counts: any = JSON.parse(count_file_content);
+
+      expected +=
+        counts.passed.total +
+        counts.failed.total +
+        counts.skipped.total +
+        counts.no_impact.total +
+        counts.error.total;
+    });
+
+    expect((controlTableWrapper.vm as any).items.length).toBe(expected);
   });
 
   it('control row and table data is correct', () => {
-    expect(true).toBe(true);
-  });
-
-  it('tests display on controls is accurate', () => {
-    expect(true).toBe(true);
+    expect(
+      (controlTableWrapper.vm as any).items
+        .map((item: ListElt) => item.control.data.id)
+        .sort()
+    ).toEqual(
+      filter_store
+        .controls({
+          fromFile: filter_store.selected_file_ids,
+          omit_overlayed_controls: true
+        })
+        .map(c => c.data.id)
+        .sort()
+    );
   });
 });
