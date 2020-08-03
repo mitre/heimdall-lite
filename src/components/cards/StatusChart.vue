@@ -74,12 +74,12 @@ export default class StatusChart extends StatusChartProps {
   get center_value(): string {
     if (this.show_compliance) {
       let counts = getModule(StatusCountModule, this.$store);
-      let passed = counts.passed(this.filter);
+      let passed = counts.countOf(this.filter, 'Passed');
       let total =
         passed +
-        counts.failed(this.filter) +
-        counts.profileError(this.filter) +
-        counts.notReviewed(this.filter);
+        counts.countOf(this.filter, 'Failed') +
+        counts.countOf(this.filter, 'Profile Error') +
+        counts.countOf(this.filter, 'Profile Error');
       if (total == 0) {
         return '0%';
       } else {
