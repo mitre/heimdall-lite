@@ -1,7 +1,7 @@
 <!-- Visualizes a delta between two controls -->
 <template>
   <v-row>
-    <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1" class="pa-0">
+    <v-col cols="3" xs="3" sm="2" md="1" class="pa-0">
       <slot name="name" />
     </v-col>
     <v-col
@@ -10,10 +10,7 @@
       :key="i"
       cols="4"
       xs="4"
-      sm="4"
       md="5"
-      lg="5"
-      xl="5"
     >
       <v-card v-if="value != 'not selected'" class="pa-2" :color="color(value)">
         {{ value }}

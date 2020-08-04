@@ -121,44 +121,6 @@ export class ControlDelta {
     }
   }
 
-  /* More specific deltas we handle as getters, so that they are only generated on-demand by vue */
-
-  /** Compute the diff in lines-of-code  */
-  // get code_changes(): ControlChangeGroup {
-  //   let old_code = this.old.data.code || "";
-  //   let new_code = this.old.data.code || "";
-
-  //   // Compute the changes in the lines
-  //   let line_diff = structuredPatch(
-  //     "old_filename",
-  //     "new_filename",
-  //     old_code,
-  //     new_code
-  //   );
-
-  //   // Convert them to change objects
-  //   let changes: ControlChange[] = line_diff.hunks.map(hunk => {
-  //     // Find the original line span
-  //     let lines = `line ${hunk.oldStart} - ${hunk.oldStart + hunk.oldLines}`;
-
-  //     // Form the complete chunks
-  //     let o = hunk.lines
-  //       .filter(l => l[0] !== "+")
-  //       .map(l => l.substr(1))
-  //       .join("\n");
-  //     let n = hunk.lines
-  //       .filter(l => l[0] !== "-")
-  //       .map(l => l.substr(1))
-  //       .join("\n");
-  //     return new ControlChange(lines, o, n);
-  //   });
-
-  //   // Clean and return the result
-  //   let result = new ControlChangeGroup("Code", changes);
-  //   result.clean();
-  //   return result;
-  // }
-
   /** Returns the changes in "header" elements of a control. E.g. name, status, etc. */
   get header_changes(): ControlChangeGroup {
     // Init the list
@@ -208,36 +170,6 @@ export class ControlDelta {
     result.clean();
     return result;
   }
-
-  /**
-   * Get the changes in the controls individual segments.
-   * They are returned as a list of change groups, with each group encoding a segment.
-   */
-  // get segment_changes(): ControlChangeGroup[] {
-  //   // Change in individual control segments
-  //   let control_segments = this.controlsandnull.map(c => {
-  //     if (c === null) {
-  //       new
-  //     }
-  //     return c!.root.hdf.segments || [];
-  //   });
-
-  //   // Do the actual pairing/diff finging
-  //   let results: ControlChangeGroup[] = [];
-  //   for (let i = 0; i < control_segments.length; i++) {
-  //     let segs = control_segments[i];
-  //     let changes = changelog_segments(segs);
-  //     let group = new ControlChangeGroup(segs[0].code_desc, changes);
-
-  //     // Clean it up and store if not empty
-  //     group.clean();
-  //     if (group.any) {
-  //       results.push(group);
-  //     }
-  //   }
-
-  //   return results;
-  // }
 }
 
 export function get_eval_start_time(

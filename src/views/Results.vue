@@ -156,7 +156,7 @@
     <v-snackbar
       style="margin-top: 44px;"
       v-model="filter_snackbar"
-      :timeout="10000000"
+      :timeout="-1"
       color="warning"
       top
     >
@@ -265,13 +265,6 @@ export default class Results extends ResultsProps {
   filter_snackbar: boolean = false;
 
   eval_info: number | null = null;
-
-  /* This is supposed to cause the dialog to automatically appear if there is
-   * no file uploaded
-   */
-  /*mounted() {
-    if (this.file_filter) this.dialog = false;
-  }*/
 
   get is_server_mode(): boolean | null {
     let mod = getModule(ServerModule, this.$store);

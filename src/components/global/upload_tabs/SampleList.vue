@@ -11,9 +11,6 @@
         </v-list-item-content>
         <v-list-item-action @click="select_samp(sample)">
           <v-checkbox color="blue" :input-value="selected(sample)" />
-          <!--v-btn icon @click="load_sample(sample)">
-            <v-icon>mdi-plus-circle</v-icon>
-          </v-btn-->
         </v-list-item-action>
       </v-list-item>
     </v-list>

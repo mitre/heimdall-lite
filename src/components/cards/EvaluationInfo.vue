@@ -171,15 +171,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     return filter_module.evaluations([this.file_filter])[0].from_file;
   }
 
-  //width of component needs to be larger for formating when in server mode
-  get width(): number {
-    let mod = getModule(ServerModule, this.$store);
-    if (mod.serverMode) {
-      return 500;
-    }
-    return 350;
-  }
-
   //gives more room for actual info when the "tags" button is not displayed
   get info_cols(): number {
     let mod = getModule(ServerModule, this.$store);

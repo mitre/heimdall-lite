@@ -2,7 +2,7 @@
   <div :watcher="file_num_watch">
     <v-row @click="viewAll">
       <!-- Control ID -->
-      <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1" class="pt-0">
+      <v-col cols="3" xs="3" sm="2" md="1" class="pt-0">
         <div style="text-align: center; padding: 19px;">
           {{ control_id }}
         </div>
@@ -12,10 +12,7 @@
       <v-col
         cols="4"
         xs="4"
-        sm="4"
         md="5"
-        lg="5"
-        xl="5"
         v-for="index in shown_files"
         filter
         :key="index - 1"
@@ -52,24 +49,16 @@
     </v-row>
     <div v-if="num_selected > 0">
       <v-row>
-        <!-- Depending on selection, more details -->
-        <!-- <transition-group> -->
-        <!--v-col cols="12" v-if="delta" key="delta">
-        <DeltaView :delta="delta" />
-      </v-col-->
         <v-col cols="12" key="delta">
           <DeltaView :delta="delta" :shift="shift" />
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="3" xs="3" sm="2" md="1" lg="1" xl="1"></v-col>
+        <v-col cols="3" xs="3" sm="2" md="1"></v-col>
         <v-col
           cols="4"
           xs="4"
-          sm="4"
           md="5"
-          lg="5"
-          xl="5"
           v-for="index in shown_files"
           :key="index - 1"
         >
@@ -133,16 +122,6 @@ export default class CompareRow extends Props {
     }
   }
 
-  // get shown_details(): number[] {
-  //   let det_ind = []
-  //   for (let i = 0; i < this.selection.length; i++) {
-  //     if (this.selection[i]) {
-  //       det_ind.push(i);
-  //     }
-  //   }
-  //   return det_ind;
-  // }
-
   get control_id(): string {
     for (let ctrl of this.hdf_controls) {
       if (ctrl != null) {
@@ -195,24 +174,6 @@ export default class CompareRow extends Props {
     return new ControlDelta(delt_data);
   }
 
-  /** Returns the HDF control that we want to show details for iff it is the only selected control */
-  get details(): boolean {
-    var selected = 0;
-    var i;
-    for (i = 0; i < this.selection.length; i++) {
-      if (this.selection[i]) {
-        if (selected == 1) {
-          return false;
-        }
-        selected += 1;
-      }
-    }
-    if (selected == 1) {
-      return true; //this.selected_controls[0].root.hdf;
-    }
-    return false;
-  }
-
   //This is used to SELECT controls to view their data
   view(index: number, evt: Event) {
     evt.stopPropagation();
@@ -245,16 +206,6 @@ export default class CompareRow extends Props {
       }
     }
     return selected;
-  }
-
-  //returns the control select
-  get detail_control(): context.ContextualizedControl | null {
-    for (let i = 0; i < this.selection.length; i++) {
-      if (this.selection[i]) {
-        return this._controls[i];
-      }
-    }
-    return null;
   }
 
   //Updates selection array to match file count

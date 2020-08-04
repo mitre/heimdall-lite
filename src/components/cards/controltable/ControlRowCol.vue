@@ -7,15 +7,7 @@
         </v-btn>
       </v-layout>
     </v-col>
-    <v-col
-      v-if="!result.message"
-      lg="10"
-      xl="10"
-      cols="12"
-      sm="12"
-      md="12"
-      class="right"
-    >
+    <v-col v-if="!result.message" cols="12" sm="12" lg="10" class="right">
       <h3 class="pa-2">Test</h3>
       <v-divider></v-divider>
       <v-clamp
@@ -35,7 +27,7 @@
         </template>
       </v-clamp>
     </v-col>
-    <v-col v-else lg="5" xl="5" sm="6" md="6" cols="12" class="left">
+    <v-col v-else sm="6" lg="5" cols="12" class="left">
       <h3 class="pa-2">Test</h3>
       <v-divider></v-divider>
       <v-clamp
@@ -55,15 +47,7 @@
         </template>
       </v-clamp>
     </v-col>
-    <v-col
-      v-if="result.message"
-      cols="12"
-      sm="6"
-      md="6"
-      lg="5"
-      xl="5"
-      class="left"
-    >
+    <v-col v-if="result.message" cols="12" sm="6" lg="5" class="left">
       <h3 class="pa-2">Result</h3>
       <v-divider></v-divider>
       <v-clamp
@@ -127,13 +111,3 @@ export default class ControlRowCol extends ControlRowColProps {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.right {
-  margin-left: -1px;
-}
-
-button.unclickable-button {
-  pointer-events: none;
-}
-</style>
