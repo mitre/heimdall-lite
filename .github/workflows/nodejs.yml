@@ -17,11 +17,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: npm installbuild, and test
         run: npm install
+      - name: Run linters
+        uses: samuelmeuli/lint-action@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          prettier: true
+          eslint: true
       - name: npm build
         run: npm run build
       - name: npm test
         run: npm run test:unit
-      - name: npm lint 
-        run: npm run lint
-        env:
-          CI: true
