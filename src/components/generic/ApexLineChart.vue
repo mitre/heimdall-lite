@@ -134,7 +134,6 @@ export default class ApexLineChart extends ApexLineChartProps {
 
   //changes text based on light or dark mode
   get white_black(): string {
-    var whiteBlack;
     if (this.$vuetify.theme.dark) {
       return '#FFFFFF';
     }
