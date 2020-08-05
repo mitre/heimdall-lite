@@ -1,22 +1,25 @@
-import chai from "chai";
-import chai_as_promised from "chai-as-promised";
+import chai from 'chai';
+import chai_as_promised from 'chai-as-promised';
 chai.use(chai_as_promised);
 const expect = chai.expect;
 
-import Store from "../../src/store/store";
-import ReportIntakeModule from "../../src/store/report_intake";
-import DataStore from "../../src/store/data_store";
-import { getModule } from "vuex-module-decorators";
-import { AllRaw } from "../util/fs";
-import FilteredDataModule from "@/store/data_filters";
-import StatusCountModule, { StatusHash } from "@/store/status_counts";
-import { readFileSync } from "fs";
+import Store from '../../src/store/store';
+import ReportIntakeModule from '../../src/store/report_intake';
+import DataStore from '../../src/store/data_store';
+import {getModule} from 'vuex-module-decorators';
+import {AllRaw} from '../util/fs';
+import FilteredDataModule from '@/store/data_filters';
+import StatusCountModule, {ControlStatusHash} from '@/store/status_counts';
+import {readFileSync, fstat, writeFileSync} from 'fs';
+import {NIST_DESCRIPTIONS} from '@/utilities/nist_util';
+import {nist} from 'inspecjs';
+import {is_control} from 'inspecjs/dist/nist';
 // import { shallowMount } from "@vue/test-utils";
 
-describe("Parsing", () => {
-  it("Report intake can read every raw file in hdf_data", function() {
+describe('Parsing', () => {
+  it('Report intake can read every raw file in hdf_data', function() {
     // Give it time!
-    this.timeout(0);
+    jest.setTimeout(0);
     let raw = AllRaw();
     let intake = getModule(ReportIntakeModule, Store);
     let id = 0;
@@ -39,7 +42,7 @@ describe("Parsing", () => {
 
   // Note that the above side effect has LOADED THESE FILES! WE CAN USE THEM IN OTHER TESTS
 
-  it("Counts statuses correctly", function() {
+  it('Counts statuses correctly', function() {
     // Grab modules
     let data = getModule(DataStore, Store);
     let filter = getModule(FilteredDataModule, Store);
@@ -52,17 +55,17 @@ describe("Parsing", () => {
     exec_files.forEach(file => {
       // Get the corresponding count file
       let count_filename = `tests/hdf_data/counts/${file.filename}.info.counts`;
-      let count_file_content = readFileSync(count_filename, "utf-8");
+      let count_file_content = readFileSync(count_filename, 'utf-8');
       let counts: any = JSON.parse(count_file_content);
 
       // Get the expected counts
-      let expected: StatusHash = {
+      let expected: ControlStatusHash = {
         Failed: counts.failed.total,
         Passed: counts.passed.total,
-        "From Profile": 0,
-        "Profile Error": counts.error.total,
-        "Not Reviewed": counts.skipped.total,
-        "Not Applicable": counts.no_impact.total
+        'From Profile': 0,
+        'Profile Error': counts.error.total,
+        'Not Reviewed': counts.skipped.total,
+        'Not Applicable': counts.no_impact.total
       };
 
       let expected_with_filename = {
@@ -76,9 +79,21 @@ describe("Parsing", () => {
         fromFile: file.unique_id
       });
 
+      let {
+        PassedTests,
+        FailedOutOf,
+        FailedTests,
+        NotApplicableTests,
+        NotReviewedTests,
+        ErroredOutOf,
+        ErroredTests,
+        TotalTests,
+        ...actual_stripped
+      } = actual;
+
       let actual_with_filename = {
         filename: file.filename,
-        ...actual
+        ...actual_stripped
       };
 
       // Compare 'em

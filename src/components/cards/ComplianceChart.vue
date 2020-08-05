@@ -11,16 +11,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import VueApexCharts from "vue-apexcharts";
-import { getModule } from "vuex-module-decorators";
-import ColorHackModule from "@/store/color_hack";
-import FilteredDataModule, { Filter } from "@/store/data_filters";
-import { ControlStatus, Severity } from "inspecjs";
-import { ApexOptions } from "apexcharts";
-import InspecDataModule from "@/store/data_store";
-import StatusCountModule from "@/store/status_counts";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import VueApexCharts from 'vue-apexcharts';
+import {getModule} from 'vuex-module-decorators';
+import ColorHackModule from '@/store/color_hack';
+import FilteredDataModule, {Filter} from '@/store/data_filters';
+import {ControlStatus, Severity} from 'inspecjs';
+import {ApexOptions} from 'apexcharts';
+import InspecDataModule from '@/store/data_store';
+import StatusCountModule from '@/store/status_counts';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -47,7 +47,7 @@ export default class ComplianceChart extends ComplianceChartProps {
           startAngle: -150,
           endAngle: 150,
           hollow: {
-            size: "70%"
+            size: '70%'
           },
           track: {
             opacity: 0
@@ -55,22 +55,22 @@ export default class ComplianceChart extends ComplianceChartProps {
           dataLabels: {
             show: true,
             value: {
-              color: "#99a2ac",
-              fontSize: "2rem"
+              color: '#99a2ac',
+              fontSize: '2rem'
             }
           }
         }
       },
       fill: {
-        type: "solid",
+        type: 'solid',
         colors: [
-          function(data: { value: number }) {
+          function(data: {value: number}) {
             if (data.value < 60) {
-              return colors.lookupColor("complianceLow");
+              return colors.lookupColor('complianceLow');
             } else if (data.value >= 60 && data.value < 90) {
-              return colors.lookupColor("complianceMedium");
+              return colors.lookupColor('complianceMedium');
             } else {
-              return colors.lookupColor("complianceHigh");
+              return colors.lookupColor('complianceHigh');
             }
           }
         ]
@@ -87,7 +87,7 @@ export default class ComplianceChart extends ComplianceChartProps {
       stroke: {
         dashArray: 8
       },
-      labels: ["Compliance Level"]
+      labels: ['Compliance Level']
     };
     return result;
   }
@@ -98,12 +98,12 @@ export default class ComplianceChart extends ComplianceChartProps {
   get series(): number[] {
     // Get access to the status counts, to compute compliance percentages
     let counts = getModule(StatusCountModule, this.$store);
-    let passed = counts.passed(this.filter);
+    let passed = counts.countOf(this.filter, 'Passed');
     let total =
       passed +
-      counts.failed(this.filter) +
-      counts.profileError(this.filter) +
-      counts.notReviewed(this.filter);
+      counts.countOf(this.filter, 'Failed') +
+      counts.countOf(this.filter, 'Profile Error') +
+      counts.countOf(this.filter, 'Not Reviewed');
     if (total == 0) {
       return [0];
     } else {

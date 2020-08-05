@@ -20,37 +20,32 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <v-btn
-        class="mx-2"
-        :class="can_clear ? 'glow' : ''"
-        @click="clear"
-        title="Clear all set filters"
-        :disabled="!can_clear"
-      >
-        <span class="d-none d-md-inline pr-2">
-          Clear
-        </span>
-        <v-icon>
-          mdi-filter-remove
-        </v-icon>
-      </v-btn>
+      <UserMenu />
     </template>
 
     <!-- Custom sidebar content -->
     <template #sidebar-content-tools>
       <ExportCaat :filter="all_filter"></ExportCaat>
       <ExportNist :filter="all_filter"></ExportNist>
+      <ExportJson></ExportJson>
     </template>
 
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pa-2>
+        <!-- Evaluation Info -->
+        <v-row>
+          <v-col xs-12>
+            <v-card elevation="2">
+              <EvaluationInfo :filter="file_filter" />
+            </v-card>
+          </v-col>
+        </v-row>
         <!-- Count Cards -->
         <StatusCardRow
           :filter="all_filter"
           @show-errors="status_filter = 'Profile Error'"
         />
-
         <!-- Compliance Cards -->
         <v-row justify="space-around">
           <v-col xs="4">
@@ -143,27 +138,31 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import BaseView from "@/views/BaseView.vue";
-import UploadNexus from "@/components/global/UploadNexus.vue";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import BaseView from '@/views/BaseView.vue';
+import UploadNexus from '@/components/global/UploadNexus.vue';
 
-import StatusCardRow from "@/components/cards/StatusCardRow.vue";
-import ControlTable from "@/components/cards/controltable/ControlTable.vue";
-import Treemap from "@/components/cards/treemap/Treemap.vue";
-import StatusChart from "@/components/cards/StatusChart.vue";
-import SeverityChart from "@/components/cards/SeverityChart.vue";
-import ComplianceChart from "@/components/cards/ComplianceChart.vue";
-import ProfileData from "@/components/cards/ProfileData.vue";
-import ExportCaat from "@/components/global/ExportCaat.vue";
-import ExportNist from "@/components/global/ExportNist.vue";
+import StatusCardRow from '@/components/cards/StatusCardRow.vue';
+import ControlTable from '@/components/cards/controltable/ControlTable.vue';
+import Treemap from '@/components/cards/treemap/Treemap.vue';
+import StatusChart from '@/components/cards/StatusChart.vue';
+import SeverityChart from '@/components/cards/SeverityChart.vue';
+import ComplianceChart from '@/components/cards/ComplianceChart.vue';
+import ProfileData from '@/components/cards/ProfileData.vue';
+import ExportCaat from '@/components/global/ExportCaat.vue';
+import ExportNist from '@/components/global/ExportNist.vue';
+import ExportJson from '@/components/global/ExportJson.vue';
+import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
 
-import FilteredDataModule, { Filter, TreeMapState } from "@/store/data_filters";
-import { ControlStatus, Severity } from "inspecjs";
-import InspecIntakeModule, { FileID } from "@/store/report_intake";
-import { getModule } from "vuex-module-decorators";
-import InspecDataModule from "../store/data_store";
-import { need_redirect_file } from "@/utilities/helper_util";
+import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
+import {ControlStatus, Severity} from 'inspecjs';
+import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import {getModule} from 'vuex-module-decorators';
+import InspecDataModule from '../store/data_store';
+import {need_redirect_file} from '@/utilities/helper_util';
+import ServerModule from '@/store/server';
+import UserMenu from '@/components/global/UserMenu.vue';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -183,7 +182,10 @@ const ResultsProps = Vue.extend({
     ComplianceChart,
     ProfileData,
     ExportCaat,
-    ExportNist
+    ExportNist,
+    ExportJson,
+    EvaluationInfo,
+    UserMenu
   }
 })
 export default class Results extends ResultsProps {
@@ -211,7 +213,7 @@ export default class Results extends ResultsProps {
    * The current search term, as modeled by the search bar
    * Never empty - should in that case be null
    */
-  search_term: string = "";
+  search_term: string = '';
 
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
@@ -223,12 +225,17 @@ export default class Results extends ResultsProps {
     if (this.file_filter) this.dialog = false;
   }
 
+  get is_server_mode(): boolean | null {
+    let mod = getModule(ServerModule, this.$store);
+    return mod.serverMode;
+  }
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
    */
   get file_filter(): FileID | null {
     let id_string: string = this.$route.params.id;
+    console.log('file_filter: ' + id_string);
     let as_int = parseInt(id_string);
     let result: FileID | null;
     if (isNaN(as_int)) {
@@ -236,15 +243,17 @@ export default class Results extends ResultsProps {
     } else {
       result = as_int as FileID;
     }
+    console.log('file_filter result: ' + result);
 
     // Route if necessary
     let redir = need_redirect_file(
       result,
       getModule(InspecDataModule, this.$store)
     );
-    if (redir !== "ok") {
-      if (redir === "root") {
-        this.$router.push("/");
+    console.log('redir: ' + redir);
+    if (redir !== 'ok') {
+      if (redir === 'root') {
+        this.$router.push('/home');
       } else {
         this.$router.push(`/results/${redir}`);
         result = redir;
@@ -290,8 +299,19 @@ export default class Results extends ResultsProps {
     this.severity_filter = null;
     this.status_filter = null;
     this.control_selection = null;
-    this.search_term = "";
+    this.search_term = '';
     this.tree_filters = [];
+  }
+
+  profile_page() {
+    this.dialog = false;
+    this.$router.push('/profile');
+  }
+
+  log_out() {
+    getModule(ServerModule, this.$store).clear_token();
+    this.dialog = false;
+    this.$router.push('/');
   }
 
   /**
@@ -304,7 +324,7 @@ export default class Results extends ResultsProps {
     if (
       this.severity_filter ||
       this.status_filter ||
-      this.search_term !== "" ||
+      this.search_term !== '' ||
       this.tree_filters.length
     ) {
       result = true;
@@ -332,6 +352,7 @@ export default class Results extends ResultsProps {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter);
       if (file) {
+        //console.log("file: " + JSON.stringify(file));
         return file.filename;
       }
     }

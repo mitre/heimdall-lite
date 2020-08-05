@@ -1,26 +1,26 @@
-let HtmlWebpackPlugin = require("html-webpack-plugin");
-let HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
-var webpack = require("webpack");
+let HtmlWebpackPlugin = require('html-webpack-plugin');
+let HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+var webpack = require('webpack');
 
 // Lookup constants
-const fs = require("fs");
-const packageJson = fs.readFileSync("./package.json");
+const fs = require('fs');
+const packageJson = fs.readFileSync('./package.json');
 const parsed = JSON.parse(packageJson);
 const version = parsed.version || 0;
-const description = parsed.description || "";
-const repository = parsed.repository.url || "";
-const license = parsed.license || "";
-const changelog = parsed.changelog || "";
-const branch = parsed.branch || "";
-const issues = parsed.issues || "";
+const description = parsed.description || '';
+const repository = parsed.repository.url || '';
+const license = parsed.license || '';
+const changelog = parsed.changelog || '';
+const branch = parsed.branch || '';
+const issues = parsed.issues || '';
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   transpileDependencies: [/(\/|\\)vuetify(\/|\\)/],
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
-        "process.env": {
+        'process.env': {
           PACKAGE_VERSION: '"' + version + '"',
           DESCRIPTION: '"' + description + '"',
           REPOSITORY: '"' + repository + '"',
@@ -31,8 +31,8 @@ module.exports = {
         }
       }),
       new HtmlWebpackPlugin({
-        template: "public/index.html",
-        inlineSource: ".(js|css)$"
+        template: 'public/index.html',
+        inlineSource: '.(js|css)$'
       }),
       new HtmlWebpackInlineSourcePlugin()
     ]
@@ -46,32 +46,30 @@ module.exports = {
   },
   chainWebpack: config => {
     config.module
-      .rule("fonts")
+      .rule('fonts')
       .test(/\.(ttf|otf|eot|woff|woff2)$/)
-      .use("url-loader")
-      .loader("url-loader")
+      .use('url-loader')
+      .loader('url-loader')
       .tap(options => {
         options = {
           // limit: 10000,
-          name: "./fonts/[name].[ext]",
-          publicPath: process.env.NODE_ENV === "production" ? "./" : "/"
+          name: './fonts/[name].[ext]',
+          publicPath: process.env.NODE_ENV === 'production' ? './' : '/'
         };
         return options;
       })
       .end();
     config.module
-      .rule("vue")
-      .use("vue-svg-inline-loader")
-      .loader("vue-svg-inline-loader")
+      .rule('vue')
+      .use('vue-svg-inline-loader')
+      .loader('vue-svg-inline-loader')
       .options();
-    ["vue-modules", "vue", "normal-modules", "normal"].forEach(match => {
+    ['vue-modules', 'vue', 'normal-modules', 'normal'].forEach(match => {
       config.module
-        .rule("scss")
+        .rule('scss')
         .oneOf(match)
-        .use("sass-loader")
-        .tap(opt =>
-          Object.assign(opt, { data: `@import '~@/sass/main.scss';` })
-        );
+        .use('sass-loader')
+        .tap(opt => Object.assign(opt, {data: `@import '~@/sass/main.scss';`}));
     });
   }
 };

@@ -2,12 +2,11 @@
  * Tools used for generating the treemaps consumed by, of course, the Treemap card and associated components.
  */
 
-import { nist } from "inspecjs";
-import * as d3 from "d3";
-import { ContextualizedControl } from "@/store/data_store";
-import { control_unique_key } from "./format_util";
-import ColorHackModule from "@/store/color_hack";
-import Chroma from "chroma-js";
+import {nist, context} from 'inspecjs';
+import * as d3 from 'd3';
+import {control_unique_key} from './format_util';
+import ColorHackModule from '@/store/color_hack';
+import Chroma from 'chroma-js';
 
 // How deep into nist trees we allow
 const MAX_DEPTH = 2;
@@ -27,7 +26,7 @@ export interface TreemapNodeParent extends AbsTreemapNode {
 }
 
 export interface TreemapNodeLeaf extends AbsTreemapNode {
-  control: ContextualizedControl;
+  control: context.ContextualizedControl;
 }
 
 export function is_leaf(n: TreemapNode): n is TreemapNodeLeaf {
@@ -48,7 +47,7 @@ export type D3TreemapNode = d3.HierarchyNode<TreemapNode>;
  * @param controls The controls to build into a nist node map
  */
 function controls_to_nist_node_data(
-  contextualized_controls: Readonly<ContextualizedControl[]>,
+  contextualized_controls: Readonly<context.ContextualizedControl[]>,
   colors: ColorHackModule
 ): TreemapNodeLeaf[] {
   return contextualized_controls.flatMap(cc => {
@@ -78,7 +77,7 @@ function controls_to_nist_node_data(
 function recursive_nist_map(
   parent: TreemapNodeParent | null,
   node: Readonly<nist.NistHierarchyNode>,
-  control_lookup: { [key: string]: TreemapNodeParent },
+  control_lookup: {[key: string]: TreemapNodeParent},
   max_depth: number
 ): TreemapNodeParent {
   // Init child list
@@ -135,15 +134,15 @@ function colorize_tree_map(root: TreemapNodeParent) {
 /** Generates a lookup key for the given control */
 function lookup_key_for(x: nist.NistControl, max_depth: number): string {
   if (max_depth) {
-    return x.sub_specifiers.slice(0, max_depth).join("-");
+    return x.sub_specifiers.slice(0, max_depth).join('-');
   } else {
-    return x.sub_specifiers.join("-");
+    return x.sub_specifiers.join('-');
   }
 }
 
 /** Populates a treemap using the given lookup table */
 function populate_tree_map(
-  lookup: { [key: string]: TreemapNodeParent },
+  lookup: {[key: string]: TreemapNodeParent},
   leaves: TreemapNodeLeaf[],
   max_depth: number
 ) {
@@ -172,14 +171,14 @@ function build_populated_nist_map(
   colors: ColorHackModule
 ): TreemapNodeParent {
   // Build our scaffold
-  let lookup: { [key: string]: TreemapNodeParent } = {};
+  let lookup: {[key: string]: TreemapNodeParent} = {};
   let root_children: TreemapNodeParent[] = [];
   let root: TreemapNodeParent = {
-    key: "tree_root",
-    title: "NIST-853 Controls",
+    key: 'tree_root',
+    title: 'NIST-853 Controls',
     children: root_children,
     parent: null,
-    nist_control: new nist.NistControl([], "NIST-853")
+    nist_control: new nist.NistControl([], 'NIST-853')
   };
 
   // Fill out children, recursively
@@ -233,7 +232,7 @@ function node_data_to_tree_map(
 
 /** Does all the steps */
 export function build_nist_tree_map(
-  data: Readonly<ContextualizedControl[]>,
+  data: Readonly<context.ContextualizedControl[]>,
   colors: ColorHackModule
 ): D3TreemapNode {
   let leaves = controls_to_nist_node_data(data, colors);

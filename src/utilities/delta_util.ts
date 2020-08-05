@@ -2,18 +2,15 @@
  * Provides utlities for comparing executions
  */
 
-import {
-  ContextualizedExecution,
-  ContextualizedControl
-} from "@/store/data_store";
-import { HDFControlSegment } from "inspecjs";
+import {SourcedContextualizedEvaluation} from '@/store/data_store';
+import {HDFControlSegment, context} from 'inspecjs';
 import {
   structuredPatch,
   createPatch,
   diffArrays,
   Change as DiffChange,
   diffJson
-} from "diff";
+} from 'diff';
 
 /**
  * Represents a change in a property.
@@ -74,15 +71,15 @@ function changelog_segments(
 ): ControlChange[] {
   // Get all the keys we care about
   let all_keys: Array<
-    "code_desc" | "status" | "message" | "resource" | "exception"
+    'code_desc' | 'status' | 'message' | 'resource' | 'exception'
   >;
-  all_keys = ["status", "code_desc", "exception", "message", "resource"]; // determines output order, which are displayed, etc.
+  all_keys = ['status', 'code_desc', 'exception', 'message', 'resource']; // determines output order, which are displayed, etc.
 
   // Map them to changes
   let changes: ControlChange[] = [];
   all_keys.forEach(key => {
-    let ov: string = old[key] || "";
-    let nv: string = new_[key] || "";
+    let ov: string = old[key] || '';
+    let nv: string = new_[key] || '';
     changes.push(new ControlChange(key, ov, nv));
   });
 
@@ -94,12 +91,15 @@ function changelog_segments(
  */
 export class ControlDelta {
   /** The older control */
-  old: ContextualizedControl;
+  old: context.ContextualizedControl;
 
   /** The newer control */
-  new: ContextualizedControl;
+  new: context.ContextualizedControl;
 
-  constructor(old: ContextualizedControl, _new: ContextualizedControl) {
+  constructor(
+    old: context.ContextualizedControl,
+    _new: context.ContextualizedControl
+  ) {
     this.old = old;
     this.new = _new;
   }
@@ -108,13 +108,13 @@ export class ControlDelta {
 
   /** Compute the diff in lines-of-code  */
   get code_changes(): ControlChangeGroup {
-    let old_code = this.old.data.code || "";
-    let new_code = this.old.data.code || "";
+    let old_code = this.old.data.code || '';
+    let new_code = this.old.data.code || '';
 
     // Compute the changes in the lines
     let line_diff = structuredPatch(
-      "old_filename",
-      "new_filename",
+      'old_filename',
+      'new_filename',
       old_code,
       new_code
     );
@@ -126,18 +126,18 @@ export class ControlDelta {
 
       // Form the complete chunks
       let o = hunk.lines
-        .filter(l => l[0] !== "+")
+        .filter(l => l[0] !== '+')
         .map(l => l.substr(1))
-        .join("\n");
+        .join('\n');
       let n = hunk.lines
-        .filter(l => l[0] !== "-")
+        .filter(l => l[0] !== '-')
         .map(l => l.substr(1))
-        .join("\n");
+        .join('\n');
       return new ControlChange(lines, o, n);
     });
 
     // Clean and return the result
-    let result = new ControlChangeGroup("Code", changes);
+    let result = new ControlChangeGroup('Code', changes);
     result.clean();
     return result;
   }
@@ -149,13 +149,13 @@ export class ControlDelta {
 
     // Change in... ID? Theoretically possible!
     header_changes.push(
-      new ControlChange("Status", this.old.data.id, this.new.data.id)
+      new ControlChange('Status', this.old.data.id, this.new.data.id)
     );
 
     // Change in status, obviously.
     header_changes.push(
       new ControlChange(
-        "Status",
+        'Status',
         this.old.root.hdf.status,
         this.new.root.hdf.status
       )
@@ -164,7 +164,7 @@ export class ControlDelta {
     // And severity! Why not
     header_changes.push(
       new ControlChange(
-        "Severity",
+        'Severity',
         this.old.root.hdf.severity,
         this.new.root.hdf.severity
       )
@@ -173,14 +173,14 @@ export class ControlDelta {
     // Change in nist tags!
     header_changes.push(
       new ControlChange(
-        "NIST Tags",
-        this.old.root.hdf.raw_nist_tags.join(", "),
-        this.new.root.hdf.raw_nist_tags.join(", ")
+        'NIST Tags',
+        this.old.root.hdf.raw_nist_tags.join(', '),
+        this.new.root.hdf.raw_nist_tags.join(', ')
       )
     );
 
     // Make the group and clean it
-    let result = new ControlChangeGroup("Control Details", header_changes);
+    let result = new ControlChangeGroup('Control Details', header_changes);
     result.clean();
     return result;
   }
@@ -201,7 +201,7 @@ export class ControlDelta {
     // Pair them by position. Crude but hopefully fine
     // Abort if they aren't the same length
     if (old_segs.length !== new_segs.length) {
-      console.warn("Unable to match control segments for delta");
+      console.warn('Unable to match control segments for delta');
       return [];
     }
 
@@ -230,8 +230,8 @@ export class ControlDelta {
  * @param exec The execution to grab controls from
  */
 function extract_top_level_controls(
-  exec: ContextualizedExecution
-): ContextualizedControl[] {
+  exec: context.ContextualizedEvaluation
+): context.ContextualizedControl[] {
   // Get all controls
   let all_controls = exec.contains.flatMap(p => p.contains);
 
@@ -241,14 +241,14 @@ function extract_top_level_controls(
 }
 
 /** Matches ControlID keys to Arrays of Controls, sorted by time */
-type MatchedControls = { [key: string]: Array<ContextualizedControl> };
+type MatchedControls = {[key: string]: Array<context.ContextualizedControl>};
 
 /** Helps manage comparing change(s) between one or more profile executions */
 export class ComparisonContext {
   /** A list of old-new control pairings */
   pairings: MatchedControls;
 
-  constructor(executions: readonly ContextualizedExecution[]) {
+  constructor(executions: readonly context.ContextualizedEvaluation[]) {
     // Get all of the "top level" controls from each execution, IE those that actually ran
     let all_controls = executions.flatMap(extract_top_level_controls);
 
@@ -266,14 +266,19 @@ export class ComparisonContext {
 
       // Sort them by start time
       Object.values(matched).forEach(ctrl_list =>
-        ctrl_list.sort((a: ContextualizedControl, b: ContextualizedControl) => {
-          // TODO: Move this to a more stable, external library based solution
-          // TODO: Create a method for getting the start time of an execution, and instead do this sort on executions at the start
-          // Convert to dates, and
-          let a_date = new Date(a.root.hdf.start_time || 0);
-          let b_date = new Date(b.root.hdf.start_time || 0);
-          return a_date.valueOf() - b_date.valueOf();
-        })
+        ctrl_list.sort(
+          (
+            a: context.ContextualizedControl,
+            b: context.ContextualizedControl
+          ) => {
+            // TODO: Move this to a more stable, external library based solution
+            // TODO: Create a method for getting the start time of an execution, and instead do this sort on executions at the start
+            // Convert to dates, and
+            let a_date = new Date(a.root.hdf.start_time || 0);
+            let b_date = new Date(b.root.hdf.start_time || 0);
+            return a_date.valueOf() - b_date.valueOf();
+          }
+        )
       );
     });
 

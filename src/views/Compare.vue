@@ -37,20 +37,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import BaseView from "@/views/BaseView.vue";
-import Modal from "@/components/global/Modal.vue";
-import UploadNexus from "@/components/global/UploadNexus.vue";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import BaseView from '@/views/BaseView.vue';
+import Modal from '@/components/global/Modal.vue';
+import UploadNexus from '@/components/global/UploadNexus.vue';
 
-import CompareRow from "@/components/cards/comparison/CompareRow.vue";
+import CompareRow from '@/components/cards/comparison/CompareRow.vue';
 
-import { Filter } from "@/store/data_filters";
-import { ControlStatus, Severity } from "inspecjs";
-import { FileID } from "@/store/report_intake";
-import { ComparisonContext } from "../utilities/delta_util";
-import { getModule } from "vuex-module-decorators";
-import InspecDataModule, { ContextualizedControl } from "../store/data_store";
+import {Filter} from '@/store/data_filters';
+import {ControlStatus, Severity, context} from 'inspecjs';
+import {FileID} from '@/store/report_intake';
+import {ComparisonContext} from '../utilities/delta_util';
+import {getModule} from 'vuex-module-decorators';
+import InspecDataModule from '../store/data_store';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -78,7 +78,7 @@ export default class Compare extends Props {
   }
 
   /** Yields the control pairings in a more easily consumable list form */
-  get control_sets(): ContextualizedControl[][] {
+  get control_sets(): context.ContextualizedControl[][] {
     return Object.values(this.curr_delta.pairings);
   }
 }

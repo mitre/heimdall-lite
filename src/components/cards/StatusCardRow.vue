@@ -10,7 +10,7 @@
       <v-card height="100%" :color="card.color">
         <v-card-title>
           <v-icon large left>mdi-{{ card.icon }}</v-icon>
-          <span class="title">{{ card.title + ": " + card.number }}</span>
+          <span class="title">{{ card.title + ': ' + card.number }}</span>
         </v-card-title>
         <v-card-text v-text="card.subtitle" />
       </v-card>
@@ -43,11 +43,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { getModule } from "vuex-module-decorators";
-import StatusCountModule from "@/store/status_counts";
-import { Filter } from "../../store/data_filters";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {getModule} from 'vuex-module-decorators';
+import StatusCountModule from '@/store/status_counts';
+import {Filter} from '../../store/data_filters';
 
 interface CardProps {
   icon: string;
@@ -74,32 +74,44 @@ export default class StatusCardRow extends StatusCardRowProps {
     let filter = this.filter as Filter;
     return [
       {
-        icon: "check-circle",
-        title: "Passed",
-        subtitle: "All tests passed",
-        color: "statusPassed",
-        number: counts.passed(filter)
+        icon: 'check-circle',
+        title: 'Passed',
+        subtitle: `Has ${counts.countOf(
+          this.filter,
+          'PassedTests'
+        )} tests passed out of ${counts.countOf(this.filter, 'TotalTests')}`,
+        color: 'statusPassed',
+        number: counts.countOf(this.filter, 'Passed')
       },
       {
-        icon: "close-circle",
-        title: "Failed",
-        subtitle: "Has tests that failed",
-        color: "statusFailed",
-        number: counts.failed(filter)
+        icon: 'close-circle',
+        title: 'Failed',
+        subtitle: `Has ${counts.countOf(
+          this.filter,
+          'FailedTests'
+        )} of ${counts.countOf(this.filter, 'TotalTests')} tests that failed`,
+        color: 'statusFailed',
+        number: counts.countOf(this.filter, 'Failed')
       },
       {
-        icon: "minus-circle",
-        title: "Not Applicable",
-        subtitle: "System exception or absent component",
-        color: "statusNotApplicable",
-        number: counts.notApplicable(filter)
+        icon: 'minus-circle',
+        title: 'Not Applicable',
+        subtitle: `System exception or absent component (${counts.countOf(
+          this.filter,
+          'NotApplicableTests'
+        )} tests)`,
+        color: 'statusNotApplicable',
+        number: counts.countOf(this.filter, 'Not Applicable')
       },
       {
-        icon: "alert-circle",
-        title: "Not Reviewed",
-        subtitle: "Can only be tested manually at this time",
-        color: "statusNotReviewed",
-        number: counts.notReviewed(filter)
+        icon: 'alert-circle',
+        title: 'Not Reviewed',
+        subtitle: `Can only be tested manually at this time (${counts.countOf(
+          this.filter,
+          'NotReviewedTests'
+        )} tests)`,
+        color: 'statusNotReviewed',
+        number: counts.countOf(this.filter, 'Not Reviewed')
       }
     ];
   }
@@ -113,12 +125,14 @@ export default class StatusCardRow extends StatusCardRowProps {
       status: undefined
     };
     return {
-      icon: "alert-circle",
-      title: "Profile Errors",
-      subtitle:
-        "Errors running test - check profile run privileges or check with the author of profile",
-      color: "statusProfileError",
-      number: counts.profileError(filter)
+      icon: 'alert-circle',
+      title: 'Profile Errors',
+      subtitle: `Errors running test - check profile run privileges or check with the author of profile (${counts.countOf(
+        filter,
+        'ErroredTests'
+      )} tests)`,
+      color: 'statusProfileError',
+      number: counts.countOf(this.filter, 'Profile Error')
     };
   }
 }
