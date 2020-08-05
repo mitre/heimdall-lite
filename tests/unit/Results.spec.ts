@@ -62,8 +62,6 @@ let status_count = getModule(StatusCountModule, Store);
 loadSample('Acme Overlay');
 selectAllFiles();
 
-console.log(filter_store.selected_file_ids);
-
 describe('Profile Info', () => {
   it('shows correct number of files', () => {
     loadAll();

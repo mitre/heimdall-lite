@@ -139,7 +139,6 @@ export default class SampleList extends Props {
 
   /** Callback for our list item clicks */
   load_sample(sample: Sample) {
-    console.log(sample.sample);
     let intake_module = getModule(InspecIntakeModule, this.$store);
     let unique_id = next_free_file_ID();
     return intake_module

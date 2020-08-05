@@ -101,7 +101,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
   database_id: number | null = null;
 
   created() {
-    console.log('created');
     this.load_file();
   }
 
@@ -119,7 +118,6 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     if (!this.database_id) {
       this.show_tags = false;
       this.edit_tags = false;
-      console.log('No Tags');
     } else {
       this.show_tags = true;
     }
@@ -130,13 +128,9 @@ export default class EvaluationInfo extends EvaluationInfoProps {
     if (mod.serverMode == undefined) {
       mod.server_mode();
     }
-    console.log(
-      'mounted ID: ' + this.file_filter + ', DBID: ' + this.database_id
-    );
     if (!this.database_id) {
       this.show_tags = false;
       this.edit_tags = false;
-      console.log('No Tags');
     } else {
       this.show_tags = true;
     }

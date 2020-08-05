@@ -86,12 +86,10 @@ export default class FileItem extends FileItemProps {
   save_this_file(evt: Event) {
     evt.stopPropagation();
     evt.preventDefault();
-    console.log('save this file');
     let data_store = getModule(InspecDataModule, this.$store);
     let file = data_store.allFiles.find(
       f => f.unique_id === this.file.unique_id
     );
-    console.log('got file');
     if (file) {
       if (file.hasOwnProperty('execution')) {
         this.save_evaluation(file as EvaluationFile);

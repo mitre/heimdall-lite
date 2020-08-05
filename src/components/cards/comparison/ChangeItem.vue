@@ -51,7 +51,6 @@ export default class ChangeItem extends Props {
     ) {
       values.push(this.change.values[i]);
     }
-    console.log(values);
     return values;
   }
 }

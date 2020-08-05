@@ -177,7 +177,6 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
   tab_change(tab: string) {
     this.local_tab = tab;
     this.$emit('update:tab', tab);
-    console.log(tab);
   }
 
   get actual_tab(): string {
