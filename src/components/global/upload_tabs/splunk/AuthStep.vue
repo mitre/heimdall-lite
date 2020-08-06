@@ -83,20 +83,40 @@ export default class SplunkAuth extends Props {
     local_password.set(this.password);
     local_hostname.set(this.hostname);
 
-    // Check splunk
-    let s = new SplunkEndpoint(this.hostname, this.username, this.password);
+    if (this.isValidHttpUrl(this.hostname)) {
+      console.log('hostname ok');
+      // Check splunk
+      let s = new SplunkEndpoint(this.hostname, this.username, this.password);
 
-    this.logging_in = true;
-    s.check_auth()
-      .then(ok => {
-        // all goes well, proceed
-        this.$emit('authenticated', s);
-        this.logging_in = false;
-      })
-      .catch(err => {
-        this.logging_in = false;
-        this.$emit('error', err);
+      this.logging_in = true;
+      s.check_auth()
+        .then(ok => {
+          // all goes well, proceed
+          this.$emit('authenticated', s);
+          this.logging_in = false;
+        })
+        .catch(err => {
+          this.logging_in = false;
+          this.$emit('error', err);
+        });
+    } else {
+      console.log('hostname bad');
+      this.logging_in = false;
+      this.$toasted.global.error({
+        message: 'Invalid hostname',
+        isDark: this.$vuetify.theme.dark
       });
+    }
+  }
+
+  isValidHttpUrl(hostname: string): boolean {
+    console.log('Checking hostname: ' + hostname);
+    try {
+      let url = new URL(hostname);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (_) {
+      return false;
+    }
   }
 
   /** Form required field rules. Maybe eventually expand to other stuff */
