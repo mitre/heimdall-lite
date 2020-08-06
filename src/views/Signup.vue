@@ -80,7 +80,13 @@
                     v-model="role"
                     required
                   />
-                  <v-btn @click="register" depressed large color="primary">
+                  <v-btn
+                    id="register"
+                    @click="register"
+                    depressed
+                    large
+                    color="primary"
+                  >
                     Register
                   </v-btn>
                 </v-form>
