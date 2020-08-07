@@ -9,8 +9,8 @@ import {
   IHttpClient,
   WebResource,
   HttpOperationResponse
-} from "@azure/storage-blob";
-import { DefaultHttpClient } from "@azure/core-http";
+} from '@azure/storage-blob';
+import {DefaultHttpClient} from '@azure/core-http';
 
 /**
  * The x-ms-version for the default was giving an error. This http client
@@ -21,7 +21,7 @@ export class PatchedHTTPClient implements IHttpClient {
     httpRequest: WebResource
   ): Promise<HttpOperationResponse> {
     // patch request to remove bad x-ms-version - this was causing a bad parameter error
-    httpRequest.headers.remove("x-ms-version");
+    httpRequest.headers.remove('x-ms-version');
 
     // run request through default handler
     let defaultHttpClient = new DefaultHttpClient();
@@ -65,7 +65,7 @@ export function get_storage_client(
   account_suffix: string | null
 ): BlobServiceClient {
   let pipelineOptions = {
-    retryOptions: { maxTries: 4 }, // Retry options
+    retryOptions: {maxTries: 4}, // Retry options
     httpClient: new PatchedHTTPClient()
   };
   const pipeline = newPipeline(new AnonymousCredential(), pipelineOptions);
@@ -98,7 +98,7 @@ export function get_storage_client(
     return blobServiceClient;
     // parameters are not set correctly
   } else {
-    const blobServiceClient = new BlobServiceClient("", pipeline);
+    const blobServiceClient = new BlobServiceClient('', pipeline);
     return blobServiceClient;
   }
 }
@@ -224,7 +224,7 @@ export async function list_blobs_hierarchy(
   prefix: string | undefined
 ): Promise<(BlobPrefix | BlobItem)[]> {
   let blobs: (BlobPrefix | BlobItem)[] = [];
-  let iter = await container_client.listBlobsByHierarchy("/", {
+  let iter = await container_client.listBlobsByHierarchy('/', {
     prefix: prefix
   });
 
@@ -246,7 +246,7 @@ export async function list_blobs_flat(
   prefix: string
 ): Promise<BlobItem[]> {
   let blobs: BlobItem[] = [];
-  let iter = await container_client.listBlobsFlat({ prefix: prefix });
+  let iter = await container_client.listBlobsFlat({prefix: prefix});
 
   for await (const item of iter) {
     blobs.push(item);

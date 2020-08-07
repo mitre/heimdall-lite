@@ -36,10 +36,10 @@
 </template>
 
 <script lang="ts">
-import path from "path";
-import Vue from "vue";
-import Component from "vue-class-component";
-import { ContainerClient, BlobItem, BlobPrefix } from "@azure/storage-blob";
+import path from 'path';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {ContainerClient, BlobItem, BlobPrefix} from '@azure/storage-blob';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -65,7 +65,7 @@ export default class BlobList extends Props {
    *   "load-container-blobs" is emitted with the given prefix to load
    */
   load_container_blobs(prefix: string) {
-    this.$emit("load-container-blobs", prefix);
+    this.$emit('load-container-blobs', prefix);
   }
 
   /**
@@ -77,7 +77,7 @@ export default class BlobList extends Props {
    *   "add-item" is emitted with the given prefix to load
    */
   add_item(item: BlobItem | BlobPrefix) {
-    this.$emit("add-item", item);
+    this.$emit('add-item', item);
   }
 
   /**
@@ -87,7 +87,7 @@ export default class BlobList extends Props {
    *   "navigate-back-prefix" is emitted
    */
   navigate_back_prefix() {
-    this.$emit("navigate-back-prefix");
+    this.$emit('navigate-back-prefix');
   }
 
   /**

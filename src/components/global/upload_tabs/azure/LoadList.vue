@@ -39,10 +39,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import path from "path";
-import { BlobItem, BlobPrefix } from "@azure/storage-blob";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import path from 'path';
+import {BlobItem, BlobPrefix} from '@azure/storage-blob';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -65,7 +65,7 @@ export default class BlobList extends Props {
    *   "load-container-blobs" is emmitted with the prefix
    */
   load_container_blobs(prefix: string) {
-    this.$emit("load-container-blobs", prefix);
+    this.$emit('load-container-blobs', prefix);
   }
 
   /**
@@ -77,7 +77,7 @@ export default class BlobList extends Props {
    *   "remove-item" is emmitted with the blob item
    */
   remove_item(item: BlobItem | BlobPrefix) {
-    this.$emit("remove-item", item);
+    this.$emit('remove-item', item);
   }
 
   /**

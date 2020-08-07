@@ -72,8 +72,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import LinkItem from '@/components/global/sidebaritems/SidebarLink.vue';
-
 import {getModule} from 'vuex-module-decorators';
 import AppInfoModule from '@/store/app_info';
 

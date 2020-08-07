@@ -80,11 +80,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { LocalStorageVal } from "../../../../utilities/helper_util";
-import { get_blob_account_url } from "../../../../utilities/azure_util";
-import { Dictionary } from "vue-router/types/router";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {LocalStorageVal} from '../../../../utilities/helper_util';
+import {get_blob_account_url} from '../../../../utilities/azure_util';
+import {Dictionary} from 'vue-router/types/router';
 
 type MultipleSelectObject = {
   value: string;
@@ -94,7 +94,7 @@ type MultipleSelectObject = {
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
   props: {
-    auth_method: Object,
+    auth_method: String,
     account_name: String,
     connection_string: String,
     container_name: String,
@@ -105,20 +105,20 @@ const Props = Vue.extend({
 
 /** Localstorage keys */
 const local_auth_method = new LocalStorageVal<MultipleSelectObject>(
-  "azure_auth_method"
+  'azure_auth_method'
 );
-const local_account_name = new LocalStorageVal<string>("azure_account_name");
+const local_account_name = new LocalStorageVal<string>('azure_account_name');
 const local_connection_string = new LocalStorageVal<string>(
-  "azure_connection_string"
+  'azure_connection_string'
 );
 const local_container_name = new LocalStorageVal<string>(
-  "azure_container_name"
+  'azure_container_name'
 );
 const local_shared_access_signature = new LocalStorageVal<string>(
-  "azure_blob_shared_access_signature"
+  'azure_blob_shared_access_signature'
 );
 const local_account_suffix = new LocalStorageVal<string>(
-  "azure_blob_account_suffix"
+  'azure_blob_account_suffix'
 );
 
 /**
@@ -135,19 +135,19 @@ export default class AuthStepBasic extends Props {
   show_secret: boolean = false;
   auth_methods: Array<MultipleSelectObject> = [
     {
-      text: "SAS Token",
-      value: "sas"
+      text: 'Connection String',
+      value: 'conn_string'
     },
     {
-      text: "Connection String",
-      value: "conn_string"
+      text: 'SAS Token',
+      value: 'sas'
     }
   ];
   auth_method_model: MultipleSelectObject | null = null;
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
-    (v || "").trim().length > 0 || "Field is Required";
+    (v || '').trim().length > 0 || 'Field is Required';
 
   /**
    * Helper function to generate the full connection url from the storage account name, suffix, and SAS token
@@ -174,7 +174,7 @@ export default class AuthStepBasic extends Props {
   change_auth_method(new_value: MultipleSelectObject) {
     this.auth_method_model = new_value;
     local_auth_method.set(new_value);
-    this.$emit("update:auth_method", new_value.value);
+    this.$emit('update:auth_method', new_value.value);
   }
 
   /**
@@ -188,7 +188,7 @@ export default class AuthStepBasic extends Props {
    */
   change_account_suffix(new_value: string) {
     local_account_suffix.set(new_value);
-    this.$emit("update:account_suffix", new_value);
+    this.$emit('update:account_suffix', new_value);
   }
 
   /**
@@ -202,7 +202,7 @@ export default class AuthStepBasic extends Props {
    */
   change_account_name(new_value: string) {
     local_account_name.set(new_value);
-    this.$emit("update:account_name", new_value);
+    this.$emit('update:account_name', new_value);
   }
 
   /**
@@ -216,7 +216,7 @@ export default class AuthStepBasic extends Props {
    */
   change_connection_string(new_value: string) {
     local_connection_string.set(new_value);
-    this.$emit("update:connection_string", new_value);
+    this.$emit('update:connection_string', new_value);
   }
 
   /**
@@ -230,7 +230,7 @@ export default class AuthStepBasic extends Props {
    */
   change_container_name(new_value: string) {
     local_container_name.set(new_value);
-    this.$emit("update:container_name", new_value);
+    this.$emit('update:container_name', new_value);
   }
 
   /**
@@ -244,7 +244,7 @@ export default class AuthStepBasic extends Props {
    */
   change_shared_access_signature(new_value: string) {
     local_shared_access_signature.set(new_value);
-    this.$emit("update:shared_access_signature", new_value);
+    this.$emit('update:shared_access_signature', new_value);
   }
 
   /** On mount, try to look up stored auth info */
@@ -253,12 +253,12 @@ export default class AuthStepBasic extends Props {
     this.change_auth_method(
       local_auth_method.get_default(this.auth_methods[0])
     );
-    this.change_account_suffix(local_account_suffix.get_default(""));
-    this.change_account_name(local_account_name.get_default(""));
-    this.change_connection_string(local_connection_string.get_default(""));
-    this.change_container_name(local_container_name.get_default(""));
+    this.change_account_suffix(local_account_suffix.get_default(''));
+    this.change_account_name(local_account_name.get_default(''));
+    this.change_connection_string(local_connection_string.get_default(''));
+    this.change_container_name(local_container_name.get_default(''));
     this.change_shared_access_signature(
-      local_shared_access_signature.get_default("")
+      local_shared_access_signature.get_default('')
     );
   }
 }

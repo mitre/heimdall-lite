@@ -1,7 +1,19 @@
 <template>
   <v-stepper v-model="step" vertical>
     <v-stepper-step :complete="!!storage_client" step="1">
-      Account Credentials {{ step === 1 ? shown_error : "" }}
+      <div>
+        Account Credentials {{ step === 1 ? shown_error : '' }}
+        <AzureHelpModal>
+          <template v-slot:clickable="{on}">
+            <v-btn v-on="on" text small>
+              <v-icon small>mdi-help-circle</v-icon>
+              <span class="d-none d-sm-inline pl-3" style="padding-top: 1px;"
+                >Help</span
+              >
+            </v-btn>
+          </template>
+        </AzureHelpModal>
+      </div>
     </v-stepper-step>
 
     <AuthStepBasic
@@ -15,7 +27,7 @@
     />
 
     <v-stepper-step :complete="!!container_client" step="2">
-      Select Container {{ step === 2 ? shown_error : "" }}
+      Select Container {{ step === 2 ? shown_error : '' }}
     </v-stepper-step>
 
     <ContainerList
@@ -25,7 +37,7 @@
     />
 
     <v-stepper-step step="3">
-      Select Files {{ step === 3 ? shown_error : "" }}
+      Select Files {{ step === 3 ? shown_error : '' }}
     </v-stepper-step>
 
     <BlobList
@@ -46,32 +58,33 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import path from "path";
-import { getModule } from "vuex-module-decorators";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import path from 'path';
+import {getModule} from 'vuex-module-decorators';
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
-} from "@/store/report_intake";
+} from '@/store/report_intake';
 import {
   BlobServiceClient,
   ContainerClient,
   BlobItem,
   BlobPrefix,
   ContainerItem
-} from "@azure/storage-blob";
-import AuthStepBasic from "@/components/global/upload_tabs/azure/AuthStepBasic.vue";
-import BlobList from "@/components/global/upload_tabs/azure/BlobList.vue";
-import LoadList from "@/components/global/upload_tabs/azure/LoadList.vue";
-import ContainerList from "@/components/global/upload_tabs/azure/ContainerList.vue";
+} from '@azure/storage-blob';
+import AuthStepBasic from '@/components/global/upload_tabs/azure/AuthStepBasic.vue';
+import BlobList from '@/components/global/upload_tabs/azure/BlobList.vue';
+import LoadList from '@/components/global/upload_tabs/azure/LoadList.vue';
+import ContainerList from '@/components/global/upload_tabs/azure/ContainerList.vue';
 import {
   get_storage_client,
   get_container_client,
   list_blobs_hierarchy,
   list_blobs_flat,
   download_blob_file
-} from "../../../../utilities/azure_util";
+} from '../../../../utilities/azure_util';
+import AzureHelpModal from '@/components/global/upload_tabs/azure/AzureHelpModal.vue';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -85,7 +98,8 @@ const Props = Vue.extend({
     AuthStepBasic,
     BlobList,
     LoadList,
-    ContainerList
+    ContainerList,
+    AzureHelpModal
   }
 })
 export default class AzureReader extends Props {
@@ -106,28 +120,28 @@ export default class AzureReader extends Props {
   blobs_to_load: (BlobItem | BlobPrefix)[] = [];
 
   /** The prefix of the blobs to load for BlobList */
-  blob_prefix: string = "";
+  blob_prefix: string = '';
 
   /** A list of blob paths traversed. This is used by BlobList to go back. */
   prev_blob_prefixs: string[] = [];
 
   /** Form required field rules. Maybe eventually expand to other stuff */
   req_rule = (v: string | null | undefined) =>
-    (v || "").trim().length > 0 || "Field is Required";
+    (v || '').trim().length > 0 || 'Field is Required';
 
   /** State of all globally relevant fields */
-  auth_method: string = "";
-  connection_string: string = "";
-  account_name: string = "";
-  shared_access_signature: string = "";
-  account_suffix: string = "";
-  container_name: string = "";
+  auth_method: string = '';
+  connection_string: string = '';
+  account_name: string = '';
+  shared_access_signature: string = '';
+  account_suffix: string = '';
+  container_name: string = '';
 
   get shown_error(): string {
     if (this.error) {
       return ` - ${this.error}`;
     } else {
-      return "";
+      return '';
     }
   }
 
@@ -143,14 +157,14 @@ export default class AzureReader extends Props {
     this.error = null;
 
     try {
-      if (this.auth_method == "sas") {
+      if (this.auth_method == 'sas') {
         this.storage_client = get_storage_client(
           null,
           this.account_name,
           this.shared_access_signature,
           this.account_suffix
         );
-      } else if (this.auth_method == "conn_string") {
+      } else if (this.auth_method == 'conn_string') {
         this.storage_client = get_storage_client(
           this.connection_string,
           null,
@@ -158,14 +172,14 @@ export default class AzureReader extends Props {
           null
         );
       } else {
-        this.handle_error("Unknown auth method " + this.auth_method);
+        this.handle_error('Unknown auth method ' + this.auth_method);
       }
     } catch (error) {
       this.handle_error(error);
       return;
     }
 
-    if (this.container_name != "") {
+    if (this.container_name != '') {
       this.step = 3;
       this.load_container(this.container_name);
     } else {
@@ -204,7 +218,7 @@ export default class AzureReader extends Props {
    * @affects
    *   this.blobs is set to the list of blobs in the container
    */
-  async load_container_blobs(prefix: string = "") {
+  async load_container_blobs(prefix: string = '') {
     this.blobs = [];
 
     if (!this.container_client) {
@@ -309,7 +323,7 @@ export default class AzureReader extends Props {
    * @return {bool} A boolean stating if the object is a blob item or not (ie blob prefix)
    */
   instanceOfBlobItem(object: BlobItem | BlobPrefix): object is BlobItem {
-    return "properties" in object;
+    return 'properties' in object;
   }
 
   /**
@@ -326,7 +340,7 @@ export default class AzureReader extends Props {
     let files = [];
 
     try {
-      this.$emit("start-loading");
+      this.$emit('start-loading');
 
       for (let item of this.blobs_to_load) {
         // check if prefix or blob item
@@ -342,10 +356,10 @@ export default class AzureReader extends Props {
         }
       }
 
-      this.$emit("stop-loading");
-      this.$emit("got-files", files);
+      this.$emit('stop-loading');
+      this.$emit('got-files', files);
     } catch (error) {
-      this.$emit("stop-loading");
+      this.$emit('stop-loading');
       throw error;
     }
   }
@@ -358,7 +372,7 @@ export default class AzureReader extends Props {
    * @return {Promise<FileID | void>} The file id for the inspec file or void if no file is loaded.
    */
   async load_file(item: BlobItem): Promise<FileID | void> {
-    if (!this.container_client || path.extname(item.name) != ".json") {
+    if (!this.container_client || path.extname(item.name) != '.json') {
       return new Promise((res, rej) => res());
     }
 

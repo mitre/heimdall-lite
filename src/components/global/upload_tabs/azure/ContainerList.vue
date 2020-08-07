@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import {
   BlobServiceClient,
   ContainerItem,
   ContainerClient
-} from "@azure/storage-blob";
+} from '@azure/storage-blob';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -57,7 +57,7 @@ export default class ContainerList extends Props {
    *   "load-container" is emmitted with the value name
    */
   load_container(name: String) {
-    this.$emit("load-container", name);
+    this.$emit('load-container', name);
   }
 }
 </script>
