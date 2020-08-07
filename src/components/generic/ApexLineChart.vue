@@ -21,8 +21,18 @@ import ColorHackModule from '@/store/color_hack';
 // We declare the props separately to make props types inferable.
 const ApexLineChartProps = Vue.extend({
   props: {
-    categories: Array, // Should be of type string[]
-    series: Array, // Should be of type object[]
+    categories: {
+      type: Array,
+      validator: value => {
+        return value.every(element => typeof element === 'string');
+      }
+    }, // Should be of type string[]
+    series: {
+      type: Array,
+      validator: value => {
+        return value.every(element => typeof element === 'object');
+      }
+    }, // Should be of type object[]
     upper_range: Number, //upper bound of y axis
     sev_chart: Boolean, //identifies chart as severity chart
     title: String,
@@ -52,52 +62,18 @@ export interface SeriesItem {
 export default class ApexLineChart extends ApexLineChartProps {
   chart_id: string = `line_chart_${next_id}`;
 
-  get _categories(): string[] {
-    // Ensure it's an array
-    if (!(this.categories instanceof Array)) {
-      throw new Error('series must be an array of strings');
-    }
-
-    // Ensure all of its elements are numbers
-    this.categories.forEach(element => {
-      if (typeof element !== 'string') {
-        throw new Error(`Invalid series item ${element}`);
-      }
-    });
-
-    // We now know the type is definitely number[]
-    let final = this.categories as string[];
-
-    // If we have any non-zero data, just returngive 0.01 of all
-    return final;
-  }
-
   /**
    * Provide a type-checked accessor to our series property
    */
   get _series(): SeriesItem[] {
-    // Ensure it's an array
-    if (!(this.series instanceof Array)) {
-      throw new Error('series must be an array of objects');
-    }
-
-    // Ensure all of its elements are numbers
-    for (let element of this.series) {
-      if (typeof element !== 'object') {
-        throw new Error(`Invalid series item ${element}`);
-      }
-    }
-
-    // We now know the type is definitely number[]
     let final = this.series as SeriesItem[];
-
     // If we have any non-zero data, just returngive 0.01 of all
     return final;
   }
 
   get label_colors(): string[] {
     let colors = [];
-    for (let i = 0; i < this._categories.length; i++) {
+    for (let i = 0; i < this.categories.length; i++) {
       colors.push('#FFFFFF');
     }
     return colors;
@@ -171,7 +147,7 @@ export default class ApexLineChart extends ApexLineChartProps {
         }
       },
       xaxis: {
-        categories: this._categories,
+        categories: this.categories as string[],
         labels: {
           style: {
             colors: this.label_colors
