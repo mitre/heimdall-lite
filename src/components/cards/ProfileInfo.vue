@@ -9,7 +9,7 @@
         <b>Copyright Email:</b> {{ copyright_email }}<br />
         <b>Summary:</b> {{ summary }}<br />
         <b>Supports:</b>
-        <ul v-for="item in supports" v-bind:key="item">
+        <ul v-for="item in supports" v-bind:key="item.name">
           <li>
             <b>{{ item.name }}:</b> {{ item.value }}
           </li>
