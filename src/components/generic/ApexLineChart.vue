@@ -4,13 +4,13 @@
       type="line"
       height="350"
       :options="chartOptions"
-      :series="_series"
+      :series="series"
     ></vue-apex-charts>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, {PropType} from 'vue';
 import Component from 'vue-class-component';
 import VueApexCharts from 'vue-apexcharts';
 import {ApexOptions, exec} from 'apexcharts';
@@ -22,13 +22,13 @@ import ColorHackModule from '@/store/color_hack';
 const ApexLineChartProps = Vue.extend({
   props: {
     categories: {
-      type: Array,
+      type: Array as PropType<string[]>,
       validator: value => {
         return value.every(element => typeof element === 'string');
       }
     }, // Should be of type string[]
     series: {
-      type: Array,
+      type: Array as PropType<SeriesItem[]>,
       validator: value => {
         return value.every(element => typeof element === 'object');
       }
@@ -61,15 +61,6 @@ export interface SeriesItem {
 })
 export default class ApexLineChart extends ApexLineChartProps {
   chart_id: string = `line_chart_${next_id}`;
-
-  /**
-   * Provide a type-checked accessor to our series property
-   */
-  get _series(): SeriesItem[] {
-    let final = this.series as SeriesItem[];
-    // If we have any non-zero data, just returngive 0.01 of all
-    return final;
-  }
 
   get label_colors(): string[] {
     let colors = [];
@@ -147,7 +138,7 @@ export default class ApexLineChart extends ApexLineChartProps {
         }
       },
       xaxis: {
-        categories: this.categories as string[],
+        categories: this.categories,
         labels: {
           style: {
             colors: this.label_colors
