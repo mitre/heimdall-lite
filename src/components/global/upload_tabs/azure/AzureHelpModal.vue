@@ -42,9 +42,9 @@
         <hr />
         <br />
         <h2>
-          3. Navigate to CORS in the sidebar. Then set Allowed origin to
-          "Heimdall-lite.com", Allowed headers to *, and set Allowed methods to
-          GET,HEAD.
+          3. Navigate to CORS in the sidebar. Then set Allowed origin to your
+          host location, in our case 'Heimdall-lite.mitre.org', Allowed headers
+          to *, and set Allowed methods to GET,HEAD.
         </h2>
         <br />
         <v-img src="@/assets/CORS.png" />
