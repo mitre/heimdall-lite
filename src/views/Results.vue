@@ -20,7 +20,7 @@
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <UserMenu />
+      <span v-if="is_server_mode"><UserMenu /></span>
     </template>
 
     <!-- Custom sidebar content -->
@@ -36,8 +36,11 @@
         <!-- Evaluation Info -->
         <v-row>
           <v-col xs-12>
-            <v-card elevation="2">
+            <v-card v-if="is_evaluation" elevation="2">
               <EvaluationInfo :filter="file_filter" />
+            </v-card>
+            <v-card v-else elevation="2">
+              <ProfileInfo :filter="file_filter" />
             </v-card>
           </v-col>
         </v-row>
@@ -154,6 +157,7 @@ import ExportCaat from '@/components/global/ExportCaat.vue';
 import ExportNist from '@/components/global/ExportNist.vue';
 import ExportJson from '@/components/global/ExportJson.vue';
 import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
+import ProfileInfo from '@/components/cards/ProfileInfo.vue';
 
 import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
@@ -185,6 +189,7 @@ const ResultsProps = Vue.extend({
     ExportNist,
     ExportJson,
     EvaluationInfo,
+    ProfileInfo,
     UserMenu
   }
 })
@@ -229,6 +234,18 @@ export default class Results extends ResultsProps {
     let mod = getModule(ServerModule, this.$store);
     return mod.serverMode;
   }
+
+  get is_evaluation(): boolean {
+    if (this.file_filter !== null) {
+      let store = getModule(InspecDataModule, this.$store);
+      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+      if (file) {
+        return file.hasOwnProperty('execution');
+      }
+    }
+    return true;
+  }
+
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
