@@ -15,7 +15,7 @@ let filter_store = getModule(FilteredDataModule, Store);
 let data_store = getModule(InspecDataModule, Store);
 let status_count = getModule(StatusCountModule, Store);
 
-let results = read_files('tests/hdf_data/compare_data/');
+let results = read_files('src/assets/samples/');
 let raw = populate_hash(results);
 //let raw = populate_hash(results);
 let intake = getModule(ReportIntakeModule, Store);
