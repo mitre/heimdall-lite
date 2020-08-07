@@ -1,5 +1,5 @@
 <template>
-  <v-menu open-on-hover offset-y v-if="is_server_mode">
+  <v-menu open-on-hover offset-y>
     <template v-slot:activator="{on, attrs}">
       <v-btn class="mx-2" v-on="on">
         <v-icon>

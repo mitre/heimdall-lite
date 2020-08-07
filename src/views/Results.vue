@@ -24,7 +24,7 @@
         Clear
         <v-icon class="px-1">mdi-filter-remove</v-icon>
       </v-btn>
-      <UserMenu />
+      <span v-if="is_server_mode"><UserMenu /></span>
     </template>
 
     <!-- Custom sidebar content -->
@@ -47,11 +47,14 @@
                 class="mx-2"
                 v-slot:default="{active, toggle}"
               >
-                <v-card :width="info_width" @click="toggle">
+                <v-card v-if="is_evaluation" :width="info_width" @click="toggle">
                   <EvaluationInfo :file_filter="file" />
                   <v-card-subtitle style="text-align: right;">
                     Profile Info ↓
                   </v-card-subtitle>
+                </v-card>
+                <v-card v-else elevation="2">
+                  <ProfileInfo :filter="file_filter" />
                 </v-card>
               </v-slide-item>
             </v-slide-group>
@@ -67,11 +70,14 @@
             :key="i"
             :cols="12 / file_filter.length"
           >
-            <v-card @click="toggle_prof(i)">
+            <v-card v-if="is_evaluation" @click="toggle_prof(i)">
               <EvaluationInfo :file_filter="file" />
               <v-card-subtitle style="text-align: right;">
                 Profile Info ↓
               </v-card-subtitle>
+            </v-card>
+            <v-card v-else elevation="2">
+              <ProfileInfo :filter="file_filter" />
             </v-card>
           </v-col>
           <ProfData
@@ -197,6 +203,7 @@ import ExportCaat from '@/components/global/ExportCaat.vue';
 import ExportNist from '@/components/global/ExportNist.vue';
 import ExportJson from '@/components/global/ExportJson.vue';
 import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
+import ProfileInfo from '@/components/cards/ProfileInfo.vue';
 
 import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
@@ -231,6 +238,7 @@ const ResultsProps = Vue.extend({
     ExportJson,
     EvaluationInfo,
     ProfData,
+    ProfileInfo,
     UserMenu
   }
 })
@@ -270,6 +278,18 @@ export default class Results extends ResultsProps {
     let mod = getModule(ServerModule, this.$store);
     return mod.serverMode;
   }
+
+  get is_evaluation(): boolean {
+    if (this.file_filter !== null) {
+      let store = getModule(InspecDataModule, this.$store);
+      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+      if (file) {
+        return file.hasOwnProperty('execution');
+      }
+    }
+    return true;
+  }
+
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
