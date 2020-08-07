@@ -115,12 +115,9 @@ export default class Sidebar extends SidebarProps {
     let filtered_module = getModule(FilteredDataModule, this.$store);
     let data_module = getModule(InspecDataModule, this.$store);
 
-    if (
+    return (
       data_module.allFiles.length == filtered_module.selected_file_ids.length
-    ) {
-      return true;
-    }
-    return false;
+    );
   }
 
   /** Generates files for all */

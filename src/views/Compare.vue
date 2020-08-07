@@ -244,7 +244,6 @@ import ApexLineChart, {
 //@ts-ignore
 import resize from 'vue-resize-directive';
 import {get_eval_start_time} from '@/utilities/delta_util';
-import {ToggleButton} from 'vue-js-toggle-button';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -260,8 +259,7 @@ const Props = Vue.extend({
     CompareRow,
     ProfileRow,
     StatusChart,
-    ApexLineChart,
-    ToggleButton
+    ApexLineChart
   },
   directives: {
     resize

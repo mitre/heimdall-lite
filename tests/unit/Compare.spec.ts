@@ -206,7 +206,7 @@ describe('compare charts', () => {
   it('sev chart gets correct data with 2 files with overlayed profiles', () => {
     removeAllFiles();
     loadSample('Triple Overlay Example');
-    loadSample('Acme Overlay');
+    loadSample('Acme Overlay Example');
     selectAllFiles();
     //the values in expected are the correct data
     expect((wrapper.vm as any).sev_series).toEqual([
@@ -258,7 +258,7 @@ describe('compare charts', () => {
   it('compliance chart gets correct data with 2 files with overlayed profiles', () => {
     removeAllFiles();
     loadSample('Triple Overlay Example');
-    loadSample('Acme Overlay');
+    loadSample('Acme Overlay Example');
     selectAllFiles();
     expect((wrapper.vm as any).compliance_series[0].data).toEqual([
       fileCompliance(filter_store.selected_file_ids[0]),

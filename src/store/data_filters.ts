@@ -95,10 +95,9 @@ class FilteredDataModule extends VuexModule {
 
   @Mutation
   set_toggle_file_off(file: FileID): void {
-    for (let i = 0; i < this.selected_file_ids.length; i++) {
-      if (this.selected_file_ids[i] == file) {
-        this.selected_file_ids.splice(i, 1);
-      }
+    let checked = this.selected_file_ids.indexOf(file);
+    if (checked != -1) {
+      this.selected_file_ids.splice(checked, 1);
     }
   }
 

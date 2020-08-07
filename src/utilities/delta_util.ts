@@ -178,8 +178,7 @@ export function get_eval_start_time(
   for (let prof of ev.contains) {
     for (let ctrl of prof.contains) {
       if (ctrl.hdf.segments!.length) {
-        let t = ctrl.hdf.segments![0].start_time;
-        return t;
+        return ctrl.hdf.segments![0].start_time;
       }
     }
   }

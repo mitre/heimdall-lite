@@ -33,51 +33,55 @@ const Props = Vue.extend({
   props: {}
 });
 
+type FileData = {
+  name: string;
+  contents: string;
+};
+
 @Component({
   components: {
     LinkItem
   }
 })
 export default class ExportJSON extends Props {
-  //exports .zip of jsons if multiple are selected, if one is selected it will export that .json file
-  export_json() {
+  populate_files(): FileData[] {
     let filter_mod = getModule(FilteredDataModule, this.$store);
     let ids = filter_mod.selected_file_ids;
-    if (ids.length < 1) {
+    let fileData = new Array<FileData>();
+    for (let evaluation of filter_mod.evaluations(ids)) {
+      fileData.push({
+        name: this.cleanup_filename(evaluation.from_file.filename),
+        contents: JSON.stringify(evaluation.data)
+      });
+    }
+    for (let prof of filter_mod.profiles(ids)) {
+      if (isFromProfileFile(prof)) {
+        fileData.push({
+          name: prof.from_file.filename,
+          contents: JSON.stringify(prof.data)
+        });
+      }
+    }
+    return fileData;
+  }
+  //exports .zip of jsons if multiple are selected, if one is selected it will export that .json file
+  export_json() {
+    let files = this.populate_files();
+    if (files.length < 1) {
       return;
-    } else if (ids.length === 1) {
+    } else if (files.length === 1) {
       //will only ever loop once
-      for (let evaluation of filter_mod.evaluations(ids)) {
-        let blob = new Blob([JSON.stringify(evaluation.data)], {
+      for (let file of files) {
+        let blob = new Blob([file.contents], {
           type: 'application/json'
         });
-        saveAs(blob, evaluation.from_file.filename);
-      }
-      for (let prof of filter_mod.profiles(ids)) {
-        if (isFromProfileFile(prof)) {
-          let blob = new Blob([JSON.stringify(prof.data)], {
-            type: 'application/json'
-          });
-          saveAs(blob, prof.from_file.filename);
-        }
+        saveAs(blob, file.name);
       }
     } else {
       let zipfile = new ZipFile();
-      for (let evaluation of filter_mod.evaluations(ids)) {
-        let buffer = Buffer.from(JSON.stringify(evaluation.data));
-        zipfile.addBuffer(
-          buffer,
-          this.cleanup_filename(evaluation.from_file.filename)
-        );
-      }
-      for (let prof of filter_mod.profiles(ids)) {
-        if (isFromProfileFile(prof)) {
-          let buffer = Buffer.from(JSON.stringify(prof.data));
-          zipfile.addBuffer(
-            buffer,
-            this.cleanup_filename(prof.from_file.filename)
-          );
-        }
+      for (let file of files) {
+        let buffer = Buffer.from(file.contents);
+        zipfile.addBuffer(buffer, file.name);
       }
       //let zipfile.addBuffer(Buffer.from("hello"), "hello.txt");
       // call end() after all the files have been added

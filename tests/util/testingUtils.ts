@@ -5,16 +5,10 @@ import Store from '../../src/store/store';
 import ReportIntakeModule, {
   next_free_file_ID
 } from '../../src/store/report_intake';
-import DataStore from '../../src/store/data_store';
 import FilteredDataModule from '@/store/data_filters';
-import StatusCountModule, {StatusHash} from '@/store/status_counts';
+import StatusCountModule from '@/store/status_counts';
 import InspecDataModule from '@/store/data_store';
-import red_hat_bad from '../hdf_data/compare_data/red_hat_bad.json';
-import red_hat_good from '../hdf_data/compare_data/red_hat_good.json';
-import good_nginxresults from '../hdf_data/compare_data/good_nginxresults.json';
-import bad_nginx from '../hdf_data/compare_data/bad_nginx.json';
-import triple_overlay_profile from '../hdf_data/compare_data/triple_overlay_profile_example.json';
-import acme from '../hdf_data/compare_data/wrapper-acme-run.json';
+import {samples, Sample} from '@/utilities/sample_util';
 import {readFileSync} from 'fs';
 
 let filter_store = getModule(FilteredDataModule, Store);
@@ -27,41 +21,9 @@ let raw = populate_hash(results);
 let intake = getModule(ReportIntakeModule, Store);
 let id = 0;
 
-export interface Sample {
-  name: string;
-  sample: any;
-}
-
-export let testSamples = [
-  {
-    name: 'NGINX Clean Sample',
-    sample: good_nginxresults
-  },
-  {
-    name: 'NGINX With Failing Tests',
-    sample: bad_nginx
-  },
-  {
-    name: 'Red Hat With Failing Tests',
-    sample: red_hat_bad
-  },
-  {
-    name: 'Red Hat Clean Sample',
-    sample: red_hat_good
-  },
-  {
-    name: 'Triple Overlay Example',
-    sample: triple_overlay_profile
-  },
-  {
-    name: 'Acme Overlay',
-    sample: acme
-  }
-];
-
 export function loadSample(sampleName: string) {
   let sample: Sample = {name: '', sample: ''};
-  for (let samp of testSamples) {
+  for (let samp of samples) {
     if (samp.name == sampleName) {
       sample = samp;
     }

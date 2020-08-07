@@ -116,16 +116,10 @@ export default class ApexLineChart extends ApexLineChartProps {
 
   //gives apex charts the severity colors
   get sev_colors(): string[] {
-    let colors = [];
-    colors.push('#FFEB3B');
-    colors.push('#FF9800');
-    colors.push('#FF5722');
-    colors.push('#F44336');
-    return colors;
+    return new Array('#FFEB3B', '#FF9800', '#FF5722', '#F44336');
   }
 
   get line_colors(): string[] | undefined {
-    let colors = [];
     if (this.sev_chart) {
       return this.sev_colors;
     }

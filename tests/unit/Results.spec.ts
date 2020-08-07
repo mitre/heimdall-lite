@@ -59,7 +59,7 @@ let filter_store = getModule(FilteredDataModule, Store);
 let data_store = getModule(InspecDataModule, Store);
 let status_count = getModule(StatusCountModule, Store);
 
-loadSample('Acme Overlay');
+loadSample('Acme Overlay Example');
 selectAllFiles();
 
 describe('Profile Info', () => {
@@ -88,7 +88,7 @@ describe('Profile Info', () => {
 
   it('2 children', () => {
     removeAllFiles();
-    loadSample('Acme Overlay');
+    loadSample('Acme Overlay Example');
     selectAllFiles();
 
     profInfoWrapper = shallowMount(ProfData, {
