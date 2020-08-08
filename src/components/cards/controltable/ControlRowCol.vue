@@ -111,3 +111,9 @@ export default class ControlRowCol extends ControlRowColProps {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+button.unclickable-button {
+  pointer-events: none;
+}
+</style>
