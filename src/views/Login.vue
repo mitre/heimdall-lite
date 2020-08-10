@@ -6,12 +6,15 @@
           <v-col cols="12" sm="8" md="4">
             <v-card class="elevation-12">
               <v-toolbar color="primary" dark flat>
-                <v-toolbar-title>Login form</v-toolbar-title>
+                <v-toolbar-title id="login_form_title"
+                  >Login form</v-toolbar-title
+                >
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
-                <v-form name="login_form" ref="form">
+                <v-form id="login_form" name="login_form" ref="form">
                   <v-text-field
+                    id="login_field"
                     label="Login"
                     name="login"
                     prepend-icon="person"
@@ -20,7 +23,7 @@
                     required
                   />
                   <v-text-field
-                    id="password"
+                    id="password_field"
                     label="Password"
                     name="password"
                     prepend-icon="lock"
@@ -28,7 +31,7 @@
                     v-model="password"
                   />
                   <v-btn
-                    id="login"
+                    id="login_button"
                     @click="login"
                     depressed
                     large
@@ -41,7 +44,9 @@
               <v-card-actions>
                 <v-spacer />
                 <div class="my-2">
-                  <v-btn @click="signup" depressed small>Sign Up</v-btn>
+                  <v-btn id="sign_up_button" @click="signup" depressed small
+                    >Sign Up</v-btn
+                  >
                 </div>
               </v-card-actions>
             </v-card>
