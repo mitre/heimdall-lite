@@ -4,20 +4,13 @@
     <template #topbar-content>
       <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
         <span class="d-none d-md-inline pr-2">
-          Upload
+          Load
         </span>
         <v-icon>
           mdi-cloud-upload
         </v-icon>
       </v-btn>
-      <v-btn v-if="is_server_mode" @click="log_out" class="mx-2">
-        <span class="d-none d-md-inline pr-2">
-          Logout
-        </span>
-        <v-icon>
-          mdi-logout
-        </v-icon>
-      </v-btn>
+      <UserMenu />
     </template>
 
     <!-- The main content: cards, etc -->
@@ -151,6 +144,8 @@ import {getModule} from 'vuex-module-decorators';
 import InspecDataModule from '../store/data_store';
 import ServerModule from '@/store/server';
 import {UserProfile, Evaluation, Usergroup} from '@/types/models.ts';
+import UserMenu from '@/components/global/UserMenu.vue';
+
 export interface RetrieveHash {
   unique_id: number;
   eva: Evaluation;
@@ -173,7 +168,8 @@ const ProfileProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus
+    UploadNexus,
+    UserMenu
   }
 })
 export default class Profile extends ProfileProps {
@@ -362,6 +358,11 @@ export default class Profile extends ProfileProps {
           console.log('here2');
         });
     }
+  }
+
+  profile_page() {
+    this.dialog = false;
+    this.$router.push('/profile');
   }
 
   log_out() {
