@@ -1,7 +1,7 @@
 <template>
   <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="bar">
     <!-- The title and nav bar -->
-    <v-toolbar-title class="pr-2">
+    <v-toolbar-title id="toolbar_title" class="pr-2">
       <v-app-bar-nav-icon @click.stop="$emit('toggle-drawer')">
         <v-icon color="bar-visible">mdi-menu</v-icon>
       </v-app-bar-nav-icon>
