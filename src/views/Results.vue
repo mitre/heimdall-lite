@@ -35,12 +35,15 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
-          <v-col xs-12>
-            <v-card v-if="is_evaluation" elevation="2">
+          <v-col xs-12 v-if="current_file">
+            <v-card
+              v-if="current_file.hasOwnProperty('evaluation')"
+              elevation="2"
+            >
               <EvaluationInfo :filter="file_filter" />
             </v-card>
-            <v-card v-else elevation="2">
-              <ProfileInfo :filter="file_filter" />
+            <v-card v-if="current_file.hasOwnProperty('profile')" elevation="2">
+              <ProfileInfo :profile="current_file" />
             </v-card>
           </v-col>
         </v-row>
@@ -162,6 +165,7 @@ import ProfileInfo from '@/components/cards/ProfileInfo.vue';
 import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
 import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import {EvaluationFile, ProfileFile} from '@/store/report_intake';
 import {getModule} from 'vuex-module-decorators';
 import InspecDataModule from '../store/data_store';
 import {need_redirect_file} from '@/utilities/helper_util';
@@ -235,17 +239,16 @@ export default class Results extends ResultsProps {
     return mod.serverMode;
   }
 
-  get is_evaluation(): boolean {
+  get current_file(): EvaluationFile | ProfileFile | null {
     if (this.file_filter !== null) {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter);
       if (file) {
-        return file.hasOwnProperty('execution');
+        return file;
       }
     }
-    return true;
+    return null;
   }
-
   /**
    * The currently selected file, if one exists.
    * Controlled by router.

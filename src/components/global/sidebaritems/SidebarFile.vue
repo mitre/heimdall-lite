@@ -98,7 +98,7 @@ export default class FileItem extends FileItemProps {
 
   get icon(): string {
     if (this.file.profile !== undefined) {
-      return 'note';
+      return 'mdi-clipboard-text';
     } else {
       return 'mdi-google-analytics';
     }
