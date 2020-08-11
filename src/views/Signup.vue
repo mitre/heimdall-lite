@@ -25,7 +25,7 @@
                   <br />
                   <div>
                     <label
-                      for="input-140"
+                      for="password"
                       class="v-label theme--dark"
                       style="padding: 35px;"
                     >
