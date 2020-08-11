@@ -39,6 +39,7 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
+<<<<<<< HEAD
           <v-col v-if="file_filter.length > 3">
             <v-slide-group show-arrows v-model="eval_info">
               <v-slide-item
@@ -47,14 +48,14 @@
                 class="mx-2"
                 v-slot:default="{active, toggle}"
               >
-                <v-card v-if="is_evaluation" :width="info_width" @click="toggle">
+                <v-card v-if="file.hasOwnProperty('evaluation')" :width="info_width" @click="toggle">
                   <EvaluationInfo :file_filter="file" />
                   <v-card-subtitle style="text-align: right;">
                     Profile Info ↓
                   </v-card-subtitle>
                 </v-card>
                 <v-card v-else elevation="2">
-                  <ProfileInfo :filter="file_filter" />
+                  <ProfileInfo :profile="file" />
                 </v-card>
               </v-slide-item>
             </v-slide-group>
@@ -70,14 +71,14 @@
             :key="i"
             :cols="12 / file_filter.length"
           >
-            <v-card v-if="is_evaluation" @click="toggle_prof(i)">
+            <v-card v-if="file.hasOwnProperty('evaluation')" @click="toggle_prof(i)">
               <EvaluationInfo :file_filter="file" />
               <v-card-subtitle style="text-align: right;">
                 Profile Info ↓
               </v-card-subtitle>
             </v-card>
-            <v-card v-else elevation="2">
-              <ProfileInfo :filter="file_filter" />
+            <v-card v-if="file.hasOwnProperty('profile')" elevation="2">
+              <ProfileInfo :profile="file" />
             </v-card>
           </v-col>
           <ProfData
@@ -208,6 +209,7 @@ import ProfileInfo from '@/components/cards/ProfileInfo.vue';
 import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
 import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import {EvaluationFile, ProfileFile} from '@/store/report_intake';
 import {getModule} from 'vuex-module-decorators';
 import InspecDataModule from '../store/data_store';
 import {need_redirect_file} from '@/utilities/helper_util';
@@ -279,17 +281,16 @@ export default class Results extends ResultsProps {
     return mod.serverMode;
   }
 
-  get is_evaluation(): boolean {
+  get current_file(): EvaluationFile | ProfileFile | null {
     if (this.file_filter !== null) {
       let store = getModule(InspecDataModule, this.$store);
       let file = store.allFiles.find(f => f.unique_id === this.file_filter);
       if (file) {
-        return file.hasOwnProperty('execution');
+        return file;
       }
     }
-    return true;
+    return null;
   }
-
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
