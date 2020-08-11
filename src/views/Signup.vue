@@ -6,7 +6,9 @@
           <v-col cols="12" sm="8" md="4">
             <v-card class="elevation-12">
               <v-toolbar color="primary" dark flat>
-                <v-toolbar-title>Registration form</v-toolbar-title>
+                <v-toolbar-title id="registration_form_title"
+                  >Registration form</v-toolbar-title
+                >
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
@@ -14,6 +16,7 @@
                   <v-text-field
                     label="Email"
                     name="email"
+                    id="email_field"
                     prepend-icon="person"
                     type="text"
                     v-model="email"
@@ -96,7 +99,7 @@
 
                 <div class="my-2">
                   <router-link to="/login">
-                    <v-btn depressed small>Login</v-btn>
+                    <v-btn id="login_button" depressed small>Login</v-btn>
                   </router-link>
                 </div>
               </v-card-actions>
