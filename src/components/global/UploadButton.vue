@@ -44,8 +44,8 @@ const Props = Vue.extend({
   components: {}
 })
 export default class UploadButton extends Props {
-  fileRecords = [];
-  fileRecordsForUpload = [];
+  fileRecords = new Array();
+  fileRecordsForUpload = new Array();
 
   errorText = {
     type: 'Invalid file type. Only json allowed.'
@@ -64,7 +64,7 @@ export default class UploadButton extends Props {
   }
 
   uploadFiles() {
-    var fileToUpload = [];
+    var fileToUpload = new Array();
 
     for (var i = 0; i < this.fileRecordsForUpload.length; i++) {
       fileToUpload.push(this.fileRecordsForUpload[i].file);
@@ -88,6 +88,7 @@ export default class UploadButton extends Props {
   onBeforeDelete(fileRecord: any) {
     var i = this.fileRecordsForUpload.indexOf(fileRecord);
     if (confirm('Are you sure you want to delete?')) {
+      // @ts-ignore
       this.$refs.vueFileAgent.deleteFileRecord(fileRecord); // will trigger 'delete' event
       this.$nextTick(() => {
         this.isUploadable();
