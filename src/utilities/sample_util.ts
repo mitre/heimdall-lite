@@ -13,6 +13,8 @@ import red_hat_bad from '../assets/samples/red_hat_bad.json';
 import red_hat_good from '../assets/samples/red_hat_good.json';
 import triple_overlay_profile from '../assets/samples/triple_overlay_profile_example.json';
 import acme_overlay from '../assets/samples/wrapper-acme-run.json';
+import nginx_profile from '../assets/samples/nginx_profile.json';
+import ubuntu_overview from '../assets/samples/ubuntu-overview.json';
 
 export interface Sample {
   name: string;
@@ -79,5 +81,13 @@ export const samples: Sample[] = [
   {
     name: 'Acme Overlay Example',
     sample: acme_overlay
+  },
+  {
+    name: 'NGINX Profile',
+    sample: nginx_profile
+  },
+  {
+    name: 'Ubuntu Overview Profile',
+    sample: ubuntu_overview
   }
 ];

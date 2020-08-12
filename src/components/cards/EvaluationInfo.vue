@@ -56,7 +56,7 @@ import InspecDataModule from '@/store/data_store';
 import {getModule} from 'vuex-module-decorators';
 import ServerModule from '@/store/server';
 import FilteredDataModule, {Filter} from '../../store/data_filters';
-import {InspecFile, EvaluationFile} from '../../store/report_intake';
+import {InspecFile, EvaluationFile, FileID} from '../../store/report_intake';
 import {context} from 'inspecjs';
 import {plainToClass} from 'class-transformer';
 import {Evaluation, Tag, Tags} from '@/types/models.ts';

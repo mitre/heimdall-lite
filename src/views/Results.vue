@@ -39,7 +39,6 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
-<<<<<<< HEAD
           <v-col v-if="file_filter.length > 3">
             <v-slide-group show-arrows v-model="eval_info">
               <v-slide-item
@@ -48,14 +47,18 @@
                 class="mx-2"
                 v-slot:default="{active, toggle}"
               >
-                <v-card v-if="file.hasOwnProperty('evaluation')" :width="info_width" @click="toggle">
+                <v-card
+                  v-if="current_file(file).hasOwnProperty('evaluation')"
+                  :width="info_width"
+                  @click="toggle"
+                >
                   <EvaluationInfo :file_filter="file" />
                   <v-card-subtitle style="text-align: right;">
                     Profile Info ↓
                   </v-card-subtitle>
                 </v-card>
                 <v-card v-else elevation="2">
-                  <ProfileInfo :profile="file" />
+                  <ProfileInfo :file_filter="file" />
                 </v-card>
               </v-slide-item>
             </v-slide-group>
@@ -71,14 +74,20 @@
             :key="i"
             :cols="12 / file_filter.length"
           >
-            <v-card v-if="file.hasOwnProperty('evaluation')" @click="toggle_prof(i)">
+            <v-card
+              v-if="current_file(file).hasOwnProperty('evaluation')"
+              @click="toggle_prof(i)"
+            >
               <EvaluationInfo :file_filter="file" />
               <v-card-subtitle style="text-align: right;">
                 Profile Info ↓
               </v-card-subtitle>
             </v-card>
-            <v-card v-if="file.hasOwnProperty('profile')" elevation="2">
-              <ProfileInfo :profile="file" />
+            <v-card
+              v-if="current_file(file).hasOwnProperty('profile')"
+              elevation="2"
+            >
+              <ProfileInfo :file_filter="file" />
             </v-card>
           </v-col>
           <ProfData
@@ -281,16 +290,6 @@ export default class Results extends ResultsProps {
     return mod.serverMode;
   }
 
-  get current_file(): EvaluationFile | ProfileFile | null {
-    if (this.file_filter !== null) {
-      let store = getModule(InspecDataModule, this.$store);
-      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
-      if (file) {
-        return file;
-      }
-    }
-    return null;
-  }
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
@@ -307,6 +306,19 @@ export default class Results extends ResultsProps {
     return data;
   }
 
+  current_file(file_id: FileID): EvaluationFile | ProfileFile | null {
+    if (file_id !== null) {
+      let store = getModule(InspecDataModule, this.$store);
+      let file = store.allFiles.find(f => f.unique_id === file_id);
+      if (file) {
+        if (file.hasOwnProperty('profile')) {
+          return file as ProfileFile;
+        } else if (file.hasOwnProperty('evaluation')) {
+          return file as EvaluationFile;
+        } else return null;
+      } else return null;
+    } else return null;
+  }
   /**
    * The filter for charts. Contains all of our filter stuff
    */
