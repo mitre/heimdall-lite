@@ -2,12 +2,12 @@
   <v-card>
     <v-row class="pa-4" justify="space-between">
       <v-col cols="12">
-        <b>Name:</b> {{ profile.profile.data.name }}<br />
-        <b>Title:</b> {{ profile.profile.data.title }}<br />
-        <b>Maintainer:</b> {{ profile.profile.data.maintainer }}<br />
-        <b>Copyright:</b> {{ profile.profile.data.copyright }}<br />
-        <b>Copyright Email:</b> {{ profile.profile.data.copyright_email }}<br />
-        <b>Summary:</b> {{ profile.profile.data.summary }}<br />
+        <b>Name:</b> {{ profile_data.name }}<br />
+        <b>Title:</b> {{ profile_data.title }}<br />
+        <b>Maintainer:</b> {{ profile_data.maintainer }}<br />
+        <b>Copyright:</b> {{ profile_data.copyright }}<br />
+        <b>Copyright Email:</b> {{ profile_data.copyright_email }}<br />
+        <b>Summary:</b> {{ profile_data.summary }}<br />
         <b>Supports:</b>
         <ul v-for="item in supports" v-bind:key="item.name">
           <li>
@@ -15,8 +15,8 @@
           </li>
         </ul>
         <br />
-        <b>Version:</b> {{ profile.profile.data.version }}<br />
-        <b>SHA256:</b> {{ profile.profile.data.sha256 }}<br />
+        <b>Version:</b> {{ profile_data.version }}<br />
+        <b>SHA256:</b> {{ profile_data.sha256 }}<br />
       </v-col>
     </v-row>
   </v-card>
@@ -81,6 +81,13 @@ export default class ProfileInfo extends ProfileInfoProps {
         }
       }
     }
+  }
+
+  get profile_data(): any | null {
+    if (this.profile) {
+      return this.profile.profile.data;
+    }
+    return null;
   }
 }
 </script>

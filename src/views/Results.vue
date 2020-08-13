@@ -311,9 +311,10 @@ export default class Results extends ResultsProps {
           return file as ProfileFile;
         } else if (file.hasOwnProperty('evaluation')) {
           return file as EvaluationFile;
-        } else return null;
-      } else return null;
-    } else return null;
+        }
+      }
+    }
+    return null;
   }
   /**
    * The filter for charts. Contains all of our filter stuff
