@@ -3,6 +3,7 @@
     <VueFileAgent
       ref="vueFileAgent"
       :theme="'list'"
+      :compact="true"
       :multiple="true"
       :deletable="true"
       :meta="true"
@@ -87,13 +88,11 @@ export default class UploadButton extends Props {
 
   onBeforeDelete(fileRecord: any) {
     var i = this.fileRecordsForUpload.indexOf(fileRecord);
-    if (confirm('Are you sure you want to delete?')) {
-      // @ts-ignore
-      this.$refs.vueFileAgent.deleteFileRecord(fileRecord); // will trigger 'delete' event
-      this.$nextTick(() => {
-        this.isUploadable();
-      });
-    }
+    // @ts-ignore
+    this.$refs.vueFileAgent.deleteFileRecord(fileRecord); // will trigger 'delete' event
+    this.$nextTick(() => {
+      this.isUploadable();
+    });
   }
 
   fileDeleted(fileRecord: any) {
