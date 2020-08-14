@@ -2,23 +2,13 @@
   <div class="caption font-weight-medium">
     <VueFileAgent
       ref="vueFileAgent"
-      :theme="'list'"
-      :compact="true"
       :multiple="true"
-      :deletable="true"
-      :meta="true"
       :accept="'.json, application/json'"
-      :helpText="'Click to choose file(s) or drag and drop file(s)'"
       :errorText="errorText"
+      :helpText="'Choose files to upload'"
       @select="filesSelected($event)"
-      @beforedelete="onBeforeDelete($event)"
-      @delete="fileDeleted($event)"
       v-model="fileRecords"
     ></VueFileAgent>
-    <br />
-    <v-btn :disabled="disableUpload" @click="uploadFiles()">
-      Upload file(s)
-    </v-btn>
   </div>
 </template>
 
@@ -46,66 +36,32 @@ const Props = Vue.extend({
 })
 export default class UploadButton extends Props {
   fileRecords = new Array();
-  fileRecordsForUpload = new Array();
-
-  errorText = {
-    type: 'Invalid file type. Only json allowed.'
-  };
-
-  disableUpload = true;
-
-  isUploadable() {
-    if (!this.fileRecordsForUpload.length) {
-      this.disableUpload = true;
-    } else if (this.fileRecords.length == this.fileRecordsForUpload.length) {
-      this.disableUpload = false;
-    } else {
-      this.disableUpload = true;
-    }
-  }
-
-  uploadFiles() {
-    var fileToUpload = new Array();
-
-    for (var i = 0; i < this.fileRecordsForUpload.length; i++) {
-      fileToUpload.push(this.fileRecordsForUpload[i].file);
-    }
-    // Notify we got files
-    this.$emit('files-selected', fileToUpload);
-  }
 
   filesSelected(fileRecordsNewlySelected: any) {
     var validFileRecords = fileRecordsNewlySelected.filter(
       (fileRecord: any) => !fileRecord.error
     );
-    this.fileRecordsForUpload = this.fileRecordsForUpload.concat(
-      validFileRecords
-    );
-    this.$nextTick(() => {
-      this.isUploadable();
-    });
-  }
 
-  onBeforeDelete(fileRecord: any) {
-    var i = this.fileRecordsForUpload.indexOf(fileRecord);
-    // @ts-ignore
-    this.$refs.vueFileAgent.deleteFileRecord(fileRecord); // will trigger 'delete' event
-    this.$nextTick(() => {
-      this.isUploadable();
-    });
-  }
+    fileRecordsNewlySelected = new Array();
 
-  fileDeleted(fileRecord: any) {
-    var i = this.fileRecordsForUpload.indexOf(fileRecord);
-    if (i !== -1) {
-      this.fileRecordsForUpload.splice(i, 1);
+    if (this.fileRecords.length == validFileRecords.length) {
+      var fileToUpload = new Array();
+
+      for (var i = 0; i < this.fileRecords.length; i++) {
+        fileToUpload.push(this.fileRecords[i].file);
+      }
+      // Notify we got files
+      this.$emit('files-selected', fileToUpload);
+    } else {
+      this.fileRecords = new Array();
+      return this.$toasted.global.error({
+        message: String(
+          'One or more files provided is not in a support format.  Please ' +
+            'upload file(s) in a format supported by Heimdall Lite (i.e., JSON)'
+        ),
+        isDark: this.$vuetify.theme.dark
+      });
     }
   }
 }
 </script>
-
-<!-- style lang="scss" scoped>
-.theme-list .vue-file-agent .file-preview-wrapper .file-preview .file-delete{color:#777
-/* updated value to show the 'x' better. was #777 */;
-}
-</style -->
