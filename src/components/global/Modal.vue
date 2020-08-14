@@ -2,7 +2,6 @@
   <v-dialog
     :value="value"
     :persistent="persistent"
-    id="#modal"
     @click:outside="$emit('input', {target: false})"
     @keydown.esc="$emit('input', {target: false})"
     width="80%"

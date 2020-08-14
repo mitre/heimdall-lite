@@ -2,7 +2,7 @@
   <v-row no-gutters>
     <v-col cols="12" class="font-weight-bold">
       <v-card>
-        <v-tabs :value="actual_tab" @change="tab_change" fixed-tabs show-arrows>
+        <v-tabs>
           <v-tabs-slider></v-tabs-slider>
           <!-- Declare our tabs -->
           <v-tab href="#tab-test">
@@ -121,11 +121,6 @@ interface Detail {
 // We declare the props separately to make props types inferable.
 const ControlRowDetailsProps = Vue.extend({
   props: {
-    tab: {
-      type: String,
-      required: false,
-      default: null
-    },
     control: {
       type: Object, // Of type context.ContextualizedControl
       required: true
@@ -148,7 +143,6 @@ interface CollapsableElement extends Element {
 export default class ControlRowDetails extends ControlRowDetailsProps {
   clamped: boolean = false;
   expanded: boolean = false;
-  local_tab: string = 'tab-test';
 
   /** Typed getter aroun control prop */
   get _control(): context.ContextualizedControl {
@@ -171,19 +165,6 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
       return this._control.data.desc.trim();
     } else {
       return 'No description';
-    }
-  }
-
-  tab_change(tab: string) {
-    this.local_tab = tab;
-    this.$emit('update:tab', tab);
-  }
-
-  get actual_tab(): string {
-    if (this.tab === null) {
-      return this.local_tab;
-    } else {
-      return this.tab;
     }
   }
 
@@ -256,12 +237,8 @@ export default class ControlRowDetails extends ControlRowDetailsProps {
     ].filter(v => v.value); // Get rid of nulls
   }
 
-  //for zebra background
   zebra(ix: number): string {
-    if (ix % 2 == 0) {
-      return 'zebra-table';
-    }
-    return 'non-zebra-table';
+    return ix % 2 ? '' : 'zebra-table';
   }
 }
 </script>
@@ -287,24 +264,9 @@ pre {
 }
 .theme--dark .zebra-table {
   background-color: var(--v-secondary-lighten2);
-  max-width: 99.9%;
-  margin: auto;
 }
-
-.theme--dark .non-zebra-table {
-  max-width: 99.9%;
-  margin: auto;
-}
-
 .theme--light .zebra-table {
   background-color: var(--v-secondary-lighten1);
-  max-width: 99.9%;
-  margin: auto;
-}
-
-.theme--light .non-zebra-table {
-  max-width: 99.9%;
-  margin: auto;
 }
 /*
 .v-application code {

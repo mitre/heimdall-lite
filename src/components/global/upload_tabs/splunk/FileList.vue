@@ -43,19 +43,13 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {getModule} from 'vuex-module-decorators';
-import InspecIntakeModule, {
-  FileID,
-  next_free_file_ID,
-  EvaluationFile,
-  SourcedContextualizedEvaluation
-} from '@/store/report_intake';
+import {FileID, next_free_file_ID, EvaluationFile} from '@/store/report_intake';
 import {
   SplunkEndpoint,
   ExecutionMetaInfo,
   SplunkErrorCode
 } from '../../../../utilities/splunk_util';
 import InspecDataModule from '../../../../store/data_store';
-import {contextualizeEvaluation} from 'inspecjs/dist/context';
 
 const SEARCH_INTERVAL = 10000;
 
@@ -116,16 +110,9 @@ export default class FileList extends Props {
         let unique_id = next_free_file_ID();
         let file = {
           unique_id,
-          filename: `${event.filename} (Splunk)`
-          // execution: contextualized
+          filename: `${event.filename} (Splunk)`,
+          execution: exec
         } as EvaluationFile;
-        let contextualized: SourcedContextualizedEvaluation = {
-          ...contextualizeEvaluation(exec),
-          from_file: file
-        };
-        file.evaluation = contextualized;
-        Object.freeze(contextualized);
-
         getModule(InspecDataModule, this.$store).addExecution(file);
         this.$emit('got-files', [unique_id]);
       })

@@ -20,7 +20,7 @@ import UploadNexus from '@/components/global/UploadNexus.vue';
 import ServerModule from '@/store/server';
 import {getModule} from 'vuex-module-decorators';
 
-import FilteredDataModule, {Filter} from '@/store/data_filters';
+import {Filter} from '@/store/data_filters';
 import {FileID} from '@/store/report_intake';
 
 // We declare the props separately
@@ -95,12 +95,17 @@ export default class Landing extends LandingProps {
     // Close the dialog
     this.dialog = false;
 
-    //enable all uploaded files
-    let filter_module = getModule(FilteredDataModule, this.$store);
-    for (let i of ids) {
-      filter_module.set_toggle_file_on(i);
+    // If just one file, focus it
+    if (ids.length === 1) {
+      console.log('one file: ' + ids[0]);
+      this.$router.push(`/results/${ids[0]}`);
     }
-    this.$router.push(`/results`);
+
+    // If more than one, focus all.
+    // TODO: Provide support for focusing a subset of files
+    else if (ids.length > 1) {
+      this.$router.push(`/results/all`);
+    }
   }
 }
 </script>
