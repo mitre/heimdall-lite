@@ -1,12 +1,25 @@
 <template>
   <v-stepper v-model="step" vertical class="elevation-0">
     <v-stepper-step :complete="!!assumed_role" step="1">
-      Account Credentials
+      <div>
+        Account Credentials
+        <AWSHelpModal>
+          <template v-slot:clickable="{on}">
+            <v-btn v-on="on" text small>
+              <v-icon small>mdi-help-circle</v-icon>
+              <span class="d-none d-sm-inline pl-3" style="padding-top: 1px;"
+                >Help</span
+              >
+            </v-btn>
+          </template>
+        </AWSHelpModal>
+      </div>
     </v-stepper-step>
 
     <AuthStepBasic
       v-bind:access_token.sync="access_token"
       v-bind:secret_token.sync="secret_token"
+      v-bind:region.sync="region"
       @auth-basic="handle_basic"
       @goto-mfa="handle_goto_mfa"
     />
@@ -32,6 +45,7 @@
     <FileList
       :auth="assumed_role"
       :files="files"
+      :region="region"
       @exit-list="handle_cancel_mfa"
       @got-files="got_files"
       @load-bucket="load_bucket"
@@ -57,6 +71,7 @@ import {
   AUTH_DURATION
 } from '../../../../utilities/aws_util';
 import InspecIntakeModule, {FileID} from '@/store/report_intake';
+import AWSHelpModal from '@/components/global/upload_tabs/aws/AWSHelpModal.vue';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -77,7 +92,8 @@ const local_session_information = new LocalStorageVal<Auth | null>(
   components: {
     AuthStepBasic,
     AuthStepMFA,
-    FileList
+    FileList,
+    AWSHelpModal
   }
 })
 export default class S3Reader extends Props {
@@ -89,6 +105,7 @@ export default class S3Reader extends Props {
   /** State of all globally relevant fields */
   access_token: string = '';
   secret_token: string = '';
+  region: string = '';
   mfa_serial: string = '';
   mfa_token: string = '';
 
@@ -200,7 +217,10 @@ export default class S3Reader extends Props {
    * Basically just wraps fetch_files with error handling
    */
   async load_bucket(name: string) {
-    let s3 = new S3(this.assumed_role!.creds);
+    let s3 = new S3({
+      ...this.assumed_role!.creds,
+      region: this.region
+    });
     await s3
       .listObjectsV2({
         Bucket: name,

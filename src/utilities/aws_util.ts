@@ -35,7 +35,8 @@ export interface Auth {
 export async function fetch_s3_file(
   creds: AuthCreds,
   file_key: string,
-  bucket_name: string
+  bucket_name: string,
+  region: string
 ): Promise<string> {
   // Fetch it from s3, and promise to submit it to be loaded afterwards
   return new S3({...creds})
