@@ -11,14 +11,14 @@
         v-model="fileRecords"
       ></VueFileAgent>
     </div>
-    <div v-else>
+    <!-- div v-else>
       <v-progress-circular
         indeterminate
         color="red"
         :size="80"
         :width="20"
       ></v-progress-circular>
-    </div>
+    </div-->
   </div>
 </template>
 
@@ -48,16 +48,17 @@ export default class UploadButton extends Props {
   fileRecords = new Array();
   display = true;
 
+  updated() {
+    this.display = true;
+  }
+
   filesSelected(fileRecordsNewlySelected: any) {
-    this.$nextTick(() => {
-      this.display = false;
-    });
+    // ensures icons do not show up when files are added
+    this.display = false;
 
     var validFileRecords = fileRecordsNewlySelected.filter(
       (fileRecord: any) => !fileRecord.error
     );
-
-    fileRecordsNewlySelected = new Array();
 
     if (this.fileRecords.length == validFileRecords.length) {
       var fileToUpload = new Array();
@@ -66,14 +67,15 @@ export default class UploadButton extends Props {
         fileToUpload.push(this.fileRecords[i].file);
       }
 
-      //this.fileRecords = new Array();
+      // ensures upload image and text does not slide over when files are added
+      this.fileRecords = new Array();
       // Notify we got files
       this.$emit('files-selected', fileToUpload);
     } else {
+      // ensures icons do not show up and upload image and text does not slide
+      // over when files are added
       this.fileRecords = new Array();
-      this.$nextTick(() => {
-        this.display = true;
-      });
+
       return this.$toasted.global.error({
         message: String(
           'One or more files provided is not in a support format.  Please ' +
