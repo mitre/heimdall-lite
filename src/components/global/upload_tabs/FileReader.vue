@@ -23,7 +23,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col align="center">
+        <v-col align="center" cols="12">
           <UploadButton @files-selected="commit_files" />
         </v-col>
       </v-row>

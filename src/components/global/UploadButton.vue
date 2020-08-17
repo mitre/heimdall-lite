@@ -1,14 +1,24 @@
 <template>
   <div class="caption font-weight-medium">
-    <VueFileAgent
-      ref="vueFileAgent"
-      :multiple="true"
-      :accept="'.json, application/json'"
-      :errorText="errorText"
-      :helpText="'Choose files to upload'"
-      @select="filesSelected($event)"
-      v-model="fileRecords"
-    ></VueFileAgent>
+    <div v-if="display == true">
+      <VueFileAgent
+        ref="vueFileAgent"
+        :multiple="true"
+        :accept="'.json, application/json'"
+        :errorText="errorText"
+        :helpText="'Choose files to upload'"
+        @select="filesSelected($event)"
+        v-model="fileRecords"
+      ></VueFileAgent>
+    </div>
+    <div v-else>
+      <v-progress-circular
+        indeterminate
+        color="red"
+        :size="80"
+        :width="20"
+      ></v-progress-circular>
+    </div>
   </div>
 </template>
 
@@ -36,8 +46,13 @@ const Props = Vue.extend({
 })
 export default class UploadButton extends Props {
   fileRecords = new Array();
+  display = true;
 
   filesSelected(fileRecordsNewlySelected: any) {
+    this.$nextTick(() => {
+      this.display = false;
+    });
+
     var validFileRecords = fileRecordsNewlySelected.filter(
       (fileRecord: any) => !fileRecord.error
     );
@@ -50,10 +65,15 @@ export default class UploadButton extends Props {
       for (var i = 0; i < this.fileRecords.length; i++) {
         fileToUpload.push(this.fileRecords[i].file);
       }
+
+      //this.fileRecords = new Array();
       // Notify we got files
       this.$emit('files-selected', fileToUpload);
     } else {
       this.fileRecords = new Array();
+      this.$nextTick(() => {
+        this.display = true;
+      });
       return this.$toasted.global.error({
         message: String(
           'One or more files provided is not in a support format.  Please ' +
