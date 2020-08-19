@@ -23,18 +23,27 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-spacer />
-        <v-col align="center" cols="4">
-          <UploadButton @files-selected="commit_files" />
-        </v-col>
-        <v-col align="right" cols="4">
-          <a
-            href="https://mitre.github.io/heimdall-lite-1.0/"
-            target="_blank"
-            class="mr-2"
-          >
-            Looking for 1.0?
-          </a>
+        <v-col align="center" cols="12">
+          <div class="caption font-weight-medium">
+            <div v-if="!loading">
+              <VueFileAgent
+                ref="vueFileAgent"
+                :multiple="true"
+                :accept="'.json, application/json'"
+                :helpText="'Choose files to upload'"
+                @select="filesSelected($event)"
+                v-model="fileRecords"
+              />
+            </div>
+            <div v-else>
+              <v-progress-circular
+                indeterminate
+                color="#ff5600"
+                :size="80"
+                :width="20"
+              />
+            </div>
+          </div>
         </v-col>
       </v-row>
     </v-container>
@@ -45,12 +54,15 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {getModule} from 'vuex-module-decorators';
-import UploadButton from '@/components/global/UploadButton.vue';
 import InspecIntakeModule, {
   FileID,
   next_free_file_ID
 } from '@/store/report_intake';
 import AppInfoModule from '@/store/app_info';
+import vueFileAgent from 'vue-file-agent';
+import 'vue-file-agent/dist/vue-file-agent.css';
+
+Vue.use(vueFileAgent);
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
@@ -61,12 +73,17 @@ const Props = Vue.extend({
  * Uploads data to the store with unique IDs asynchronously as soon as data is entered.
  * Emits "got-files" with a list of the unique_ids of the loaded files.
  */
-@Component({
-  components: {
-    UploadButton
-  }
-})
+@Component({})
 export default class FileReader extends Props {
+  fileRecords = new Array();
+  loading = false;
+
+  filesSelected(fileRecordsNewlySelected: any) {
+    this.loading = true;
+    this.commit_files(this.fileRecords.map(record => record.file));
+    this.fileRecords = new Array();
+  }
+
   /** Callback for our file reader */
   commit_files(files: File[]) {
     let valid_ids: FileID[] = []; // Use this to track those that get successfully uploaded
@@ -95,9 +112,10 @@ export default class FileReader extends Props {
     // When they're all done, emit event.
     // To use promise.all we must make each promise explicitly allow rejection without breaking promise.all failfast
     let guaranteed_promises = upload_promises.map(p => p.catch(err => err));
-    Promise.all(guaranteed_promises).then(_ =>
-      this.$emit('got-files', valid_ids)
-    );
+    Promise.all(guaranteed_promises).then(_ => {
+      this.$emit('got-files', valid_ids);
+      this.loading = false;
+    });
   }
 
   get title_class(): string[] {
@@ -113,3 +131,9 @@ export default class FileReader extends Props {
   }
 }
 </script>
+
+<style>
+.file-preview-new::before {
+  background: transparent !important;
+}
+</style>
