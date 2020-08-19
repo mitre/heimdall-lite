@@ -444,11 +444,9 @@ export default class Results extends ResultsProps {
             .unique_id
         );
       } else {
-        ids.push((prof as SourcedContextualizedProfile).from_file.unique_id);
+        ids.push(prof.from_file.unique_id);
       }
     }
-    console.log(ids);
-    console.log(this.file_filter);
     return ids;
   }
 
