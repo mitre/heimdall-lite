@@ -121,10 +121,9 @@ export default class StatusCardRow extends StatusCardRowProps {
   }
 
   get errorProps(): CardProps | null {
-    let filter = this.filter as Filter;
     // Want to ignore existing status filter
-    filter = {
-      ...filter,
+    let filter = {
+      ...this.filter,
       status: undefined
     };
     return {

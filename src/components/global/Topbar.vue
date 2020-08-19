@@ -25,7 +25,7 @@
         mdi-cloud-upload
       </v-icon>
     </v-btn>
-    <v-btn v-if="serverMode" @click="logOut" class="mx-2" id="logout">
+    <v-btn v-if="serverMode" @click="logOut" id="logout">
       <span class="d-none d-md-inline pr-2">
         Logout
       </span>
@@ -58,6 +58,7 @@ import Component from 'vue-class-component';
 import {BackendModule} from '@/store/backend';
 import {FileID} from '@/store/report_intake';
 import UploadNexus from '@/components/global/UploadNexus.vue';
+import {FilteredDataModule} from '@/store/data_filters';
 
 // We declare the props separately to make props types inferable.
 const TopbarProps = Vue.extend({
@@ -90,17 +91,6 @@ export default class Topbar extends TopbarProps {
   on_got_files(ids: FileID[]) {
     // Close the dialog
     this.uploadModal = false;
-
-    // If just one file, focus it
-    if (ids.length === 1) {
-      this.$router.push(`/results/${ids[0]}`);
-    }
-
-    // If more than one, focus all.
-    // TODO: Provide support for focusing a subset of files
-    else if (ids.length > 1) {
-      this.$router.push(`/results/all`);
-    }
   }
 
   get serverMode() {

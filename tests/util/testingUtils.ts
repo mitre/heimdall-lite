@@ -12,6 +12,8 @@ import {readFileSync} from 'fs';
 
 let id = 0;
 
+export function createTestingVue() {}
+
 export function loadSample(sampleName: string) {
   let sample: Sample = {name: '', sample: ''};
   for (let samp of samples) {
@@ -71,12 +73,16 @@ export function fileCompliance(id: number) {
   return Math.round((100.0 * passed) / total);
 }
 
-export function expectedCount(status: string) {
-  let failed = 0;
-  let passed = 0;
-  let notReviewed = 0;
-  let notApplicable = 0;
-  let profileError = 0;
+export function expectedCount(
+  status: 'failed' | 'passed' | 'notReviewed' | 'notApplicable' | 'profileError'
+) {
+  let statuses = {
+    failed: 0,
+    passed: 0,
+    notReviewed: 0,
+    notApplicable: 0,
+    profileError: 0
+  };
 
   // For each, we will filter then count
   InspecDataModule.executionFiles.forEach(file => {
@@ -85,24 +91,12 @@ export function expectedCount(status: string) {
     let count_file_content = readFileSync(count_filename, 'utf-8');
     let counts: any = JSON.parse(count_file_content);
 
-    failed += counts.failed.total;
-    passed += counts.passed.total;
-    notReviewed += counts.skipped.total;
-    notApplicable += counts.no_impact.total;
-    profileError += counts.error.total;
+    statuses['failed'] += counts.failed.total;
+    statuses['passed'] += counts.passed.total;
+    statuses['notReviewed'] += counts.skipped.total;
+    statuses['notApplicable'] += counts.no_impact.total;
+    statuses['profileError'] += counts.error.total;
   });
 
-  if (status == 'failed') {
-    return failed;
-  } else if (status == 'passed') {
-    return passed;
-  } else if (status == 'notReviewed') {
-    return notReviewed;
-  } else if (status == 'notApplicable') {
-    return notApplicable;
-  } else if (status == 'profileError') {
-    return profileError;
-  } else {
-    return 0;
-  }
+  return statuses[status];
 }

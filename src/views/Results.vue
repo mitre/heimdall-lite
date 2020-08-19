@@ -11,7 +11,15 @@
         label="Search"
         v-model="search_term"
         clearable
+        class="mx-2"
       />
+
+      <v-btn @click="clear" :disabled="!can_clear">
+        <span class="d-none d-md-inline pr-2">
+          Clear
+        </span>
+        <v-icon>mdi-filter-remove</v-icon>
+      </v-btn>
     </template>
 
     <!-- Custom sidebar content -->
@@ -266,8 +274,7 @@ export default class Results extends ResultsProps {
 
   // Returns true if no files are uploaded
   get no_files(): boolean {
-    let data = InspecDataModule.allFiles.length === 0;
-    return data;
+    return InspecDataModule.allFiles.length === 0;
   }
 
   /**

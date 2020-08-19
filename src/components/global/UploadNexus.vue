@@ -56,12 +56,12 @@ import Component from 'vue-class-component';
 import {InspecIntakeModule, FileID} from '@/store/report_intake';
 import Modal from '@/components/global/Modal.vue';
 import FileReader from '@/components/global/upload_tabs/FileReader.vue';
-//import DatabaseReader from "@/components/global/upload_tabs/DatabaseReader.vue";
 import HelpFooter from '@/components/global/upload_tabs/HelpFooter.vue';
 import S3Reader from '@/components/global/upload_tabs/aws/S3Reader.vue';
 import SplunkReader from '@/components/global/upload_tabs/splunk/SplunkReader.vue';
 import SampleList from '@/components/global/upload_tabs/SampleList.vue';
 import {LocalStorageVal} from '@/utilities/helper_util';
+import {FilteredDataModule} from '@/store/data_filters';
 
 const local_tab = new LocalStorageVal<string>('nexus_curr_tab');
 
@@ -100,6 +100,10 @@ export default class UploadNexus extends Props {
   // Event passthrough
   got_files(files: FileID[]) {
     this.$emit('got-files', files);
+
+    for (let f of files) {
+      FilteredDataModule.set_toggle_file_on(f);
+    }
   }
 }
 </script>

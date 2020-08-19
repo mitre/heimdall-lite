@@ -3,6 +3,7 @@
     <v-row>
       <v-col center xl="8" md="8" sm="12" xs="12">
         <UploadNexus
+          v-if="!serverMode"
           :value="true"
           @got-files="on_got_files"
           :persistent="true"
@@ -39,19 +40,19 @@ export default class Landing extends LandingProps {
    */
   mounted() {
     // Redirect logged in users in server mode to the profile page instead of the landing page
-    if (BackendModule.serverMode && !!BackendModule.token) {
-      this.$router.push('/profile');
+    if (this.serverMode) {
+      this.$router.replace('/profile');
     }
+  }
+
+  get serverMode() {
+    return BackendModule.serverMode;
   }
 
   /**
    * Invoked when file(s) are loaded.
    */
   on_got_files(ids: FileID[]) {
-    //enable all uploaded files
-    for (let i of ids) {
-      FilteredDataModule.set_toggle_file_on(i);
-    }
     this.$router.push(`/results`);
   }
 }

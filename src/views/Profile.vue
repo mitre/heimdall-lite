@@ -1,5 +1,5 @@
 <template>
-  <BaseView :title="curr_title">
+  <BaseView title="Profile">
     <template #topbar-content />
 
     <!-- The main content: cards, etc -->
@@ -10,10 +10,10 @@
         <v-card>
           <v-row class="pa-4" justify="space-between">
             <v-col cols="5">
-              <b>Name:</b> {{ user.first_name }} {{ user.last_name }}<br />
-              <b>Email:</b> {{ user.email }}<br />
-              <b>Created:</b> {{ user.created_at }}<br />
-              <b>Updated:</b> {{ user.updated_at }}<br />
+              <p><b>Name:</b> {{ user.first_name }} {{ user.last_name }}</p>
+              <p><b>Email:</b> {{ user.email }}</p>
+              <p><b>Created:</b> {{ user.created_at }}</p>
+              <p><b>Updated:</b> {{ user.updated_at }}</p>
             </v-col>
             <v-divider vertical></v-divider>
             <v-col v-if="show_groups" class="text-center">
@@ -52,10 +52,9 @@
         <v-row>
           <v-col xs-12>
             <v-card class="elevation-0">
-              <v-card-subtitle
-                >Easily load any supported Heimdall Data Format
-                file</v-card-subtitle
-              >
+              <v-card-subtitle>
+                Easily load any supported Heimdall Data Format file
+              </v-card-subtitle>
               <v-container>
                 <v-data-table
                   dense
@@ -153,15 +152,12 @@ const ProfileProps = Vue.extend({
   }
 })
 export default class Profile extends ProfileProps {
-  dialog: boolean = false;
-  is_server_mode: boolean = true;
   show_groups: boolean = true;
   edit_groups: boolean = false;
   user_id: number | null = null;
   group_name: string | null = null;
   selected: number[] | null = null;
   selected_group: number | null = null;
-  curr_title: string = 'Profile';
 
   get headers(): Object[] {
     return [

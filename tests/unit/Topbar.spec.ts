@@ -5,7 +5,7 @@ import Vuetify from 'vuetify';
 import {BackendModule} from '@/store/backend';
 
 jest.mock('@/store/backend');
-const BackendModSub = sinon.stub(BackendModule);
+const BackendModStub = sinon.stub(BackendModule);
 
 describe('Logout button', () => {
   const vuetify = new Vuetify();
@@ -15,7 +15,7 @@ describe('Logout button', () => {
   });
 
   it('Hides the Logout button when the application is not in Server Mode', () => {
-    BackendModSub.serverMode = false;
+    BackendModStub.serverMode = false;
     // Mounting the component has to happen after setting up the serverMode
     const wrapper = shallowMount(Topbar, {vuetify});
 
@@ -23,7 +23,7 @@ describe('Logout button', () => {
   });
 
   it('Displays a Logout button when the application is in Server Mode', () => {
-    BackendModSub.serverMode = true;
+    BackendModStub.serverMode = true;
     // Mounting the component has to happen after setting up the serverMode
     const wrapper = shallowMount(Topbar, {vuetify});
 

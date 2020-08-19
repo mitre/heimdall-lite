@@ -57,7 +57,6 @@ describe('Compare table data', () => {
     (wrapper.vm as any).search_term = 'failed';
     expect((wrapper.vm as any).show_sets.length).toBe(0);
   });
-  (wrapper.vm as any).search_term = '';
 
   it('search id works', () => {
     (wrapper.vm as any).checkbox = false;
@@ -209,21 +208,6 @@ describe('compare charts', () => {
     ]);
   });
 
-  it('sev chart gets correct data with all test files', () => {
-    removeAllFiles();
-    loadAll();
-    selectAllFiles();
-    let sevFail = 0;
-    let exec_files = InspecDataModule.executionFiles;
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < exec_files.length; j++) {
-        sevFail += (wrapper.vm as any).sev_series[i][j];
-      }
-    }
-
-    expect(sevFail).toBe(expectedCount('failed'));
-  });
-
   it('compliance chart gets correct data with 2 files', () => {
     removeAllFiles();
     loadSample('NGINX With Failing Tests');
@@ -255,27 +239,5 @@ describe('compare charts', () => {
       fileCompliance(FilteredDataModule.selected_file_ids[0]),
       fileCompliance(FilteredDataModule.selected_file_ids[1])
     ]);
-  });
-
-  it('compliance chart gets correct data with all test files', () => {
-    removeAllFiles();
-    loadAll();
-    selectAllFiles();
-    let expected = [];
-    for (let id of FilteredDataModule.selected_file_ids) {
-      expected.push(fileCompliance(id));
-    }
-    expect((wrapper.vm as any).compliance_series[0].data.sort()).toEqual(
-      expected.sort()
-    );
-  });
-
-  it('displays correct number of donuts', () => {
-    removeAllFiles();
-    loadAll();
-    selectAllFiles();
-    expect((wrapper.vm as any).files.length).toBe(
-      InspecDataModule.allFiles.length
-    );
   });
 });

@@ -6,8 +6,7 @@
     <v-container>
       <v-row>
         <v-col cols="12" align="center">
-          <!-- Use inline style to emulate v-img props -->
-          <img
+          <v-img
             src="@/assets/logo-orange-tsp.svg"
             svg-inline
             style="max-width: 164px; max-height: 164px;"

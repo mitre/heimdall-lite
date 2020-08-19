@@ -197,9 +197,6 @@
         </v-card>
       </v-container>
     </template>
-
-    <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
   </BaseView>
 </template>
 
@@ -208,7 +205,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
 import Modal from '@/components/global/Modal.vue';
-import UploadNexus from '@/components/global/UploadNexus.vue';
 import CompareRow from '@/components/cards/comparison/CompareRow.vue';
 
 import {FilteredDataModule, Filter} from '@/store/data_filters';
@@ -244,7 +240,6 @@ const Props = Vue.extend({
   components: {
     BaseView,
     Modal,
-    UploadNexus,
     CompareRow,
     ProfileRow,
     StatusChart,
@@ -283,8 +278,6 @@ export default class Compare extends Props {
     }
   ];
 
-  /** Whether or not the model is showing */
-  dialog: boolean = false;
   checkbox: boolean = true;
   expanded_view: boolean = true;
   tab: number = 0;
@@ -567,21 +560,11 @@ export default class Compare extends Props {
   }
 
   scroll_left() {
-    this.start_index += -1;
+    this.start_index -= 1;
   }
 
   scroll_right() {
     this.start_index += 1;
-  }
-
-  on_got_files(ids: FileID[]) {
-    // Close the dialog
-    this.dialog = false;
-
-    //enable all uploaded files
-    for (let i of ids) {
-      FilteredDataModule.set_toggle_file_on(i);
-    }
   }
 
   changeTab(x: number) {
