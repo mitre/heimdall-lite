@@ -11,6 +11,7 @@
         label="Search"
         v-model="search_term"
         clearable
+        @click:clear="clear()"
         class="mx-2"
       />
 
