@@ -6,9 +6,9 @@
           <v-col cols="12" sm="8" md="4">
             <v-card class="elevation-12">
               <v-toolbar color="primary" dark flat>
-                <v-toolbar-title id="login_form_title"
-                  >Login form</v-toolbar-title
-                >
+                <v-toolbar-title id="login_form_title">
+                  Login form
+                </v-toolbar-title>
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
@@ -44,9 +44,9 @@
               <v-card-actions>
                 <v-spacer />
                 <div class="my-2">
-                  <v-btn id="sign_up_button" @click="signup" depressed small
-                    >Sign Up</v-btn
-                  >
+                  <v-btn id="sign_up_button" @click="signup" depressed small>
+                    Sign Up
+                  </v-btn>
                 </div>
               </v-card-actions>
             </v-card>

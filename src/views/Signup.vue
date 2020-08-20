@@ -6,9 +6,9 @@
           <v-col cols="12" sm="8" md="4">
             <v-card class="elevation-12">
               <v-toolbar color="primary" dark flat>
-                <v-toolbar-title id="registration_form_title"
-                  >Registration form</v-toolbar-title
-                >
+                <v-toolbar-title id="registration_form_title">
+                  Registration form
+                </v-toolbar-title>
                 <v-spacer />
               </v-toolbar>
               <v-card-text>
