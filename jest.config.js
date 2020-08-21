@@ -8,10 +8,12 @@ module.exports = {
   cacheDirectory: '<rootDir>/.cache/unit',
   transform: {
     '.*\\.(vue)$': 'vue-jest',
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.svg$': '<rootDir>/tests/util/svgTransform.js'
   },
   moduleDirectories: ['node_modules', 'src'],
   moduleNameMapper: {
-    '^@[/](.+)': '<rootDir>/src/$1'
+    '^@[/](.+)': '<rootDir>/src/$1',
+    '^.+\\.(css)$': '<rootDir>/tests/util/cssTransform.js'
   }
 };

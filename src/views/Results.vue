@@ -11,16 +11,15 @@
         label="Search"
         v-model="search_term"
         clearable
-      ></v-text-field>
-      <v-btn @click="dialog = true" :disabled="dialog" class="mx-2">
+        class="mx-2"
+      />
+
+      <v-btn @click="clear" :disabled="!can_clear">
         <span class="d-none d-md-inline pr-2">
-          Upload
+          Clear
         </span>
-        <v-icon>
-          mdi-cloud-upload
-        </v-icon>
+        <v-icon>mdi-filter-remove</v-icon>
       </v-btn>
-      <UserMenu />
     </template>
 
     <!-- Custom sidebar content -->
@@ -35,11 +34,50 @@
       <v-container fluid grid-list-md pa-2>
         <!-- Evaluation Info -->
         <v-row>
-          <v-col xs-12>
-            <v-card elevation="2">
-              <EvaluationInfo :filter="file_filter" />
+          <v-col v-if="file_filter.length > 3">
+            <v-slide-group show-arrows v-model="eval_info">
+              <v-slide-item
+                v-for="(file, i) in file_filter"
+                :key="i"
+                class="mx-2"
+                v-slot:default="{active, toggle}"
+              >
+                <v-card :width="info_width" @click="toggle">
+                  <EvaluationInfo :file_filter="file" />
+                  <v-card-subtitle style="text-align: right;">
+                    Profile Info ↓
+                  </v-card-subtitle>
+                </v-card>
+              </v-slide-item>
+            </v-slide-group>
+            <ProfData
+              class="my-4 mx-10"
+              v-if="eval_info != null"
+              :selected_prof="
+                root_profiles[prof_ids.indexOf(file_filter[eval_info])]
+              "
+            ></ProfData>
+          </v-col>
+          <v-col
+            v-else
+            v-for="(file, i) in file_filter"
+            :key="i"
+            :cols="12 / file_filter.length"
+          >
+            <v-card @click="toggle_prof(i)">
+              <EvaluationInfo :file_filter="file" />
+              <v-card-subtitle style="text-align: right;">
+                Profile Info ↓
+              </v-card-subtitle>
             </v-card>
           </v-col>
+          <ProfData
+            class="my-4 mx-10"
+            v-if="eval_info != null && file_filter.length <= 3"
+            :selected_prof="
+              root_profiles[prof_ids.indexOf(file_filter[eval_info])]
+            "
+          ></ProfData>
         </v-row>
         <!-- Count Cards -->
         <StatusCardRow
@@ -82,13 +120,6 @@
           </v-col>
         </v-row>
 
-        <!-- Profile information -->
-        <v-row>
-          <v-col xs-12>
-            <ProfileData :filter="all_filter" />
-          </v-col>
-        </v-row>
-
         <!-- TreeMap and Partition Map -->
         <v-row>
           <v-col xs-12>
@@ -117,22 +148,30 @@
       </v-container>
     </template>
 
-    <!-- File select modal -->
-    <UploadNexus v-model="dialog" @got-files="on_got_files" />
-
     <!-- Everything-is-filtered snackbar -->
     <v-snackbar
       style="margin-top: 44px;"
       v-model="filter_snackbar"
-      :timeout="10000"
+      :timeout="0"
       color="warning"
       top
     >
-      <span class="subtitle-2"
-        >All results are filtered out. Use the
+      <span class="subtitle-2" v-if="file_filter.length">
+        All results are filtered out. Use the
         <v-icon>mdi-filter-remove</v-icon> button in the top right to clear
-        filters and show all.</span
-      >
+        filters and show all.
+      </span>
+      <span class="subtitle-2" v-else-if="no_files">
+        No files are currently loaded. Press the <strong>LOAD</strong>
+        <v-icon class="mx-1"> mdi-cloud-upload</v-icon> button above to load
+        some.
+      </span>
+      <span class="subtitle-2" v-else>
+        No files are currently enabled for viewing. Open the
+        <v-icon class="mx-1">mdi-menu</v-icon> sidebar menu, and ensure that the
+        file(s) you wish to view have are
+        <v-icon class="mx-1">mdi-checkbox-marked</v-icon> checked.
+      </span>
     </v-snackbar>
   </BaseView>
 </template>
@@ -141,7 +180,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import BaseView from '@/views/BaseView.vue';
-import UploadNexus from '@/components/global/UploadNexus.vue';
 
 import StatusCardRow from '@/components/cards/StatusCardRow.vue';
 import ControlTable from '@/components/cards/controltable/ControlTable.vue';
@@ -155,14 +193,21 @@ import ExportNist from '@/components/global/ExportNist.vue';
 import ExportJson from '@/components/global/ExportJson.vue';
 import EvaluationInfo from '@/components/cards/EvaluationInfo.vue';
 
-import FilteredDataModule, {Filter, TreeMapState} from '@/store/data_filters';
+import {FilteredDataModule, Filter, TreeMapState} from '@/store/data_filters';
 import {ControlStatus, Severity} from 'inspecjs';
-import InspecIntakeModule, {FileID} from '@/store/report_intake';
-import {getModule} from 'vuex-module-decorators';
-import InspecDataModule from '../store/data_store';
+import {
+  InspecIntakeModule,
+  FileID,
+  SourcedContextualizedEvaluation,
+  SourcedContextualizedProfile
+} from '@/store/report_intake';
+import {InspecDataModule, isFromProfileFile} from '@/store/data_store';
 import {need_redirect_file} from '@/utilities/helper_util';
-import ServerModule from '@/store/server';
+import ProfData from '@/components/cards/ProfData.vue';
+import {context} from 'inspecjs';
+import {profile_unique_key} from '../utilities/format_util';
 import UserMenu from '@/components/global/UserMenu.vue';
+import {BackendModule} from '@/store/backend';
 
 // We declare the props separately
 // to make props types inferrable.
@@ -173,18 +218,17 @@ const ResultsProps = Vue.extend({
 @Component({
   components: {
     BaseView,
-    UploadNexus,
     StatusCardRow,
     Treemap,
     ControlTable,
     StatusChart,
     SeverityChart,
     ComplianceChart,
-    ProfileData,
     ExportCaat,
     ExportNist,
     ExportJson,
     EvaluationInfo,
+    ProfData,
     UserMenu
   }
 })
@@ -218,49 +262,19 @@ export default class Results extends ResultsProps {
   /** Model for if all-filtered snackbar should be showing */
   filter_snackbar: boolean = false;
 
-  /* This is supposed to cause the dialog to automatically appear if there is
-   * no file uploaded
-   */
-  mounted() {
-    if (this.file_filter) this.dialog = false;
-  }
-
-  get is_server_mode(): boolean | null {
-    let mod = getModule(ServerModule, this.$store);
-    return mod.serverMode;
-  }
+  eval_info: number | null = null;
   /**
    * The currently selected file, if one exists.
    * Controlled by router.
    */
-  get file_filter(): FileID | null {
-    let id_string: string = this.$route.params.id;
-    console.log('file_filter: ' + id_string);
-    let as_int = parseInt(id_string);
-    let result: FileID | null;
-    if (isNaN(as_int)) {
-      result = null;
-    } else {
-      result = as_int as FileID;
-    }
-    console.log('file_filter result: ' + result);
 
-    // Route if necessary
-    let redir = need_redirect_file(
-      result,
-      getModule(InspecDataModule, this.$store)
-    );
-    console.log('redir: ' + redir);
-    if (redir !== 'ok') {
-      if (redir === 'root') {
-        this.$router.push('/home');
-      } else {
-        this.$router.push(`/results/${redir}`);
-        result = redir;
-      }
-    }
+  get file_filter(): FileID[] {
+    return FilteredDataModule.selected_file_ids;
+  }
 
-    return result;
+  // Returns true if no files are uploaded
+  get no_files(): boolean {
+    return InspecDataModule.allFiles.length === 0;
   }
 
   /**
@@ -270,7 +284,7 @@ export default class Results extends ResultsProps {
     return {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
-      fromFile: this.file_filter || undefined,
+      fromFile: this.file_filter,
       tree_filters: this.tree_filters,
       search_term: this.search_term,
       omit_overlayed_controls: true,
@@ -285,7 +299,7 @@ export default class Results extends ResultsProps {
     return {
       status: this.status_filter || undefined,
       severity: this.severity_filter || undefined,
-      fromFile: this.file_filter || undefined,
+      fromFile: this.file_filter,
       search_term: this.search_term,
       omit_overlayed_controls: true
     };
@@ -301,17 +315,6 @@ export default class Results extends ResultsProps {
     this.control_selection = null;
     this.search_term = '';
     this.tree_filters = [];
-  }
-
-  profile_page() {
-    this.dialog = false;
-    this.$router.push('/profile');
-  }
-
-  log_out() {
-    getModule(ServerModule, this.$store).clear_token();
-    this.dialog = false;
-    this.$router.push('/');
   }
 
   /**
@@ -333,8 +336,7 @@ export default class Results extends ResultsProps {
     }
 
     // Logic to check: are any files actually visible?
-    let filter = getModule(FilteredDataModule, this.$store);
-    if (filter.controls(this.all_filter).length === 0) {
+    if (FilteredDataModule.controls(this.all_filter).length === 0) {
       this.filter_snackbar = true;
     } else {
       this.filter_snackbar = false;
@@ -347,34 +349,65 @@ export default class Results extends ResultsProps {
   /**
    * The title to override with
    */
-  get curr_title(): String | undefined {
-    if (this.file_filter !== null) {
-      let store = getModule(InspecDataModule, this.$store);
-      let file = store.allFiles.find(f => f.unique_id === this.file_filter);
+  get curr_title(): string | undefined {
+    if (this.file_filter.length == 1) {
+      let file = InspecDataModule.allFiles.find(
+        f => f.unique_id === this.file_filter[0]
+      );
       if (file) {
-        //console.log("file: " + JSON.stringify(file));
         return file.filename;
       }
     }
-    return undefined;
+    if (this.file_filter.length > 1) {
+      return this.file_filter.length + ' files selected';
+    } else {
+      return 'No files selected';
+    }
   }
 
-  /**
-   * Invoked when file(s) are loaded.
-   */
-  on_got_files(ids: FileID[]) {
-    // Close the dialog
-    this.dialog = false;
-
-    // If just one file, focus it
-    if (ids.length === 1) {
-      this.$router.push(`/results/${ids[0]}`);
+  //changes width of eval info if it is in server mode and needs more room for tags
+  get info_width(): number {
+    if (BackendModule.serverMode) {
+      return 500;
     }
+    return 300;
+  }
 
-    // If more than one, focus all.
-    // TODO: Provide support for focusing a subset of files
-    else if (ids.length > 1) {
-      this.$router.push(`/results/all`);
+  /** Flat representation of all profiles that ought to be visible  */
+  get visible_profiles(): Readonly<context.ContextualizedProfile[]> {
+    return FilteredDataModule.profiles(this.all_filter.fromFile);
+  }
+
+  get root_profiles(): context.ContextualizedProfile[] {
+    // Strip to roots
+    let profiles = this.visible_profiles.filter(
+      p => p.extended_by.length === 0
+    );
+    return profiles;
+  }
+
+  //gets profile ids for the profData component to display corresponding info
+  get prof_ids(): number[] {
+    let ids = [];
+    for (let prof of this.root_profiles) {
+      if (!isFromProfileFile(prof)) {
+        ids.push(
+          (prof.sourced_from as SourcedContextualizedEvaluation).from_file
+            .unique_id
+        );
+      } else {
+        ids.push(prof.from_file.unique_id);
+      }
+    }
+    return ids;
+  }
+
+  //basically a v-model for the eval info cards when there is no slide group
+  toggle_prof(index: number) {
+    if (index == this.eval_info) {
+      this.eval_info = null;
+    } else {
+      this.eval_info = index;
     }
   }
 }

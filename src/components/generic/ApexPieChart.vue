@@ -16,8 +16,7 @@ import Component from 'vue-class-component';
 import VueApexCharts from 'vue-apexcharts';
 import {ApexOptions, exec} from 'apexcharts';
 import {install} from 'vuetify/es5/install';
-import {getModule} from 'vuex-module-decorators';
-import ColorHackModule from '@/store/color_hack';
+import {ColorHackModule} from '@/store/color_hack';
 
 // Represents a slice of the pie.
 export interface Category<C extends string> {
@@ -39,7 +38,9 @@ function isCategory(x: any): x is Category<string> {
 const ApexPieChartProps = Vue.extend({
   props: {
     categories: Array, // Should be of type Category[]
-    series: Array // Should be of type number[]
+    series: Array, // Should be of type number[]
+    center_label: String,
+    center_value: String
   }
 });
 
@@ -105,9 +106,6 @@ export default class ApexPieChart extends ApexPieChartProps {
 
   // Generate the chart options based on _categories
   get chartOptions(): ApexOptions {
-    // Apex charts does not support color names; must use color hack module
-    let colors = getModule(ColorHackModule, this.$store);
-
     return {
       labels: this._categories.map(cat => cat.label),
       dataLabels: {
@@ -120,6 +118,23 @@ export default class ApexPieChart extends ApexPieChartProps {
         },
         labels: {
           useSeriesColors: true
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              value: {color: '#99a2ac'},
+              total: {
+                show: !!(this.center_label && this.center_value),
+                label: this.center_label,
+                showAlways: true,
+                color: '#008FFB',
+                formatter: () => this.center_value
+              }
+            }
+          }
         }
       },
       chart: {
@@ -150,7 +165,10 @@ export default class ApexPieChart extends ApexPieChartProps {
         }
       },
       stroke: {width: 0},
-      colors: this._categories.map(cat => colors.lookupColor(cat.color))
+      // Apex charts does not support color names; must use color hack module
+      colors: this._categories.map(cat =>
+        ColorHackModule.lookupColor(cat.color)
+      )
     };
   }
 }

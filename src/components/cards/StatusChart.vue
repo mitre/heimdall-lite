@@ -2,6 +2,8 @@
   <ApexPieChart
     :categories="categories"
     :series="series"
+    :center_label="center_label"
+    :center_value="center_value"
     @category-selected="onSelect"
   />
 </template>
@@ -10,15 +12,16 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import ApexPieChart, {Category} from '@/components/generic/ApexPieChart.vue';
-import {getModule} from 'vuex-module-decorators';
-import StatusCountModule from '@/store/status_counts';
+import {StatusCountModule} from '@/store/status_counts';
 import {ControlStatus} from 'inspecjs';
 
 // We declare the props separately to make props types inferable.
 const StatusChartProps = Vue.extend({
   props: {
     value: String, // The currently selected status, or null
-    filter: Object // Of type Filer from filteredData
+    filter: Object, // Of type Filer from filteredData
+    show_compliance: Boolean
+    //supress: Boolean // Supress status selection
   }
 });
 
@@ -60,14 +63,36 @@ export default class StatusChart extends StatusChartProps {
     }
   ];
 
+  get center_label(): string {
+    if (this.show_compliance) {
+      return 'Compliance:';
+    }
+    return '';
+  }
+
+  get center_value(): string {
+    if (this.show_compliance) {
+      let passed = StatusCountModule.countOf(this.filter, 'Passed');
+      let total =
+        passed +
+        StatusCountModule.countOf(this.filter, 'Failed') +
+        StatusCountModule.countOf(this.filter, 'Profile Error') +
+        StatusCountModule.countOf(this.filter, 'Not Reviewed');
+      if (total == 0) {
+        return '0%';
+      } else {
+        return '' + Math.round((100.0 * passed) / total) + '%';
+      }
+    } else return '';
+  }
+
   get series(): number[] {
-    let counts: StatusCountModule = getModule(StatusCountModule, this.$store);
     return [
-      counts.countOf(this.filter, 'Passed'),
-      counts.countOf(this.filter, 'Failed'),
-      counts.countOf(this.filter, 'Not Applicable'),
-      counts.countOf(this.filter, 'Not Reviewed'),
-      counts.countOf(this.filter, 'Profile Error')
+      StatusCountModule.countOf(this.filter, 'Passed'),
+      StatusCountModule.countOf(this.filter, 'Failed'),
+      StatusCountModule.countOf(this.filter, 'Not Applicable'),
+      StatusCountModule.countOf(this.filter, 'Not Reviewed'),
+      StatusCountModule.countOf(this.filter, 'Profile Error')
     ];
   }
 
