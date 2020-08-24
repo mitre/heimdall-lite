@@ -1,10 +1,7 @@
 <template>
-  <v-dialog v-model="dialog" width="75%">
+  <v-dialog :value="value" @input="forwardModal" width="75%">
     <!-- clickable slot passes the activator prop up to parent 
         This allows the parent to pass in a clickable icon -->
-    <template v-slot:activator="{on}">
-      <slot name="clickable" v-bind:on="on"> </slot>
-    </template>
 
     <v-card>
       <v-card-title class="headline grey" primary-title
@@ -29,20 +26,7 @@
         <hr />
         <br />
         <h2>
-          2. Navigate to Containers, and make sure your container has at least
-          Blob level access.
-        </h2>
-        <br />
-        <v-img src="@/assets/containerNav.png" />
-        <br />
-        <v-img src="@/assets/containers.png" />
-        <br />
-        <v-img src="@/assets/changeAccessLevel.png" />
-        <br />
-        <hr />
-        <br />
-        <h2>
-          3. Navigate to CORS in the sidebar. Then set Allowed origin to your
+          2. Navigate to CORS in the sidebar. Then set Allowed origin to your
           host location, in our case 'Heimdall-lite.mitre.org', Allowed headers
           to *, and set Allowed methods to GET,HEAD.
         </h2>
@@ -52,7 +36,7 @@
         <hr />
         <br />
         <h2>
-          4. Navigate to Shared access signature in the sidebar. Select Service,
+          3. Navigate to Shared access signature in the sidebar. Select Service,
           Container, and Object for Allowed resource type.
         </h2>
         <br />
@@ -61,7 +45,7 @@
         <hr />
         <br />
         <h2>
-          5. Click "Generate SAS and connection" string to get your SAS token
+          4. Click "Generate SAS and connection" string to get your SAS token
           and Connection String.
         </h2>
         <br />
@@ -70,7 +54,7 @@
         <hr />
         <br />
         <h2>
-          6. Copy and paste your connection string into Heimdall-lite.
+          5. Copy and paste your connection string into Heimdall-lite.
         </h2>
         <br />
         <v-img src="@/assets/HeimdallAzureConnection.png" />
@@ -78,7 +62,7 @@
         <hr />
         <br />
         <h2>
-          7. Select the container and files you wish to load.
+          6. Select the container and files you wish to load.
         </h2>
         <br />
         <v-img src="@/assets/selectContainer.png" />
@@ -93,7 +77,9 @@
       <v-divider></v-divider>
 
       <v-card-actions>
-        <v-btn color="primary" text @click="dialog = false">Close Window</v-btn>
+        <v-btn color="primary" text @click="forwardModal(false)"
+          >Close Window</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -104,16 +90,20 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import {getModule} from 'vuex-module-decorators';
-import AppInfoModule from '@/store/app_info';
+import {AppInfoModule} from '@/store/app_info';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
-  props: {}
+  props: {
+    value: Boolean
+  }
 });
 @Component({
   components: {}
 })
 export default class HelpModal extends Props {
-  dialog: boolean = false;
+  forwardModal(show: boolean) {
+    this.$emit('input', show);
+  }
 }
 </script>

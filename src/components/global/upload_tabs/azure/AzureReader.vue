@@ -2,17 +2,14 @@
   <v-stepper v-model="step" vertical>
     <v-stepper-step :complete="!!storage_client" step="1">
       <div>
-        Account Credentials {{ step === 1 ? shown_error : '' }}
-        <AzureHelpModal>
-          <template v-slot:clickable="{on}">
-            <v-btn v-on="on" text small>
-              <v-icon small>mdi-help-circle</v-icon>
-              <span class="d-none d-sm-inline pl-3" style="padding-top: 1px;"
-                >Help</span
-              >
-            </v-btn>
-          </template>
-        </AzureHelpModal>
+        Account Credentials
+        <AzureHelpModal v-model="help_dialogue" />
+        <v-btn @click="help_dialogue = true" text small>
+          <v-icon small>mdi-help-circle</v-icon>
+          <span class="d-none d-sm-inline pl-3" style="padding-top: 1px;"
+            >Help</span
+          >
+        </v-btn>
       </div>
     </v-stepper-step>
 
@@ -27,7 +24,7 @@
     />
 
     <v-stepper-step :complete="!!container_client" step="2">
-      Select Container {{ step === 2 ? shown_error : '' }}
+      Select Container
     </v-stepper-step>
 
     <ContainerList
@@ -37,7 +34,7 @@
     />
 
     <v-stepper-step step="3">
-      Select Files {{ step === 3 ? shown_error : '' }}
+      Select Files
     </v-stepper-step>
 
     <BlobList
@@ -62,7 +59,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import path from 'path';
 import {getModule} from 'vuex-module-decorators';
-import InspecIntakeModule, {
+import {
+  InspecIntakeModule,
   FileID,
   next_free_file_ID
 } from '@/store/report_intake';
@@ -103,6 +101,9 @@ const Props = Vue.extend({
   }
 })
 export default class AzureReader extends Props {
+  /** Triggers help modal */
+  help_dialogue: boolean = false;
+
   /** What error is currently shown, if any. Shared between stages. */
   error: string | null = null;
 
@@ -138,10 +139,20 @@ export default class AzureReader extends Props {
   container_name: string = '';
 
   get shown_error(): string {
-    if (this.error) {
-      return ` - ${this.error}`;
-    } else {
+    if (!this.error) {
       return '';
+    } else if ((this.error + '').includes('Failed to send request to')) {
+      return ` - Error: Request failed to send request. Make sure your CORS is properly setup. (see step 2 in help)`;
+    } else if (
+      (this.error + '').includes('AuthorizationResourceTypeMismatch')
+    ) {
+      return ` - Error: AuthorizationResourceTypeMismatch. Make you've selected Service, Container, and Object for resource types. (see step 3 in help)`;
+    } else if ((this.error + '').includes('AuthenticationFailed')) {
+      return ` - Error: AuthenticationFailed. Make sure your connection string is not expired. You may have to generate a new connection string. (see step 4 in help)`;
+    } else if ((this.error + '').includes('unable to extract')) {
+      return ` - Error: Invalid Connection String. (see step 2, 3, and 4 in help)`;
+    } else {
+      return ` - ${this.error}`;
     }
   }
 
@@ -285,6 +296,29 @@ export default class AzureReader extends Props {
    */
   handle_error(error: any): void {
     this.error = error;
+    this.$toasted.global.error({
+      message: this.shown_error,
+      isDark: this.$vuetify.theme.dark,
+      action: [
+        {
+          text: 'Show Help',
+          onClick: (_: any, toast_object: any) => {
+            toast_object.goAway(0);
+            this.help_dialogue = true;
+          }
+        },
+        {
+          text: 'Report Issue',
+          href:
+            'https://github.com/mitre/heimdall-lite/issues/new?assignees=&labels=bug&template=bug_report.md&title='
+        },
+        {
+          text: 'Dismiss',
+          onClick: (_: any, toast_object: any) => toast_object.goAway(0)
+        }
+      ]
+    });
+    this.step = 1;
   }
 
   /**
@@ -378,12 +412,11 @@ export default class AzureReader extends Props {
 
     // Generate file id for it, and prep module for load
     let unique_id = next_free_file_ID();
-    let intake_module = getModule(InspecIntakeModule, this.$store);
 
     // Fetch it from azure, and promise to submit it to be loaded afterwards
     return download_blob_file(this.container_client, item.name)
       .then((content: String) => {
-        return intake_module.loadText({
+        return InspecIntakeModule.loadText({
           text: content.valueOf(),
           filename: this.basename(item.name!).valueOf(),
           unique_id

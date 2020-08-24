@@ -1,10 +1,7 @@
 <template>
-  <v-dialog v-model="dialog" width="75%">
+  <v-dialog :value="value" @input="forwardModal" width="75%">
     <!-- clickable slot passes the activator prop up to parent 
         This allows the parent to pass in a clickable icon -->
-    <template v-slot:activator="{on}">
-      <slot name="clickable" v-bind:on="on"> </slot>
-    </template>
 
     <v-card>
       <v-card-title class="headline grey" primary-title
@@ -80,7 +77,7 @@
         <hr />
         <br />
         <h2>
-          7. Type in the name of the bucket and proess the button with the load
+          7. Type in the name of the bucket and press the button with the load
           icon.
         </h2>
         <br />
@@ -100,7 +97,9 @@
       <v-divider></v-divider>
 
       <v-card-actions>
-        <v-btn color="primary" text @click="dialog = false">Close Window</v-btn>
+        <v-btn color="primary" text @click="forwardModal(false)"
+          >Close Window</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -111,16 +110,20 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import {getModule} from 'vuex-module-decorators';
-import AppInfoModule from '@/store/app_info';
+import {AppInfoModule} from '@/store/app_info';
 
 // We declare the props separately to make props types inferable.
 const Props = Vue.extend({
-  props: {}
+  props: {
+    value: Boolean
+  }
 });
 @Component({
   components: {}
 })
 export default class AWSHelpModal extends Props {
-  dialog: boolean = false;
+  forwardModal(show: boolean) {
+    this.$emit('input', show);
+  }
 }
 </script>
