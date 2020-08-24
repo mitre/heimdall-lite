@@ -50,6 +50,20 @@ module.exports = {
   },
   chainWebpack: config => {
     config.module
+      .rule('fonts')
+      .test(/\.(ttf|otf|eot|woff|woff2)$/)
+      .use('url-loader')
+      .loader('url-loader')
+      .tap(options => {
+        options = {
+          // limit: 10000,
+          name: './fonts/[name].[ext]',
+          publicPath: process.env.NODE_ENV === 'production' ? './' : '/'
+        };
+        return options;
+      })
+      .end();
+    config.module
       .rule('vue')
       .use('vue-svg-inline-loader')
       .loader('vue-svg-inline-loader')

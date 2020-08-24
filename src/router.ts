@@ -56,7 +56,7 @@ const router = new Router({
     },
     {
       path: '*',
-      redirect: '/results/all',
+      redirect: '/',
       meta: {requiresAuth: true}
     }
   ]
@@ -64,7 +64,7 @@ const router = new Router({
 
 router.beforeEach((to, _, next) => {
   BackendModule.CheckForServer().then(() => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (to && to.matched.some(record => record.meta.requiresAuth)) {
       if (BackendModule.serverMode && !BackendModule.token) {
         next('/login');
         return;

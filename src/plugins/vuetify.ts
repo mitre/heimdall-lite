@@ -43,6 +43,7 @@ Vue.toasted.register(
     // The vue component passes in current dark mode setting, and the toast is adjusted
     // to be high contrast
     options.className += payload.isDark ? ' invert' : '';
+    Object.assign(options, payload);
 
     // Display message passed by vue component
     return 'ERROR: ' + payload.message;

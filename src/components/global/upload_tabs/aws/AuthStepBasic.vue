@@ -17,6 +17,12 @@
         :type="show_secret ? 'text' : 'password'"
         @click:append="show_secret = !show_secret"
       />
+      <v-text-field
+        :value="region"
+        @input="change_region"
+        label="AWS Region  (e.g. us-east-2)"
+        :rules="[req_rule]"
+      />
     </v-form>
     <v-btn
       color="primary"
@@ -56,13 +62,15 @@ import FileList from '@/components/global/upload_tabs/aws/FileList.vue';
 const Props = Vue.extend({
   props: {
     access_token: String,
-    secret_token: String
+    secret_token: String,
+    region: String
   }
 });
 
 /** Localstorage keys */
 const local_access_token = new LocalStorageVal<string>('aws_s3_access_token');
 const local_secret_token = new LocalStorageVal<string>('aws_s3_secret_token');
+const local_region = new LocalStorageVal<string>('aws_s3_region');
 
 /**
  * File reader component for taking in inspec JSON data.
@@ -97,11 +105,17 @@ export default class S3Reader extends Props {
     this.$emit('update:secret_token', new_value);
   }
 
+  change_region(new_value: string) {
+    local_region.set(new_value);
+    this.$emit('update:region', new_value);
+  }
+
   /** On mount, try to look up stored auth info */
   mounted() {
     // Load our credentials
     this.change_access_token(local_access_token.get_default(''));
     this.change_secret_token(local_secret_token.get_default(''));
+    this.change_region(local_region.get_default(''));
   }
 }
 </script>

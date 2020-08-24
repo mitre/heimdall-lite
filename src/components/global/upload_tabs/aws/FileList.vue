@@ -91,7 +91,8 @@ const Props = Vue.extend({
   props: {
     auth: Object, // Can be null, but shouldn't be!
     files: Array, // List of S3 objects of current files
-    error: String
+    error: String,
+    region: String
   }
 });
 
@@ -127,7 +128,12 @@ export default class FileList extends Props {
     let unique_id = next_free_file_ID();
 
     // Fetch it from s3, and promise to submit it to be loaded afterwards
-    await fetch_s3_file(this._auth.creds, file.Key!, this.form_bucket_name)
+    await fetch_s3_file(
+      this._auth.creds,
+      file.Key!,
+      this.form_bucket_name,
+      this.region
+    )
       .then(content => {
         return InspecIntakeModule.loadText({
           text: content,

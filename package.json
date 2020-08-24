@@ -28,6 +28,7 @@
     "test:unit": "jest"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.0.2",
     "@types/chroma-js": "^1.4.3",
     "@types/concat-stream": "^1.6.0",
     "@types/d3": "^5.7.2",

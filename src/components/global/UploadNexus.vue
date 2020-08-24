@@ -19,6 +19,8 @@
 
         <v-tab href="#uploadtab-s3">S3 Bucket</v-tab>
 
+        <v-tab href="#uploadtab-azure">Azure Blob</v-tab>
+
         <v-tab href="#uploadtab-splunk">Splunk</v-tab>
         <v-spacer />
         <v-divider />
@@ -41,6 +43,10 @@
           <S3Reader @got-files="got_files" />
         </v-tab-item>
 
+        <v-tab-item value="uploadtab-azure">
+          <AzureReader class="pa-4" @got-files="got_files" />
+        </v-tab-item>
+
         <v-tab-item value="uploadtab-splunk">
           <SplunkReader @got-files="got_files" />
         </v-tab-item>
@@ -61,6 +67,7 @@ import S3Reader from '@/components/global/upload_tabs/aws/S3Reader.vue';
 import SplunkReader from '@/components/global/upload_tabs/splunk/SplunkReader.vue';
 import SampleList from '@/components/global/upload_tabs/SampleList.vue';
 import {LocalStorageVal} from '@/utilities/helper_util';
+import AzureReader from '@/components/global/upload_tabs/azure/AzureReader.vue';
 import {FilteredDataModule} from '@/store/data_filters';
 
 const local_tab = new LocalStorageVal<string>('nexus_curr_tab');
@@ -83,6 +90,7 @@ const Props = Vue.extend({
     FileReader,
     HelpFooter,
     S3Reader,
+    AzureReader,
     SplunkReader,
     SampleList
   }
