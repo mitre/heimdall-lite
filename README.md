@@ -1,4 +1,4 @@
-# heimdall-lite v2.0
+# MUST READ: THIS PACKAGE HAS BEEN MOVED
 
 This repository has been moved to https://github.com/mitre/heimdall2, please update any links accordingly.
 
